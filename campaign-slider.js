@@ -25,6 +25,9 @@
   let active = 0;
   let timer = 0;
   let focusInside = false;
+  let touchInside = false;
+  let inView = true;
+  let pointerOrigin = null;
 
   function language() {
     const currentLanguage = document.documentElement.lang;
@@ -54,6 +57,10 @@
     });
   }
 
+  function nextDelay() {
+    return window.matchMedia('(max-width: 760px)').matches ? 6400 : 5200;
+  }
+
   let scrollFrame = 0;
   function updateParallax() {
     scrollFrame = 0;
@@ -71,17 +78,46 @@
   function clearTimer() { window.clearInterval(timer); timer = 0; }
   function startTimer() {
     clearTimer();
-    if (!focusInside && !reducedMotion.matches && !document.hidden) {
-      timer = window.setInterval(() => show(active + 1), 4400);
+    if (!focusInside && !touchInside && inView && !reducedMotion.matches && !document.hidden) {
+      timer = window.setInterval(() => show(active + 1), nextDelay());
     }
   }
 
+  root.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'touch' || event.isPrimary === false) return;
+    pointerOrigin = { x: event.clientX, y: event.clientY };
+    touchInside = true;
+    clearTimer();
+  }, { passive: true });
+  root.addEventListener('pointerup', event => {
+    if (!pointerOrigin || event.pointerType !== 'touch') return;
+    const deltaX = event.clientX - pointerOrigin.x;
+    const deltaY = event.clientY - pointerOrigin.y;
+    pointerOrigin = null;
+    touchInside = false;
+    if (Math.abs(deltaX) >= 48 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
+      show(active + (deltaX < 0 ? 1 : -1));
+    }
+    startTimer();
+  }, { passive: true });
+  root.addEventListener('pointercancel', () => {
+    pointerOrigin = null;
+    touchInside = false;
+    startTimer();
+  }, { passive: true });
   root.addEventListener('focusin', () => { focusInside = true; clearTimer(); });
   root.addEventListener('focusout', (event) => {
     if (!root.contains(event.relatedTarget)) { focusInside = false; startTimer(); }
   });
   document.addEventListener('visibilitychange', startTimer);
   reducedMotion.addEventListener?.('change', () => { updateParallax(); startTimer(); });
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      inView = entries.some(entry => entry.isIntersecting);
+      startTimer();
+    }, { threshold: 0.15 });
+    observer.observe(root);
+  }
   document.addEventListener('melatoni:language-change', renderLanguage);
   renderLanguage();
   show(0);
