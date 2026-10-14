@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#F7F7F3" />
+  <meta name="description" content="Melatoni ilə əlaqə saxlayın. Təklif və fikirlərinizi bizə yazın." />
+  <title>Əlaqə — Melatoni</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="contact.css" />
+  <link rel="stylesheet" href="typography.css" />
+  <link rel="stylesheet" href="motion.css" />
+  <link rel="stylesheet" href="brand-refresh.css" />
+  <link rel="stylesheet" href="header-scroll.css" />
+  <link rel="stylesheet" href="soft-header.css" />
+  <link rel="stylesheet" href="cookie-consent.css" />
+</head>
+<body class="contact-body">
+  <header class="site-header contact-header">
+    <button class="icon-button menu-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
+    <a class="brand" href="index.html" aria-label="Melatoni home"><img src="assets/melatoni-logo.png" alt="Melatoni — The Art of Sleep" /></a>
+    <nav class="main-nav" aria-label="Main navigation"><a href="index.html#collections" data-i18n="navCollections">Kolleksiyalar</a><a href="index.html#bedroom" data-i18n="navBedroom">Yataq otağı</a><a href="index.html#products" data-i18n="navPillows">Yastıq və yorğan</a><a href="about.html" data-i18n="navAbout">Haqqımızda</a><a class="nav-contact active" href="contact.html" data-i18n="navContact">Əlaqə</a></nav>
+    <div class="header-actions"><label class="lang-wrap"><span class="sr-only">Language</span><select id="language" aria-label="Language"><option value="az">AZ</option><option value="ru">RU</option><option value="en">EN</option></select></label></div>
+  </header>
+  <main class="contact-page">
+    <div class="contact-intro">
+      <p class="eyebrow"><span data-i18n="contactEyebrow">MELATONI İLƏ ƏLAQƏ</span></p>
+      <h1 data-i18n="contactTitle">Sizi<br/><em>dinləyirik.</em></h1>
+      <p class="contact-lead" data-i18n="contactLead">Fikirləriniz, suallarınız və təklifləriniz bizim üçün dəyərlidir. Bizə bir qeyd yazın.</p>
+      
+      <a class="contact-phone" href="https://wa.me/994514188764" target="_blank" rel="noreferrer"><span data-i18n="contactPhoneLabel">Birbaşa danışmaq istərdiniz?</span><strong>+994 51 418 87 64 ↗</strong></a>
+    </div>
+    <section class="contact-form-card" aria-labelledby="formTitle">
+      <div class="form-card-head"><h2 id="formTitle" data-i18n="formTitle">Bizə qeyd yazın</h2></div>
+      <form id="contactForm">
+        <label class="contact-field"><span data-i18n="nameLabel">Adınız</span><input name="name" type="text" autocomplete="name" placeholder="Ad və soyad" data-i18n-placeholder="namePlaceholder" required /></label>
+        <label class="contact-field"><span data-i18n="emailLabel">E-poçt ünvanınız</span><input name="email" type="email" autocomplete="email" placeholder="adiniz@email.com" required /></label>
+        <label class="contact-field"><span data-i18n="messageLabel">Mesajınız</span><textarea name="message" rows="6" placeholder="Təklifinizi, sualınızı və ya fikrinizi yazın..." data-i18n-placeholder="messagePlaceholder" required></textarea></label>
+        <p class="contact-form-hint" data-i18n="formHint">Göndərdikdə WhatsApp söhbəti açılacaq və mesajınız hazır görünəcək.</p>
+        <button class="button button-dark contact-submit" type="submit"><span data-i18n="sendMessage">Mesajı göndər</span><span class="arrow">↗</span></button>
+        <p class="contact-status" id="contactStatus" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+  <footer class="contact-footer"><a href="index.html" class="contact-footer-brand"><img src="assets/melatoni-logo.png" alt="Melatoni" /></a><span>© 2025 MELATONI — THE ART OF SLEEP</span><a href="about.html" data-i18n="navAbout">Haqqımızda</a><a href="index.html" data-i18n="backHome">Ana səhifəyə qayıt ↗</a></footer>
+  <script src="contact.js"></script>
+  <script src="header-scroll.js"></script>
+  <script src="cookie-consent.js"></script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,25 @@
+/* Yataş-inspired product discovery points, using Melatoni's existing bedroom imagery. */
+.showcase-image{position:relative}
+.scene-hotspots{position:absolute;inset:0;z-index:2}
+.scene-hotspot{position:absolute;left:var(--pin-x);top:var(--pin-y);width:0;height:0;z-index:2}
+.scene-pin{position:absolute;left:0;top:0;display:grid;place-items:center;width:25px;height:25px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.16);transform:translate(-50%,-50%);cursor:pointer;z-index:2}
+.scene-pin span{display:block;width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 1px 7px rgba(24,36,45,.24);transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
+.scene-pin:hover span,.scene-hotspot.is-open .scene-pin span,.scene-pin:focus-visible span{transform:scale(1.26);box-shadow:0 0 0 6px rgba(255,255,255,.27),0 2px 12px rgba(24,36,45,.26)}
+.scene-pin:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.scene-product{position:absolute;left:18px;top:0;width:min(270px,calc(100vw - 72px));padding:9px;background:rgba(255,255,255,.97);box-shadow:0 12px 32px rgba(16,36,53,.2);opacity:0;visibility:hidden;transform:translateY(7px);transition:opacity .2s ease,transform .24s cubic-bezier(.2,.8,.2,1),visibility .2s;z-index:3;backdrop-filter:blur(8px)}
+.scene-hotspot[data-side="left"] .scene-product{left:auto;right:18px}
+.scene-hotspot[data-vertical="up"] .scene-product{top:auto;bottom:0}
+.scene-hotspot.is-open .scene-product{opacity:1;visibility:visible;transform:translateY(0)}
+.scene-product-row{display:grid;grid-template-columns:78px minmax(0,1fr);gap:12px;align-items:center}
+.scene-product-image{display:block;width:78px;height:78px;object-fit:cover;background:#f0f1ef}
+.scene-product-copy{min-width:0}
+.scene-product-name{display:block;margin:0 0 7px;color:#16293a;font-size:13px;line-height:1.35;font-weight:600}
+.scene-product-price{display:block;color:#355d79;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.scene-product-link{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:9px;padding:10px 11px;background:#142536;color:#fff;text-decoration:none;font-size:11px;font-weight:600;transition:background .18s ease}
+.scene-product-link:hover{background:#245b82}
+.scene-all-products{position:absolute;left:clamp(14px,2vw,28px);bottom:clamp(14px,2vw,24px);z-index:2;display:inline-flex;align-items:center;gap:24px;padding:14px 19px;background:rgba(255,255,255,.97);color:#142536;text-decoration:none;font-size:14px;font-weight:600;transition:transform .2s ease,background .2s ease}
+.scene-all-products:hover{transform:translateY(-2px);background:#fff}
+.scene-all-products span{color:#3f7da3;font-size:17px}
+@media(max-width:760px){.scene-pin{width:30px;height:30px}.scene-pin span{width:11px;height:11px}.scene-product{width:min(244px,calc(100vw - 58px));padding:8px}.scene-product-row{grid-template-columns:64px minmax(0,1fr);gap:10px}.scene-product-image{width:64px;height:68px}.scene-product-name{font-size:12px}.scene-product-price{font-size:12px}.scene-product-link{padding:9px;font-size:10px}.scene-all-products{left:9px;bottom:9px;padding:11px 13px;gap:12px;font-size:12px}}
+@media(max-width:430px){.scene-hotspot[data-side="left"] .scene-product{right:12px}.scene-product{width:min(222px,calc(100vw - 48px))}.scene-product-row{grid-template-columns:54px minmax(0,1fr)}.scene-product-image{width:54px;height:60px}.scene-product-name{font-size:11px}.scene-all-products{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.scene-pin span,.scene-product,.scene-product-link,.scene-all-products{transition:none}}

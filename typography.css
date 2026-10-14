@@ -1,0 +1,98 @@
+/* Melatoni type system: an editorial display face paired with a calm, readable sans. */
+:root {
+  --serif: 'Newsreader', 'Iowan Old Style', 'Baskerville', Georgia, serif;
+  --sans: 'Manrope', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --hero-serif: 'Newsreader', 'Iowan Old Style', 'Baskerville', Georgia, serif;
+  --hero-sans: 'Manrope', Inter, system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  font-size: clamp(14px, .2vw + 13.5px, 15px);
+  line-height: 1.62;
+  font-kerning: normal;
+  font-feature-settings: 'kern' 1;
+}
+
+h1, h2, h3, .product-name, .drawer-head h2 {
+  font-optical-sizing: auto;
+  text-wrap: balance;
+}
+
+.hero h1,
+.section-heading h2,
+.guide-copy h2,
+.wa-text h2,
+.editorial-copy h2,
+.newsletter h2,
+.product-content h1,
+.contact-intro h1,
+.form-card-head h2,
+.quiz-step h2,
+.quiz-result h2,
+.drawer-head h2 {
+  font-family: var(--serif);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  letter-spacing: -.035em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.eyebrow { font-size: 10px; letter-spacing: .145em; line-height: 1.45; }
+.main-nav a { font-size: 11px; letter-spacing: .035em; }
+.hero-description { max-width: 39ch; font-size: clamp(14px, .35vw + 13px, 16px); line-height: 1.72; }
+.button { font-size: 11px; letter-spacing: .045em; }
+.trust-item h3 { font-size: 12px; }
+.trust-item p { font-size: 11px; line-height: 1.55; }
+
+.shop-filter-group h3 { font-size: 11px; letter-spacing: .105em; }
+.category-filter { font-size: 11px; }
+.category-count { font-size: 10px; }
+.price-range, .price-filter > p, .shop-toolbar, .sort-control select { font-size: 10.5px; }
+.shop-toolbar strong { font-size: 12px; }
+.products-section .product-name { font-size: clamp(16px, 1.3vw, 18px); line-height: 1.22; letter-spacing: -.015em; }
+.products-section .product-price { font-size: 12px; font-variant-numeric: tabular-nums; }
+.products-section .product-desc { font-size: 11px; line-height: 1.55; }
+.products-section .order-link { font-size: 10px; letter-spacing: .055em; }
+.shop-end-note { font-size: 13px; }
+.footer-col h3, .footer-contact h3 { font-size: 11px; letter-spacing: .06em; }
+.footer-col a, .footer-contact a, .footer-contact span { font-size: 11px; }
+.footer-bottom { font-size: 9px; }
+
+.product-kicker, .product-category { font-size: 10px; letter-spacing: .12em; }
+.price-line strong { font-size: 26px; font-variant-numeric: tabular-nums; }
+.price-note { font-size: 11px; line-height: 1.6; }
+.detail-description { font-size: 13px; line-height: 1.75; }
+.option-heading h2, .product-specs h2 { font-size: 19px; letter-spacing: -.015em; }
+.option-heading > span, .size-choice { font-size: 10.5px; }
+.product-specs dt, .product-specs dd { font-size: 11px; line-height: 1.55; }
+.detail-order, .detail-add { font-size: 10px; letter-spacing: .06em; }
+.detail-status, .back-row, .breadcrumbs { font-size: 10px; }
+.option-note { font-size: 9.5px; }
+
+.contact-intro h1 { font-size: clamp(52px, 6.2vw, 82px); line-height: .98; letter-spacing: -.045em; }
+.contact-lead { font-size: 15px; line-height: 1.75; }
+.form-card-head h2 { font-size: clamp(31px, 3vw, 38px); line-height: 1.08; letter-spacing: -.025em; }
+.form-card-head p { font-size: 13px; line-height: 1.7; }
+.contact-field > span { font-size: 10px; letter-spacing: .095em; }
+.contact-field input, .contact-field textarea { font-size: 14px; line-height: 1.65; }
+.contact-form-hint { font-size: 10px; line-height: 1.6; }
+.contact-status { font-size: 11px; }
+.contact-footer { font-size: 9px; letter-spacing: .07em; }
+
+@media (max-width: 760px) {
+  .main-nav a { font-size: 13px; }
+  .category-filter { font-size: 10px; }
+  .products-section .product-name { font-size: 15px; }
+  .products-section .product-desc { font-size: 10px; }
+  .products-section .order-link { font-size: 9px; }
+  .hero-description { font-size: 15px; }
+  .contact-intro h1 { font-size: clamp(52px, 13vw, 68px); }
+  .contact-lead { font-size: 14px; }
+  .contact-footer span, .contact-footer a:last-child { font-size: 9px; }
+  .product-content h1 { font-size: clamp(38px, 10vw, 49px); }
+  .detail-description { font-size: 12px; }
+  .breadcrumbs { font-size: 9px; }
+  .product-specs dl > div { grid-template-columns: minmax(115px, 38%) 1fr; }
+}

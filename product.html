@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#F7F7F3" />
+  <meta name="description" content="Melatoni məhsul detalları və WhatsApp ilə sifariş." />
+  <title>Məhsul | Melatoni — The Art of Sleep</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="product-page.css" />
+  <link rel="stylesheet" href="product-material.css" />
+  <link rel="stylesheet" href="typography.css" />
+  <link rel="stylesheet" href="motion.css" />
+  <link rel="stylesheet" href="brand-refresh.css" />
+  <link rel="stylesheet" href="header-scroll.css" />
+  <link rel="stylesheet" href="soft-header.css" />
+  <link rel="stylesheet" href="cookie-consent.css" />
+</head>
+<body>
+  <header class="product-header">
+    <a href="index.html" class="product-brand" aria-label="Melatoni ana səhifə"><img src="assets/melatoni-logo.png" alt="Melatoni — The Art of Sleep" /></a>
+    <a class="back-to-shop" href="index.html#products"><span aria-hidden="true">←</span><span data-copy="back">Məhsullara qayıt</span></a>
+    <div class="product-header-tools"><a class="product-about-link" href="about.html">Haqqımızda</a><details class="lang-picker product-lang-picker"><summary aria-label="Dil seçin"><span id="productLangCurrent">AZ</span></summary><div class="lang-options"><button type="button" data-lang="az"><strong>AZ</strong><span>Azərbaycan</span></button><button type="button" data-lang="ru"><strong>RU</strong><span>Русский</span></button><button type="button" data-lang="en"><strong>EN</strong><span>English</span></button></div></details><a class="bag-shortcut" href="index.html#bag"><span class="bag-symbol" aria-hidden="true"></span><span data-copy="bag">Səbət</span><span id="bagCount">0</span></a></div>
+  </header>
+  <main class="product-main">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="index.html" data-copy="home">Ana səhifə</a><span>/</span><a href="index.html#products" data-copy="products">Məhsullar</a><span>/</span><span id="crumbName"></span></nav>
+    <section class="product-detail-layout" id="productDetail" aria-live="polite">
+      <div class="product-photo"><img id="detailImage" alt=""/><span class="image-mark">THE ART OF SLEEP</span></div>
+      <div class="product-content">
+        <p class="product-kicker"><span data-copy="brandLine">MELATONI · YUXU ÜÇÜN SEÇİLİB</span></p>
+        <p class="product-category" id="detailCategory"></p>
+        <h1 id="detailName"></h1>
+        <div class="price-line"><strong id="detailPrice"></strong><span data-copy="estimated">Təxmini qiymət</span></div>
+        <p class="price-note" data-copy="priceNote">Yekun qiymət seçilmiş rəng və ölçüyə əsasən WhatsApp-da dəqiqləşdiriləcək.</p>
+        <p class="detail-description" id="detailDescription"></p>
+        <section class="option-section"><div class="option-heading"><h2 data-copy="chooseColor">Rəng seçimi</h2><span id="selectedColorName"></span></div><div class="color-options" id="colorOptions" role="group" aria-label="Rəng seçimi"></div><p class="option-note" id="colorNote"></p></section>
+        <section class="option-section size-section" id="sizeSection"><div class="option-heading"><h2 data-copy="chooseSize">Ölçü</h2><span data-copy="sizeNote">Seçiminizi edin</span></div><div class="size-options" id="sizeOptions" role="group" aria-label="Ölçü seçimi"></div></section>
+        <div class="product-specs"><h2 data-copy="detailsTitle">Məhsul haqqında</h2><dl><div><dt data-copy="feelLabel">Material və rahatlıq</dt><dd id="detailFeel"></dd></div><div><dt data-copy="formatLabel">Ölçü / format</dt><dd id="detailFormat"></dd></div><div><dt data-copy="careLabel">Qulluq</dt><dd id="detailCare"></dd></div></dl></div>
+        <div class="detail-actions"><button class="detail-order" id="detailOrder"><span data-copy="orderWhatsapp">WhatsApp-da sifariş et</span><span aria-hidden="true">↗</span></button><button class="detail-add" id="detailAdd"><span class="mini-bag" aria-hidden="true"></span><span data-copy="addBag">Səbətə əlavə et</span></button></div>
+        <p class="detail-status" id="detailStatus" aria-live="polite"></p>
+      </div>
+    </section>
+    <section class="material-story" aria-labelledby="materialTitle">
+      <figure class="material-story-image"><img id="materialImage" alt="" loading="lazy"/><figcaption data-copy="materialCaption">Məhsulun toxuması yaxından</figcaption></figure>
+      <div class="material-story-copy"><p class="material-story-kicker" data-copy="materialEyebrow">MATERIAL · YAXINDAN</p><h2 id="materialTitle" data-copy="materialTitle">Rahatlıq toxunuşdan başlayır.</h2><p id="materialDescription"></p><p class="material-note" data-copy="materialNote">Tərkib və qulluq qaydaları məhsulun etiketində göstərilən məlumatlara əsaslanır.</p></div>
+    </section>
+    <p class="back-row"><a href="index.html#products" data-copy="browseMore">Digər məhsullara bax</a><span aria-hidden="true">↗</span></p>
+  </main>
+  <script src="products-data.js"></script>
+  <script src="product-page.js?v=material-detail-20261014"></script>
+  <script src="header-scroll.js"></script>
+  <script src="cookie-consent.js"></script>
+</body>
+</html>
+
+
+
+
+

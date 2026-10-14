@@ -1,0 +1,22 @@
+.site-header,
+.product-header {
+  transition: transform 220ms cubic-bezier(.2, .8, .2, 1), box-shadow 160ms ease-out;
+  will-change: transform;
+}
+.site-header.header-hidden,
+.product-header.header-hidden {
+  transform: translate3d(0, calc(-100% - 8px), 0);
+  pointer-events: none;
+}
+.product-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .product-header {
+    transition: none;
+    will-change: auto;
+  }
+}

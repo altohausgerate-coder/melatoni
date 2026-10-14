@@ -1,0 +1,32 @@
+.personalize-layer{position:fixed;inset:0;z-index:110;display:grid;place-items:center;padding:24px;background:rgba(28,31,30,.48);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:opacity .24s ease,visibility .24s ease}
+.personalize-layer[hidden]{display:none}
+.personalize-layer.is-open{opacity:1;visibility:visible}
+.personalize-dialog{position:relative;width:min(700px,100%);max-height:min(88vh,780px);overflow:auto;padding:clamp(30px,5vw,58px);border:1px solid rgba(26,55,78,.09);border-radius:22px;background:#fbfaf7;color:#172f44;box-shadow:0 28px 90px rgba(12,25,35,.24);outline:none;transform:translateY(14px) scale(.985);transition:transform .38s cubic-bezier(.23,1,.32,1)}
+.personalize-layer.is-open .personalize-dialog{transform:translateY(0) scale(1)}
+.personalize-close{position:absolute;top:19px;right:20px;display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:50%;background:#eef1f1;color:#506373;font-size:24px;line-height:1;cursor:pointer;transition:background .18s,transform .18s}
+.personalize-close:hover{background:#e2e8e8;transform:rotate(5deg)}
+.personalize-eyebrow{margin:0 0 18px;color:#668099;font-size:10px;font-weight:700;letter-spacing:.17em}
+.personalize-step h2{max-width:560px;margin:0 42px 12px 0;font:400 clamp(32px,5vw,48px)/1.08 var(--serif);letter-spacing:-.035em}
+.personalize-step>p:not(.personalize-privacy){max-width:520px;margin:0 0 27px;color:#647586;font-size:14px;line-height:1.7}
+.personalize-genders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.personalize-gender{display:flex;min-height:180px;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:1px solid rgba(26,55,78,.1);border-radius:17px;background:#fff;color:#183751;font-size:18px;font-weight:600;cursor:pointer;transition:transform .2s cubic-bezier(.23,1,.32,1),border-color .2s,box-shadow .2s,background .2s}
+.personalize-gender:hover{transform:translateY(-3px);border-color:#7ea9c8;background:#f5f8fa;box-shadow:0 12px 30px rgba(18,63,122,.1)}
+.personalize-gender:active,.personalize-submit:active{transform:scale(.98)}
+.personalize-symbol{display:grid;place-items:center;width:82px;height:82px;border-radius:50%;background:#eef4f7;color:#27649a;font:400 46px/1 var(--sans)}
+.personalize-skip,.personalize-back{margin-top:19px;padding:8px 0;border:0;background:none;color:#526d83;font-size:12px;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.personalize-back{margin:0 0 20px;text-decoration:none}.personalize-back:hover,.personalize-skip:hover{color:#14559b}
+.personalize-interest-title{margin-top:0!important}
+.personalize-preference{margin:0 0 4px}.personalize-preference[hidden]{display:none}.personalize-preference h3{margin:17px 0 9px;color:#334f65;font-size:13px;font-weight:650;line-height:1.4}.personalize-preference .personalize-interests{gap:8px;margin:0 0 12px}.personalize-preference .personalize-interests button{min-height:38px;padding-inline:14px;font-size:12px}
+.personalize-interests{display:flex;flex-wrap:wrap;gap:10px;margin:5px 0 25px}
+.personalize-interests button{min-height:43px;padding:0 17px;border:1px solid rgba(26,55,78,.12);border-radius:999px;background:#fff;color:#29475f;font-size:13px;cursor:pointer;transition:background .18s,border-color .18s,color .18s,transform .18s}
+.personalize-interests button:hover{transform:translateY(-1px);border-color:#91aec2}
+.personalize-interests button[aria-pressed=true]{border-color:#183f65;background:#183f65;color:#fff}
+.personalize-submit{display:flex;min-height:52px;align-items:center;justify-content:space-between;gap:25px;padding:0 21px;border:0;border-radius:999px;background:#183f65;color:#fff;font-size:13px;font-weight:600;letter-spacing:.03em;cursor:pointer;transition:transform .18s,background .18s}
+.personalize-submit:hover{background:#245f96;transform:translateY(-1px)}.personalize-submit span{font-size:18px}
+.personalize-privacy{margin:14px 0 0!important;color:#87939c!important;font-size:11px!important;line-height:1.55!important}
+.personalize-dialog button:focus-visible{outline:3px solid #74b9df;outline-offset:3px}
+.personalize-footer-link{padding:0;border:0;background:none;color:#c0bdb3;font:inherit;font-size:10px;text-align:left;cursor:pointer}.personalize-footer-link:hover{color:#fff;text-decoration:underline;text-underline-offset:4px}
+@media(max-width:600px){.personalize-layer{align-items:end;padding:0}.personalize-dialog{width:100%;max-height:92dvh;padding:34px 22px max(25px,env(safe-area-inset-bottom));border-radius:22px 22px 0 0}.personalize-eyebrow{font-size:9px}.personalize-step h2{font-size:36px}.personalize-step>p:not(.personalize-privacy){font-size:13px;margin-bottom:20px}.personalize-genders{gap:10px}.personalize-gender{min-height:152px;font-size:16px}.personalize-symbol{width:67px;height:67px;font-size:38px}.personalize-interests{gap:8px}.personalize-interests button{min-height:40px;padding:0 13px;font-size:12px}.personalize-submit{width:100%;min-height:48px;padding:0 17px;font-size:12px}}
+
+@media(prefers-reduced-motion:reduce){.personalize-layer,.personalize-dialog,.personalize-close,.personalize-gender,.personalize-interests button,.personalize-submit{transition:none!important}.personalize-dialog{transform:none!important}}
+

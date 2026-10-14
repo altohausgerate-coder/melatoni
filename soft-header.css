@@ -1,0 +1,124 @@
+/* A softer, warmer-feeling storefront header while keeping Melatoni's blue mark. */
+:root {
+  --header-soft-bg: rgba(247, 247, 243, .92);
+  --header-soft-bg-scrolled: rgba(247, 247, 243, .97);
+  --header-soft-text: #314b5d;
+  --header-soft-muted: #657986;
+  --header-soft-line: rgba(49, 75, 93, .14);
+  --header-soft-input: rgba(229, 236, 237, .78);
+}
+.site-header,
+.product-header {
+  background: var(--header-soft-bg);
+  color: var(--header-soft-text);
+  border-color: var(--header-soft-line);
+  box-shadow: 0 5px 20px rgba(46, 62, 70, .055);
+  transition: background-color 280ms ease, border-color 280ms ease, box-shadow 280ms ease;
+  -webkit-backdrop-filter: blur(16px) saturate(118%);
+  backdrop-filter: blur(16px) saturate(118%);
+}
+.site-header.scrolled {
+  background: var(--header-soft-bg-scrolled);
+  box-shadow: 0 9px 26px rgba(46, 62, 70, .09);
+}
+.site-header .brand,
+.product-header .product-brand {
+  box-sizing: border-box;
+  padding: 3px 8px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  background: #0a4181;
+  box-shadow: 0 3px 12px rgba(23, 48, 69, .12);
+  overflow: hidden;
+}
+.site-header .main-nav a,
+.site-header .main-nav .nav-contact,
+.site-header .header-actions,
+.product-header .back-to-shop,
+.product-header .bag-shortcut,
+.product-header .lang-picker>summary {
+  color: var(--header-soft-text);
+}
+.site-header .main-nav a:hover,
+.site-header .footer a:hover {
+  color: #527d91;
+}
+.site-header .main-nav .nav-contact {
+  border-color: var(--header-soft-line);
+  background: rgba(255,255,255,.44);
+  border-radius: 14px;
+}
+.site-header .main-nav .nav-contact:hover {
+  border-color: #476b7c;
+  background: #476b7c;
+  color: #fff;
+}
+.site-header .lang-picker>summary,
+.product-header .lang-picker>summary {
+  color: var(--header-soft-text);
+  background: rgba(255,255,255,.54);
+  border-color: var(--header-soft-line);
+}
+.site-header .lang-picker>summary::after,
+.product-header .lang-picker>summary::after {
+  border-color: var(--header-soft-muted);
+}
+.site-header .icon-button,
+.product-header .bag-shortcut {
+  color: var(--header-soft-text);
+}
+.site-header .icon-button:hover {
+  border-radius: 50%;
+  background: rgba(77, 111, 128, .09);
+}
+.site-header .bag-count,
+.product-header .bag-shortcut #bagCount {
+  background: #d7e4e6;
+  color: #314b5d;
+}
+.site-header .header-search {
+  background: var(--header-soft-input);
+  color: var(--header-soft-text);
+}
+.site-header .header-search input,
+.site-header .header-search .search-toggle {
+  color: var(--header-soft-text);
+}
+.site-header .header-search input::placeholder {
+  color: #71818a;
+}
+.site-header .header-search:focus-within {
+  box-shadow: 0 0 0 3px rgba(87, 132, 151, .16);
+}
+.site-header .notifications-panel {
+  border-color: rgba(49,75,93,.1);
+  background: rgba(250,250,247,.97);
+}
+@media(max-width:760px) {
+  .site-header,
+  .site-header.scrolled {
+    background: var(--header-soft-bg-scrolled);
+  }
+  .site-header .main-nav {
+    border-top: 1px solid var(--header-soft-line);
+    background: rgba(247,247,243,.98);
+    box-shadow: 0 14px 24px rgba(46,62,70,.08);
+  }
+  .site-header .main-nav a,
+  .site-header .main-nav .nav-contact {
+    color: var(--header-soft-text);
+  }
+  .site-header .main-nav .nav-contact {
+    background: transparent;
+  }
+}
+@media(prefers-reduced-transparency:reduce) {
+  .site-header,
+  .site-header.scrolled,
+  .product-header {
+    background: #f7f7f3;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+

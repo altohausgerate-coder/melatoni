@@ -1,0 +1,42 @@
+.contact-body{min-height:100vh;background:var(--ivory)}
+.contact-header{top:0}
+.contact-header .nav-contact{color:var(--ink);border-bottom:1px solid var(--gold);padding-bottom:5px}
+.contact-page{min-height:calc(100vh - 86px);display:grid;grid-template-columns:minmax(300px,.9fr) minmax(420px,1fr);gap:clamp(50px,10vw,150px);align-items:center;max-width:1200px;margin:0 auto;padding:75px 7% 92px}
+.contact-intro .eyebrow{color:var(--brown);font:500 10px var(--hero-sans);letter-spacing:.15em;margin-bottom:23px}
+.contact-intro h1{font:500 clamp(62px,7.3vw,94px)/.92 var(--hero-serif);letter-spacing:-.035em;margin:0;color:var(--ink)}
+.contact-intro h1 em{font-style:normal;color:#947b56}
+.contact-lead{font:400 14px/1.8 var(--hero-sans);color:var(--brown);max-width:390px;margin:25px 0 29px}
+.contact-phone{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:26px}
+.contact-phone span{font:400 9px var(--hero-sans);letter-spacing:.07em;color:var(--muted)}
+.contact-phone strong{font:500 14px var(--hero-sans);color:var(--green);letter-spacing:.03em}
+.contact-form-card{background:transparent;padding:0;border:0;box-shadow:none}
+.form-card-head{margin-bottom:28px}
+.form-card-head h2{font:500 35px/1.05 var(--hero-serif);margin:0 0 24px;color:var(--ink)}
+.form-card-head p{font:400 11px/1.7 var(--hero-sans);color:var(--muted);margin:0}
+.contact-form-card form{display:grid;gap:20px}
+.contact-field{display:grid;gap:9px}
+.contact-field>span{font:500 9px var(--hero-sans);letter-spacing:.12em;text-transform:uppercase;color:#625d54}
+.contact-field input,.contact-field textarea{width:100%;border:0;border-bottom:1px solid #cfc5b5;background:transparent;border-radius:0;padding:10px 0 12px;color:var(--ink);font:400 12px/1.6 var(--hero-sans);outline:0;resize:vertical;transition:border-color .2s}
+.contact-field input:focus,.contact-field textarea:focus{border-color:#89734f}
+.contact-field textarea{min-height:112px}
+.contact-field input::placeholder,.contact-field textarea::placeholder{color:#aaa295}
+.contact-form-hint{font:400 9px/1.6 var(--hero-sans);color:var(--muted);margin:-6px 0 0}
+.contact-submit{width:100%;min-height:52px}
+.contact-status{font:400 10px/1.6 var(--hero-sans);color:var(--green);margin:0}
+.contact-footer{min-height:80px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:15px 7%;color:var(--muted);font:400 8px var(--hero-sans);letter-spacing:.09em}
+.contact-footer-brand img{width:130px;height:34px;object-fit:contain;filter:brightness(.39) sepia(.25)}
+.contact-footer a:last-child{color:var(--brown);letter-spacing:.04em}
+@media(max-width:1020px){.contact-page{gap:48px;padding-inline:5%}.contact-intro h1{font-size:76px}.contact-form-card{padding:34px}}
+@media(max-width:760px){.contact-page{min-height:calc(100svh - 68px);grid-template-columns:1fr;gap:38px;padding:55px 6% 62px}.contact-intro h1{font-size:68px}.contact-lead{font-size:13px;margin:19px 0 22px}.contact-phone{margin-top:20px}.contact-form-card{padding:0}.form-card-head h2{font-size:30px}.contact-footer{padding:14px 6%;min-height:72px;gap:10px;flex-wrap:wrap}.contact-footer-brand{width:100%}.contact-footer-brand img{height:30px}.contact-footer span,.contact-footer a:last-child{font-size:7px}}
+
+/* Contact page typography matches the storefront's quieter editorial voice. */
+.contact-intro h1{font-size:clamp(52px,6.2vw,82px);line-height:.98;letter-spacing:-.045em;font-optical-sizing:auto;text-wrap:balance}
+.contact-lead{font-size:15px;line-height:1.75}
+.form-card-head h2{font-size:clamp(31px,3vw,38px);line-height:1.08;letter-spacing:-.025em;font-optical-sizing:auto}
+.form-card-head p{font-size:13px;line-height:1.7}
+.contact-field>span{font-size:10px;letter-spacing:.095em}
+.contact-field input,.contact-field textarea{font-size:14px;line-height:1.65}
+.contact-form-hint{font-size:10px;line-height:1.6}
+.contact-status{font-size:11px}
+.contact-footer{font-size:9px;letter-spacing:.07em}
+@media(max-width:760px){.contact-intro h1{font-size:clamp(52px,13vw,68px)}.contact-lead{font-size:14px}.contact-footer span,.contact-footer a:last-child{font-size:9px}}

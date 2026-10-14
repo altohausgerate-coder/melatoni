@@ -1,0 +1,96 @@
+/* Homepage composition: fit the first view and bring the catalogue into a denser, readable rhythm. */
+.site-header { height: 78px; }
+.site-header.scrolled { height: 70px; }
+.brand img { height: 47px; }
+.search-panel { top: 78px; }
+
+.hero {
+  height: calc(100svh - 78px);
+  min-height: min(540px, calc(100svh - 78px));
+  max-height: none;
+}
+
+html { scroll-padding-top: 88px; }
+.products-section {
+  padding: clamp(46px, 5.4vh, 64px) 6.5% 72px;
+  scroll-margin-top: 0;
+}
+.products-section .products-heading {
+  margin-bottom: clamp(22px, 3.2vh, 34px);
+  align-items: flex-end;
+}
+.products-section .section-heading h2 {
+  max-width: 14ch;
+  font-size: clamp(42px, 4.2vw, 60px);
+  line-height: .99;
+}
+.products-section .shop-layout {
+  grid-template-columns: minmax(205px, 228px) minmax(0, 1fr);
+  gap: clamp(24px, 3vw, 40px);
+}
+.products-section .shop-sidebar { top: 88px; padding-right: 18px; }
+.products-section .shop-filter-group h3 { margin-bottom: 12px; font-size: 12px; }
+.products-section .category-list { gap: 1px; }
+.products-section .category-filter { padding-block: 10px; font-size: clamp(12px, .88vw, 14px); }
+.products-section .category-count { font-size: 11px; }
+.products-section .price-range,
+.products-section .price-filter > p,
+.products-section .shop-toolbar,
+.products-section .sort-control select { font-size: 12px; }
+.products-section .shop-toolbar { margin-bottom: 14px; padding-bottom: 11px; }
+.products-section .shop-toolbar strong { font-size: 14px; }
+.products-section .product-grid { gap: 28px 18px; }
+.products-section .product-image { aspect-ratio: .96; }
+.products-section .product-name { font-size: clamp(18px, 1.35vw, 21px); line-height: 1.2; }
+.products-section .product-price { font-size: 14px; }
+.products-section .product-desc { font-size: 13px; line-height: 1.5; }
+.products-section .order-link { min-height: 42px; font-size: 11px; }
+.products-section .add-to-bag { width: 42px; height: 42px; }
+
+/* Clearer catalogue hierarchy with the filters and content set slightly farther left. */
+.products-section { padding-left: 4.6%; padding-right: 6%; }
+.products-section .section-heading h2 { font-size: clamp(46px, 4.4vw, 64px); }
+.products-section .shop-layout { gap: clamp(22px, 2.5vw, 34px); }
+.products-section .shop-filter-group h3 { font-size: 13px; letter-spacing: .09em; }
+.products-section .category-filter { min-height: 42px; font-size: clamp(13px, .98vw, 15px); }
+.products-section .category-count { font-size: 12px; }
+.products-section .price-range,
+.products-section .price-filter > p,
+.products-section .shop-toolbar,
+.products-section .sort-control select { font-size: 13px; }
+.products-section .shop-toolbar strong { font-size: 15px; }
+.products-section .product-name { font-size: clamp(19px, 1.45vw, 22px); }
+.products-section .product-desc { font-size: 13px; }
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  .products-section { padding-inline: 5%; }
+  .products-section .shop-layout { grid-template-columns: minmax(180px, 205px) minmax(0, 1fr); gap: 24px; }
+  .products-section .product-name { font-size: 20px; }
+  .products-section .product-desc { font-size: 13px; }
+}
+
+@media (max-width: 760px) {
+  .site-header { height: 64px; }
+  .site-header.scrolled { height: 60px; }
+  .brand img { height: 43px; }
+  .search-panel { top: 64px; }
+  .hero { height: calc(100svh - 64px); min-height: 0; max-height: none; }
+  html { scroll-padding-top: 72px; }
+  .products-section { padding: 44px 4.5% 58px; }
+  .products-section .products-heading { margin-bottom: 22px; }
+  .products-section .section-heading h2 { font-size: clamp(38px, 8.8vw, 48px); }
+  .products-section .shop-layout { gap: 18px; }
+  .products-section .shop-sidebar { padding-bottom: 13px; }
+  .products-section .shop-filter-group h3 { font-size: 11px; }
+  .products-section .category-filter { min-height: 38px; padding: 8px 10px; font-size: 12px; }
+  .products-section .price-range { font-size: 11px; }
+  .products-section .shop-toolbar { font-size: 12px; }
+  .products-section .shop-toolbar strong { font-size: 14px; }
+  .products-section .product-grid { gap: 22px 12px; }
+  .products-section .product-image { aspect-ratio: .88; }
+  .products-section .product-name { font-size: clamp(16px, 4vw, 18px); }
+  .products-section .product-price { font-size: 12px; }
+  .products-section .product-desc { font-size: 11px; }
+  .products-section .order-link { min-height: 38px; font-size: 9px; }
+  .products-section .add-to-bag { width: 38px; height: 38px; }
+}

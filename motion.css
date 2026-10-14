@@ -1,0 +1,127 @@
+/* Shared interaction curves and motion rules for Melatoni. */
+:root {
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);
+  --ease-drawer: cubic-bezier(.32, .72, 0, 1);
+}
+
+/* Keep scroll-driven chrome from animating layout dimensions. */
+.site-header { transition: box-shadow 160ms var(--ease-out); }
+.site-header.scrolled { height: 86px; }
+.search-panel {
+  transform-origin: top right;
+  transition: transform 180ms var(--ease-out), opacity 180ms ease-out, visibility 180ms linear;
+}
+.search-panel:not(.open) { transform: translateY(-4px) scale(.985); }
+.search-panel.open { transform: none; }
+
+/* Sheets and notices animate only the properties their state actually changes. */
+.overlay { transition: opacity 180ms ease-out, visibility 180ms linear; }
+.cart-drawer { transition: none; }
+.modal-wrap { transition: opacity 180ms ease-out, visibility 180ms linear; }
+.modal-card {
+  opacity: 0;
+  transform: scale(.98);
+  transition: opacity 180ms ease-out, transform 180ms var(--ease-out);
+  transform-origin: center;
+}
+.modal-wrap.open .modal-card { opacity: 1; transform: scale(1); }
+.toast { transition: opacity 180ms ease-out, transform 180ms var(--ease-out); }
+.quiz-options button { transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease, transform 120ms var(--ease-out); }
+
+/* The language menu grows from its trigger instead of replaying keyframes. */
+.lang-options {
+  animation: none;
+  transform-origin: top right;
+  transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out), display 160ms allow-discrete;
+}
+.lang-picker:not([open]) .lang-options { display: none; opacity: 0; transform: translateY(-3px) scale(.985); }
+@starting-style {
+  .lang-picker[open] .lang-options { opacity: 0; transform: translateY(-3px) scale(.985); }
+}
+
+/* The phone navigation fades and settles; it does not animate max-height. */
+@media (max-width: 760px) {
+  .site-header.scrolled { height: 68px; }
+  .main-nav {
+    max-height: 370px;
+    padding: 9px 6% 18px;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-5px) scaleY(.985);
+    transform-origin: top;
+    pointer-events: none;
+    transition: opacity 180ms ease-out, transform 180ms var(--ease-out), visibility 180ms linear;
+  }
+  .main-nav.open {
+    max-height: 370px;
+    padding: 9px 6% 18px;
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+}
+
+/* Keep pointer hover quiet and completely absent on touch-first devices. */
+@media (hover: hover) and (pointer: fine) {
+  .category-card, .product-card { transition: transform 150ms var(--ease-out), box-shadow 150ms ease-out; }
+  .category-card:hover, .product-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(48, 39, 25, .09); }
+  .category-card img, .product-image img { transition: transform 160ms var(--ease-out); }
+  .category-card:hover img, .product-card:hover .product-image img { transform: scale(1.015); }
+  .color-choice:hover { transform: scale(1.03); }
+}
+@media (hover: none), (pointer: coarse) {
+  .category-card:hover, .product-card:hover, .category-card:hover img, .product-card:hover .product-image img, .color-choice:hover { transform: none; box-shadow: none; }
+}
+
+/* Short, staggered scroll reveals; reduced motion keeps a quiet opacity cue. */
+.motion-ready [data-motion-item] { transform: translateY(10px); transition: opacity 260ms ease-out, transform 260ms var(--ease-out); transition-delay: calc(var(--motion-order, 0) * 36ms); }
+.motion-ready [data-motion-item].is-visible { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  .cart-drawer:not(.open) { transform: translateX(105%) !important; }
+  .cart-drawer.open { transform: none !important; }
+  .motion-ready [data-motion-item] { opacity: 1; transform: none; transition: opacity 120ms ease-out !important; }
+  .hero-image, .hero-copy .eyebrow, .hero h1, .hero-description, .hero-actions, .hero-stamp, .product-photo img { animation: none !important; transform: none !important; }
+  .search-panel, .modal-card { transform: none !important; }
+  .cart-drawer, .main-nav, .category-card, .product-card, .category-card img, .product-image img, .color-choice { transition: none !important; transform: none !important; }
+  .color-choice, .size-choice, .detail-order, .detail-add, .order-link { transition: opacity 120ms ease-out, color 120ms ease-out, background-color 120ms ease-out, border-color 120ms ease-out !important; }
+  .color-choice:active, .size-choice:active, .detail-order:active, .detail-add:active, .order-link:active { transform: none !important; }
+  .category-card:hover, .product-card:hover { box-shadow: none; }
+  .search-panel, .modal-wrap, .overlay, .toast { transition: opacity 120ms ease-out, visibility 120ms linear !important; }
+  .lang-options { transition: opacity 120ms ease-out, visibility 120ms linear !important; }
+}
+
+@media (prefers-contrast: more) {
+  .product-image, .category-card, .cart-row { outline-color: currentColor; }
+}
+
+/* Long names, localized labels, missing media, and narrow viewports. */
+.product-card, .product-detail, .product-meta, .product-name, .cart-row,
+.cart-row-content, .cart-row-content h3, .product-photo, .product-info { min-width: 0; }
+.product-meta { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: start; }
+.product-name, .product-name a, .product-desc, .cart-row-content h3, .cart-variant,
+#detailName, #detailDescription, #detailFeel { overflow-wrap: anywhere; word-break: normal; }
+.product-price { max-width: 12ch; white-space: normal; text-align: right; overflow-wrap: anywhere; }
+.product-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.product-image.image-unavailable { background: #e9e2d7; }
+.product-image.image-unavailable::after { content: "MELATONI"; display: grid; place-items: center; height: 100%; color: #76684f; letter-spacing: .18em; font-size: .72rem; }
+.cart-row { grid-template-columns: minmax(48px, 68px) minmax(0, 1fr) minmax(54px, auto); }
+.cart-row > img { width: 100%; max-width: 68px; object-fit: cover; }
+.cart-row-price { max-width: 12ch; text-align: right; overflow-wrap: anywhere; }
+.cart-row.image-unavailable::before { content: "M"; width: 48px; aspect-ratio: 1; display: grid; place-items: center; background: #e9e2d7; color: #76684f; font: 500 13px var(--serif); }
+.catalog-more { display: block; margin: 28px auto 0; }
+.catalog-more[hidden] { display: none; }
+.product-photo.image-unavailable { background: #e9e2d7; }
+.product-photo.image-unavailable::after { content: "MELATONI"; position: absolute; inset: 0; display: grid; place-items: center; color: #76684f; letter-spacing: .18em; font-size: .72rem; }
+@media (max-width: 420px) {
+  .product-meta { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .product-price { max-width: none; text-align: left; }
+  .cart-row { grid-template-columns: 48px minmax(0, 1fr); }
+  .cart-row-price { grid-column: 2; justify-self: start; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .button:active, .quiz-options button:active, .order-link:active { transform: none !important; }
+}

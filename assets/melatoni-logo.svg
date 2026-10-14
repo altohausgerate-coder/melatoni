@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="410" viewBox="0 -32 1600 410" role="img" aria-labelledby="title desc">
+  <title id="title">Melatoni — The Art of Sleep</title>
+  <desc id="desc">Warm champagne-gold Melatoni logo on a transparent background.</desc>
+  <g fill="#C7A46A" stroke="#C7A46A" transform="translate(800 -50) scale(1.2) translate(-800 0)">
+    <!-- crescent moon -->
+    <path d="M800 55c-25 12-36 42-24 68 12 27 44 39 71 27-22 24-59 27-85 5-29-25-32-68-7-96 13-14 29-22 45-24z" stroke="none"/>
+    <circle cx="836" cy="43" r="4" stroke="none"/>
+    <path d="M850 59l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" stroke="none"/>
+  </g>
+  <text x="800" y="270" text-anchor="middle" fill="#D2B27B" font-family="Georgia, 'Times New Roman', serif" font-size="172" font-weight="400" letter-spacing="-7">Melatoni</text>
+  <g fill="none" stroke="#C7A46A" stroke-width="2">
+    <path d="M412 340h194"/>
+    <path d="M994 340h194"/>
+  </g>
+  <text x="800" y="353" text-anchor="middle" fill="#D2B27B" font-family="Arial, Helvetica, sans-serif" font-size="31" font-weight="500" letter-spacing="8">THE ART OF SLEEP</text>
+</svg>
