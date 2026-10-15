@@ -105,7 +105,7 @@
     max-width: 540px;
   }
   .campaign-offer { font-size: clamp(34px, 9vw, 52px); line-height: 1.02; }
-  .campaign-copy h1 { max-width: 15ch; font-size: clamp(27px, 7vw, 37px); line-height: 1.12; }
+  .campaign-copy h1 { max-width: 15ch; font-size: clamp(35px, 9vw, 48px); line-height: 1.02; }
   .campaign-description { max-width: 36ch; margin: 11px 0 17px; font-size: 14px; line-height: 1.55; }
   .campaign-cta { min-height: 48px; padding-inline: 18px; }
 
@@ -262,7 +262,7 @@
   .campaign-hero { min-height: 470px; }
   .campaign-copy { bottom: calc(72px + var(--mobile-safe-bottom)); }
   .campaign-offer { font-size: clamp(32px, 8.8vw, 39px); }
-  .campaign-copy h1 { font-size: clamp(26px, 7vw, 30px); }
+  .campaign-copy h1 { font-size: clamp(32px, 8.5vw, 38px); }
   .campaign-description { font-size: 13px; }
   .popular-grid, .popular-grid.is-compact { grid-template-columns: 1fr; }
   .popular-card:last-child:nth-child(odd) { width: auto; }
@@ -275,7 +275,7 @@
   .campaign-copy { bottom: calc(56px + var(--mobile-safe-bottom)); }
   .campaign-description { margin-block: 8px 12px; }
   .campaign-offer { font-size: clamp(30px, 8vw, 42px); }
-  .campaign-copy h1 { font-size: clamp(24px, 6.4vw, 31px); }
+  .campaign-copy h1 { font-size: clamp(30px, 8vw, 36px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

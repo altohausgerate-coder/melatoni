@@ -57,8 +57,8 @@
 .campaign-copy h1 {
   margin: 9px 0 0;
   color: var(--melatoni-ivory);
-  font: 600 clamp(28px, 3.05vw, 43px)/1.12 Manrope, Inter, system-ui, sans-serif;
-  letter-spacing: -.04em;
+  font: 400 clamp(44px, 5.2vw, 72px)/1.02 var(--hero-serif);
+  letter-spacing: -.045em;
   text-wrap: balance;
 }
 .campaign-description { max-width: 43ch; margin: 16px 0 25px; color: rgba(246,243,236,.9); font-size: clamp(14px, 1.15vw, 17px); line-height: 1.65; }
@@ -71,7 +71,7 @@
   .campaign-image { object-position: 57% center; }
   .campaign-copy { left: 7%; right: 7%; top: auto; bottom: 116px; width: auto; transform: none; }
   .campaign-offer { font-size: clamp(35px, 9vw, 54px); }
-  .campaign-copy h1 { font-size: clamp(28px, 7vw, 38px); }
+  .campaign-copy h1 { font-size: clamp(35px, 9vw, 48px); line-height: 1.02; }
   .campaign-description { max-width: 36ch; margin: 12px 0 19px; font-size: 14px; }
   .campaign-cta { min-height: 49px; min-width: 198px; font-size: 11px; }
 }
