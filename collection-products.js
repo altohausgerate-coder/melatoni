@@ -3,7 +3,7 @@
   const track = root?.querySelector('[data-collection-track]');
   if (!root || !track || !Array.isArray(window.MELATONI_PRODUCTS)) return;
 
-  const ids = ['linen-calm', 'pillow-cloud', 'duvet-dream', 'throw-knit', 'robe-soft', 'linen-satin', 'pillow-balance', 'duvet-airy', 'mask-silk', 'candle-night', 'towel-spa', 'gift-rest'];
+  const ids = ['linen-calm', 'pillow-cloud', 'duvet-dream', 'pajama-cotton', 'mask-silk', 'throw-knit', 'robe-soft', 'slippers-cloud', 'linen-satin', 'pillow-balance', 'duvet-airy', 'sheet-cloud', 'protector-pure', 'candle-night', 'diffuser-calm', 'towel-spa', 'gift-rest', 'mattress-rest'];
   const collectionImages = {
     'linen-calm': 'assets/products/collection-linen.jpg',
     'pillow-cloud': 'assets/products/collection-pillows.jpg',
@@ -12,21 +12,22 @@
     'duvet-airy': 'assets/products/collection-duvet.jpg',
     'throw-knit': 'assets/products/collection-throw.jpg',
     'robe-soft': 'assets/products/collection-robe.jpg',
+    'pajama-cotton': 'assets/products/pajama-cotton.png',
   };
   const rank = new Map(ids.map((id, index) => [id, index]));
   const products = window.MELATONI_PRODUCTS.filter(product => rank.has(product.id)).sort((a, b) => rank.get(a.id) - rank.get(b.id));
   const filters = {
     all: () => true,
-    linen: product => product.category === 'linen',
+    linen: product => ['linen', 'bedcare'].includes(product.category),
     'sleep-set': product => ['pillow', 'duvet'].includes(product.category),
     comfort: product => product.category === 'sleepwear' || product.id === 'throw-knit',
-    accessory: product => ['accessory', 'gift'].includes(product.category),
+    accessory: product => product.category === 'accessory' || product.category === 'gift',
     bath: product => product.category === 'bath',
   };
   const copy = {
-    az: { eyebrow: 'MELATONI KOLLEKSİYALARI', heading: 'Zərif seçimlər, rahat yuxu.', intro: 'Yataq otağınıza rahatlıq və gözəllik qatan seçilmiş Melatoni məhsulları.', allProducts: 'Bütün məhsullar', all: 'Hamısı', linen: 'Yataq dəstləri', sleepSet: 'Yastıq və yorğan', comfort: 'Ev rahatlığı', accessory: 'Yuxu aksesuarları', bath: 'Hamam tekstili', product: 'Məhsula bax', offer: 'Xüsusi qiymət' },
-    ru: { eyebrow: 'КОЛЛЕКЦИИ MELATONI', heading: 'Изысканный выбор для спокойного сна.', intro: 'Подборка Melatoni, которая добавит спальне уюта и красоты.', allProducts: 'Все товары', all: 'Все', linen: 'Постельное бельё', sleepSet: 'Подушки и одеяла', comfort: 'Домашний комфорт', accessory: 'Аксессуары для сна', bath: 'Текстиль для ванной', product: 'Подробнее', offer: 'Специальная цена' },
-    en: { eyebrow: 'MELATONI COLLECTIONS', heading: 'Thoughtful details, softer sleep.', intro: 'A considered edit of Melatoni pieces for a more comfortable, beautiful bedroom.', allProducts: 'All products', all: 'All', linen: 'Bed linen', sleepSet: 'Pillows & duvets', comfort: 'Home comfort', accessory: 'Sleep accessories', bath: 'Bath textiles', product: 'View product', offer: 'Special price' },
+    az: { eyebrow: 'MELATONI KOLLEKSİYALARI', heading: 'Rahat yuxu üçün hər detal.', intro: 'Yataq dəstindən pijamaya, yuxu maskasından axşam rahatlığına qədər.', allProducts: 'Bütün məhsullar', all: 'Hamısı', linen: 'Yataq tekstili', sleepSet: 'Yastıq və yorğan', comfort: 'Pijama və ev geyimi', accessory: 'Yuxu aksesuarları', bath: 'Hamam və qulluq', product: 'Məhsula bax', offer: 'Xüsusi qiymət' },
+    ru: { eyebrow: 'КОЛЛЕКЦИИ MELATONI', heading: 'Каждая деталь для спокойного сна.', intro: 'От постельного белья и пижам до масок для сна и вечерних аксессуаров.', allProducts: 'Все товары', all: 'Все', linen: 'Текстиль для спальни', sleepSet: 'Подушки и одеяла', comfort: 'Пижамы и домашняя одежда', accessory: 'Аксессуары для сна', bath: 'Ванная и уход', product: 'Подробнее', offer: 'Специальная цена' },
+    en: { eyebrow: 'MELATONI COLLECTIONS', heading: 'Every detail for better rest.', intro: 'From bed linen and pajamas to sleep masks and calming evening essentials.', allProducts: 'All products', all: 'All', linen: 'Bedroom textiles', sleepSet: 'Pillows & duvets', comfort: 'Pajamas & loungewear', accessory: 'Sleep accessories', bath: 'Bath & care', product: 'View product', offer: 'Special price' },
   };
   const text = value => typeof value === 'string' ? value : (value?.[lang] || value?.az || '');
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char]);
@@ -59,8 +60,7 @@
       const sale = Number(product.salePrice) > 0 && Number(product.salePrice) < Number(product.price);
       const selectedImage = collectionImages[product.id] || product.image;
       const image = /^assets\/products\/[\w-]+\.(?:jpe?g|png|webp|avif)$/i.test(selectedImage || '') ? selectedImage : '';
-      const placement = ['feature', 'upper-left', 'upper-right', 'lower-left', 'lower-right'][index];
-      return `<article class="collection-product-card collection-product-card--${placement}" style="--collection-order:${index}"><a class="collection-product-image" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(labels.product)}: ${name}">${image ? `<img src="${escape(image)}" alt="${name}" loading="lazy">` : ''}${sale ? `<span class="collection-product-sale">${escape(labels.offer)}</span>` : ''}<span class="collection-product-image-arrow" aria-hidden="true">↗</span></a><div class="collection-product-info"><a class="collection-product-name" href="product.html?id=${encodeURIComponent(product.id)}">${name}</a><p class="collection-product-description">${escape(text(product.desc))}</p><div class="collection-product-prices">${sale ? `<del>${money(product.price)}</del>` : ''}<strong>${money(sale ? product.salePrice : product.price)}</strong></div></div></article>`;
+      return `<article class="collection-product-card" style="--collection-order:${index}"><a class="collection-product-image" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(labels.product)}: ${name}">${image ? `<img src="${escape(image)}" alt="${name}" loading="lazy">` : ''}${sale ? `<span class="collection-product-sale">${escape(labels.offer)}</span>` : ''}<span class="collection-product-image-arrow" aria-hidden="true">↗</span></a><div class="collection-product-info"><a class="collection-product-name" href="product.html?id=${encodeURIComponent(product.id)}">${name}</a><p class="collection-product-description">${escape(text(product.desc))}</p><div class="collection-product-prices">${sale ? `<del>${money(product.price)}</del>` : ''}<strong>${money(sale ? product.salePrice : product.price)}</strong></div></div></article>`;
     }).join('')}</div>`).join('');
     pagination.innerHTML = pages.map((_, index) => `<button type="button" data-collection-page-dot="${index}" aria-label="${lang === 'en' ? 'Page' : lang === 'ru' ? 'Страница' : 'Səhifə'} ${index + 1}" aria-current="${index === 0}"></button>`).join('');
     track.scrollTo({ left: 0, behavior: 'auto' });

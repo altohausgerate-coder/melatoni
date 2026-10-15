@@ -279,6 +279,23 @@ window.MELATONI_PRODUCTS=[
   "image": "assets/products/robe-soft.jpg"
  },
  {
+  "id": "pajama-cotton",
+  "category": "sleepwear",
+  "name": {
+   "az": "Cotton Rest Pijama Dəsti",
+   "ru": "Пижамный комплект Cotton Rest",
+   "en": "Cotton Rest Pajama Set"
+  },
+  "desc": {
+   "az": "Nəfəs alan pambıq · rahat gecə geyimi",
+   "ru": "Дышащий хлопок · комфорт для сна",
+   "en": "Breathable cotton · made for winding down"
+  },
+  "price": 129,
+  "salePrice": 109,
+  "image": "assets/products/pajama-cotton.png"
+ },
+ {
   "id": "slippers-cloud",
   "category": "sleepwear",
   "name": {
