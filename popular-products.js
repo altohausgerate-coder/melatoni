@@ -28,7 +28,6 @@
   const langFromStore = () => ['az', 'ru', 'en'].includes(localStorage.getItem('melatoni-language')) ? localStorage.getItem('melatoni-language') : 'az';
   let lang = langFromStore();
   let activeFilter = 'all';
-  let startIndex = 0;
   let timer = 0;
   let focusInside = false;
   let visible = false;
@@ -41,6 +40,7 @@
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char]);
   const textFor = value => typeof value === 'string' ? value : (value?.[lang] || value?.az || '');
   const formatPrice = value => `${new Intl.NumberFormat(lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US', { maximumFractionDigits: 0 }).format(Number(value) || 0)} AZN`;
+  const saleLabel = { az: 'Xüsusi qiymət', ru: 'Специальная цена', en: 'Special price' };
   const imageFor = value => /^assets\/products\/[\w-]+\.(?:jpe?g|png|webp|avif)$/i.test(String(value || '')) ? value : '';
   const list = () => {
     const maxBudget = preferences.budget && preferences.budget !== 'all' ? Number(preferences.budget) : Infinity;
@@ -75,7 +75,7 @@
   function render() {
     const copy = labels[lang] || labels.az;
     const matching = list();
-    const count = Math.min(personalized ? 6 : 3, matching.length);
+    const count = matching.length;
     grid.classList.toggle('is-personalized', personalized);
     if (personalized) grid.classList.remove('is-compact');
     else grid.classList.toggle('is-compact', count === 2);
@@ -83,24 +83,27 @@
       grid.innerHTML = `<p class="popular-empty">${lang === 'ru' ? 'По этим фильтрам товары не найдены. Попробуйте изменить категорию или бюджет.' : lang === 'en' ? 'No products match these filters. Try changing the category or budget.' : 'Bu seçimlərə uyğun məhsul tapılmadı. Kateqoriyanı və ya büdcəni dəyişərək yenidən baxın.'}</p>`;
       return;
     }
-    const cards = Array.from({ length: count }, (_, offset) => matching[(startIndex + offset) % matching.length]);
+    const cards = matching;
     grid.innerHTML = cards.map((product, index) => {
       const id = escape(product.id);
       const name = escape(textFor(product.name));
       const description = escape(textFor(product.desc));
       const image = escape(imageFor(product.image));
       const saved = savedIds.has(product.id);
+      const salePrice = Number(product.salePrice);
+      const hasSale = Number.isFinite(salePrice) && salePrice > 0 && salePrice < Number(product.price);
       return `<article class="popular-card" style="--popular-order:${index}" data-popular-card>
         <div class="popular-image-wrap">
           <a class="popular-image-link" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(copy.product)}: ${name}">
             ${image ? `<img src="${image}" alt="${name}" loading="lazy"/>` : '<span class="popular-image-empty">MELATONI</span>'}
           </a>
+          ${hasSale ? `<span class="popular-sale">${escape(saleLabel[lang] || saleLabel.az)}</span>` : ''}
           <button class="popular-save${saved ? ' is-saved' : ''}" type="button" data-save="${id}" aria-label="${saved ? escape(copy.wishlistRemove) : escape(copy.wishlistAdd)}" aria-pressed="${saved}">${saved ? '♥' : '♡'}</button>
         </div>
         <div class="popular-details">
           <a class="popular-name" href="product.html?id=${encodeURIComponent(product.id)}">${name}</a>
           <p class="popular-description">${description}</p>
-          <div class="popular-bottom"><span class="popular-price">${formatPrice(product.price)}</span><a class="popular-open" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(copy.product)}">↗</a></div>
+          <div class="popular-bottom"><span class="popular-prices">${hasSale ? `<del>${formatPrice(product.price)}</del>` : ''}<strong class="popular-price">${formatPrice(hasSale ? salePrice : product.price)}</strong></span><a class="popular-open" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(copy.product)}">↗</a></div>
         </div>
       </article>`;
     }).join('');
@@ -110,26 +113,31 @@
   function start() {
     stop();
     if (visible && !focusInside && !reducedMotion && !document.hidden && list().length > 2) {
-      timer = window.setInterval(() => { startIndex = (startIndex + 1) % list().length; render(); }, 5200);
+      timer = window.setInterval(() => step(1), 3300);
     }
   }
   function step(direction) {
-    const length = list().length;
-    if (length < 2) return;
-    startIndex = (startIndex + direction + length) % length;
-    render();
+    const firstCard = grid.querySelector('[data-popular-card]');
+    if (!firstCard) return;
+    const styles = getComputedStyle(grid);
+    const gap = parseFloat(styles.columnGap || styles.gap) || 0;
+    const atStart = grid.scrollLeft <= 4;
+    const atEnd = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 8;
+    if (direction > 0 && atEnd) grid.scrollTo({ left: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+    else if (direction < 0 && atStart) grid.scrollTo({ left: grid.scrollWidth - grid.clientWidth, behavior: reducedMotion ? 'auto' : 'smooth' });
+    else grid.scrollBy({ left: direction * (firstCard.getBoundingClientRect().width + gap), behavior: reducedMotion ? 'auto' : 'smooth' });
     start();
   }
 
   root.querySelectorAll('[data-popular-filter]').forEach(button => button.addEventListener('click', () => {
     activeFilter = button.dataset.popularFilter;
-    startIndex = 0;
     root.querySelectorAll('[data-popular-filter]').forEach(item => {
       const selected = item === button;
       item.classList.toggle('is-active', selected);
       item.setAttribute('aria-pressed', String(selected));
     });
     render();
+    grid.scrollTo({ left: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
     start();
   }));
   root.querySelector('[data-popular-prev]').addEventListener('click', () => step(-1));
@@ -150,8 +158,8 @@
     ) : [];
     preferences = profile.preferences && typeof profile.preferences === 'object' ? profile.preferences : {};
     personalized = true;
-    startIndex = 0;
     renderLabels();
+    grid.scrollTo({ left: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
     start();
   });
   if ('IntersectionObserver' in window) {

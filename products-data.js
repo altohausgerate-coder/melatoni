@@ -13,6 +13,7 @@ window.MELATONI_PRODUCTS=[
    "en": "Soft support · cotton cover"
   },
   "price": 79,
+  "salePrice": 65,
   "image": "assets/products/pillow-cloud.jpg"
  },
  {
@@ -29,6 +30,7 @@ window.MELATONI_PRODUCTS=[
    "en": "Memory foam · gentle neck support"
   },
   "price": 119,
+  "salePrice": 99,
   "image": "assets/products/pillow-balance.jpg"
  },
  {
@@ -61,6 +63,7 @@ window.MELATONI_PRODUCTS=[
    "en": "Breathable cotton · natural texture"
   },
   "price": 189,
+  "salePrice": 159,
   "image": "assets/products/linen-calm.jpg"
  },
  {
@@ -109,6 +112,7 @@ window.MELATONI_PRODUCTS=[
    "en": "Light warmth · made for every season"
   },
   "price": 149,
+  "salePrice": 125,
   "image": "assets/products/duvet-dream.jpg"
  },
  {
@@ -173,6 +177,7 @@ window.MELATONI_PRODUCTS=[
    "en": "Elasticated edge · cotton comfort"
   },
   "price": 59,
+  "salePrice": 49,
   "image": "assets/products/sheet-cloud.jpg"
  },
  {
@@ -205,6 +210,7 @@ window.MELATONI_PRODUCTS=[
    "en": "Textured knit · slower evenings"
   },
   "price": 119,
+  "salePrice": 99,
   "image": "assets/products/throw-knit.jpg"
  },
  {
@@ -269,6 +275,7 @@ window.MELATONI_PRODUCTS=[
    "en": "Gentle touch · everyday comfort"
   },
   "price": 99,
+  "salePrice": 79,
   "image": "assets/products/robe-soft.jpg"
  },
  {
@@ -301,6 +308,7 @@ window.MELATONI_PRODUCTS=[
    "en": "Soft cotton · absorbent and plush"
   },
   "price": 89,
+  "salePrice": 75,
   "image": "assets/products/towel-spa.jpg"
  },
  {
@@ -317,6 +325,7 @@ window.MELATONI_PRODUCTS=[
    "en": "A thoughtful set for a bedtime ritual"
   },
   "price": 159,
+  "salePrice": 135,
   "image": "assets/products/gift-rest.jpg"
  }
 ];

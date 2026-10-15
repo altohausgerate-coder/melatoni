@@ -187,3 +187,5 @@ html,body{background-color:var(--page-background)}
 .lang-options button[aria-current=true]::after{content:"✓";position:absolute;right:10px;color:var(--gold);font-size:10px}
 .lang-options button{position:relative;padding-right:28px}
 
+
+.product-price.has-sale{display:flex;flex-direction:column;align-items:flex-end;gap:2px}.product-old-price{color:#87939a;font-size:.82em;font-weight:400}.product-price.has-sale strong{color:#a45e44;font:inherit}

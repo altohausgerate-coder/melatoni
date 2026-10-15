@@ -19,6 +19,7 @@
 .product-content h1{font-size:clamp(38px,4.1vw,58px);line-height:1.02;letter-spacing:-.04em}
 .product-kicker,.product-category{font-size:10px;letter-spacing:.12em}
 .price-line strong{font-size:26px;font-variant-numeric:tabular-nums}
+.price-line del{color:#8b969e;font-size:14px;font-weight:450;font-variant-numeric:tabular-nums}
 .price-note{font-size:11px;line-height:1.6}
 .detail-description{font-size:13px;line-height:1.75}
 .option-heading h2,.product-specs h2{font-size:19px;letter-spacing:-.015em}
