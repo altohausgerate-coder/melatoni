@@ -21,10 +21,13 @@
   letter-spacing: .16em;
 }
 .faq-heading h2 {
-  max-width: 12ch;
+  max-width: 11ch;
   margin: 0;
-  font: 400 clamp(52px, 5.2vw, 76px)/.98 var(--hero-serif, var(--serif));
-  letter-spacing: -.05em;
+  font-family: 'Newsreader', 'Iowan Old Style', Baskerville, Georgia, serif;
+  font-size: clamp(58px, 6.2vw, 88px);
+  font-weight: 300;
+  line-height: .94;
+  letter-spacing: -.055em;
   text-wrap: balance;
 }
 .faq-intro {
@@ -106,7 +109,7 @@
   .faq-section { padding: 60px clamp(18px, 5.5vw, 28px) 66px; }
   .faq-inner { grid-template-columns: 1fr; gap: 28px; }
   .faq-eyebrow { margin-bottom: 13px; font-size: 10px; }
-  .faq-heading h2 { max-width: 12ch; font-size: clamp(39px, 10vw, 52px); }
+  .faq-heading h2 { max-width: 11ch; font-size: clamp(43px, 11vw, 58px); line-height: .96; }
   .faq-intro { margin-top: 13px; font-size: 14px; }
   .faq-contact { margin-top: 19px; }
   .faq-item summary { min-height: 68px; padding: 17px 48px 17px 0; font-size: 16px; }
