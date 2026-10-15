@@ -4,6 +4,15 @@
   if (!root || !track || !Array.isArray(window.MELATONI_PRODUCTS)) return;
 
   const ids = ['linen-calm', 'pillow-cloud', 'duvet-dream', 'throw-knit', 'robe-soft', 'linen-satin', 'pillow-balance', 'duvet-airy', 'mask-silk', 'candle-night', 'towel-spa', 'gift-rest'];
+  const collectionImages = {
+    'linen-calm': 'assets/products/collection-linen.jpg',
+    'pillow-cloud': 'assets/products/collection-pillows.jpg',
+    'pillow-balance': 'assets/products/collection-pillows.jpg',
+    'duvet-dream': 'assets/products/collection-duvet.jpg',
+    'duvet-airy': 'assets/products/collection-duvet.jpg',
+    'throw-knit': 'assets/products/collection-throw.jpg',
+    'robe-soft': 'assets/products/collection-robe.jpg',
+  };
   const rank = new Map(ids.map((id, index) => [id, index]));
   const products = window.MELATONI_PRODUCTS.filter(product => rank.has(product.id)).sort((a, b) => rank.get(a.id) - rank.get(b.id));
   const filters = {
@@ -24,7 +33,9 @@
   const money = value => `${new Intl.NumberFormat(lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US', { maximumFractionDigits: 0 }).format(Number(value) || 0)} AZN`;
   let lang = ['az', 'ru', 'en'].includes(localStorage.getItem('melatoni-language')) ? localStorage.getItem('melatoni-language') : 'az';
   let active = 'all';
-  const dots = [...root.querySelectorAll('.collection-products-pagination span')];
+  const pagination = root.querySelector('.collection-products-pagination');
+  let pages = [];
+  let activePage = 0;
 
   function render() {
     const labels = copy[lang] || copy.az;
@@ -40,20 +51,29 @@
       button.setAttribute('aria-pressed', String(selected));
     });
     const selected = products.filter(product => filters[active](product));
-    track.innerHTML = selected.map((product, index) => {
+    pages = [];
+    for (let start = 0; start < selected.length; start += 5) pages.push(selected.slice(start, start + 5));
+    activePage = 0;
+    track.innerHTML = pages.map((page, pageIndex) => `<div class="collection-products-page${page.length < 5 ? ' is-compact' : ''}" data-collection-page="${pageIndex}">${page.map((product, index) => {
       const name = escape(text(product.name));
       const sale = Number(product.salePrice) > 0 && Number(product.salePrice) < Number(product.price);
-      const image = /^assets\/products\/[\w-]+\.(?:jpe?g|png|webp|avif)$/i.test(product.image || '') ? product.image : '';
-      return `<article class="collection-product-card" style="--collection-order:${index}"><a class="collection-product-image" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(labels.product)}: ${name}">${image ? `<img src="${escape(image)}" alt="${name}" loading="lazy">` : ''}${sale ? `<span class="collection-product-sale">${escape(labels.offer)}</span>` : ''}</a><div class="collection-product-info"><a class="collection-product-name" href="product.html?id=${encodeURIComponent(product.id)}">${name}</a><p class="collection-product-description">${escape(text(product.desc))}</p><div class="collection-product-prices">${sale ? `<del>${money(product.price)}</del>` : ''}<strong>${money(sale ? product.salePrice : product.price)}</strong></div></div></article>`;
-    }).join('');
+      const selectedImage = collectionImages[product.id] || product.image;
+      const image = /^assets\/products\/[\w-]+\.(?:jpe?g|png|webp|avif)$/i.test(selectedImage || '') ? selectedImage : '';
+      const placement = ['feature', 'upper-left', 'upper-right', 'lower-left', 'lower-right'][index];
+      return `<article class="collection-product-card collection-product-card--${placement}" style="--collection-order:${index}"><a class="collection-product-image" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(labels.product)}: ${name}">${image ? `<img src="${escape(image)}" alt="${name}" loading="lazy">` : ''}${sale ? `<span class="collection-product-sale">${escape(labels.offer)}</span>` : ''}<span class="collection-product-image-arrow" aria-hidden="true">↗</span></a><div class="collection-product-info"><a class="collection-product-name" href="product.html?id=${encodeURIComponent(product.id)}">${name}</a><p class="collection-product-description">${escape(text(product.desc))}</p><div class="collection-product-prices">${sale ? `<del>${money(product.price)}</del>` : ''}<strong>${money(sale ? product.salePrice : product.price)}</strong></div></div></article>`;
+    }).join('')}</div>`).join('');
+    pagination.innerHTML = pages.map((_, index) => `<button type="button" data-collection-page-dot="${index}" aria-label="${lang === 'en' ? 'Page' : lang === 'ru' ? 'Страница' : 'Səhifə'} ${index + 1}" aria-current="${index === 0}"></button>`).join('');
     track.scrollTo({ left: 0, behavior: 'auto' });
     updateDots();
   }
   function updateDots() {
     const max = Math.max(0, track.scrollWidth - track.clientWidth);
-    const position = max ? track.scrollLeft / max : 0;
-    const activeDot = Math.min(dots.length - 1, Math.round(position * (dots.length - 1)));
-    dots.forEach((dot, index) => dot.classList.toggle('is-active', index === activeDot));
+    activePage = Math.min(pages.length - 1, Math.max(0, Math.round((max ? track.scrollLeft / max : 0) * (pages.length - 1))));
+    pagination.querySelectorAll('[data-collection-page-dot]').forEach((dot, index) => {
+      const selected = index === activePage;
+      dot.classList.toggle('is-active', selected);
+      dot.setAttribute('aria-current', String(selected));
+    });
   }
   root.querySelector('.collection-products-filters').addEventListener('click', event => {
     const button = event.target.closest('[data-collection-filter]');
@@ -62,6 +82,13 @@
     render();
   });
   track.addEventListener('scroll', updateDots, { passive: true });
+  pagination.addEventListener('click', event => {
+    const button = event.target.closest('[data-collection-page-dot]');
+    if (!button) return;
+    const max = Math.max(0, track.scrollWidth - track.clientWidth);
+    const destination = pages.length > 1 ? max * Number(button.dataset.collectionPageDot) / (pages.length - 1) : 0;
+    track.scrollTo({ left: destination, behavior: 'smooth' });
+  });
   document.addEventListener('melatoni:language-change', event => { lang = event.detail || lang; render(); });
   render();
 })();
