@@ -21,10 +21,11 @@
   letter-spacing: .16em;
 }
 .faq-heading h2 {
-  max-width: 10ch;
+  max-width: 12ch;
   margin: 0;
-  font: 400 clamp(42px, 4.8vw, 66px)/1.02 var(--serif);
-  letter-spacing: -.045em;
+  font: 400 clamp(52px, 5.2vw, 76px)/.98 var(--hero-serif, var(--serif));
+  letter-spacing: -.05em;
+  text-wrap: balance;
 }
 .faq-intro {
   max-width: 35ch;
