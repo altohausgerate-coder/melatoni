@@ -2,7 +2,7 @@
 .collection-products-inner { width: min(100%, 1660px); margin-inline: auto; }
 .collection-products-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 30px; }
 .collection-products-eyebrow { margin: 0 0 17px; color: #728396; font-size: 12px; font-weight: 650; letter-spacing: .16em; }
-.collection-products-heading h2 { max-width: 850px; margin: 0; font-family: Newsreader, Georgia, serif; font-size: clamp(38px, 5.2vw, 72px); font-weight: 400; line-height: .98; letter-spacing: -.045em; }
+.collection-products-heading h2 { max-width: 900px; margin: 0; font-family: 'Newsreader', 'Iowan Old Style', Baskerville, Georgia, serif; font-size: clamp(52px, 6.2vw, 82px); font-weight: 300; line-height: .94; letter-spacing: -.055em; text-wrap: balance; }
 .collection-products-intro { margin: 17px 0 0; color: #617182; font-size: clamp(15px, 1.4vw, 18px); line-height: 1.6; }
 .collection-products-all { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 16px; margin-bottom: 8px; padding: 14px 21px; border-radius: 999px; background: #e8ecee; color: #142b43; font-size: 15px; transition: background-color 180ms ease, transform 180ms ease; }
 .collection-products-all:hover { transform: translateY(-2px); background: #dce4e8; }
@@ -35,7 +35,7 @@
   .collection-products { padding: 58px 18px 66px; }
   .collection-products-heading { align-items: flex-start; flex-direction: column; gap: 17px; margin-bottom: 22px; }
   .collection-products-eyebrow { margin-bottom: 13px; font-size: 10px; }
-  .collection-products-heading h2 { max-width: 540px; font-size: clamp(37px, 10vw, 54px); line-height: 1.02; }
+  .collection-products-heading h2 { max-width: 540px; font-size: clamp(43px, 11vw, 58px); line-height: .96; }
   .collection-products-intro { max-width: 470px; margin-top: 12px; font-size: 14px; }
   .collection-products-all { padding: 11px 16px; font-size: 13px; }
   .collection-products-filters { gap: 8px; margin: 20px -18px 16px; padding: 0 18px 5px; }
