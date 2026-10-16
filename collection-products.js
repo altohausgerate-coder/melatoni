@@ -15,7 +15,7 @@
     'pajama-cotton': 'assets/products/pajama-cotton.png',
   };
   const rank = new Map(ids.map((id, index) => [id, index]));
-  const products = window.MELATONI_PRODUCTS.filter(product => rank.has(product.id)).sort((a, b) => rank.get(a.id) - rank.get(b.id));
+  let products = window.MELATONI_PRODUCTS.filter(product => rank.has(product.id)).sort((a, b) => rank.get(a.id) - rank.get(b.id));
   const filters = {
     all: () => true,
     linen: product => ['linen', 'bedcare'].includes(product.category),
@@ -103,6 +103,7 @@
     const destination = pages.length > 1 ? max * Number(button.dataset.collectionPageDot) / (pages.length - 1) : 0;
     track.scrollTo({ left: destination, behavior: 'smooth' });
   });
+document.addEventListener('melatoni:catalog-updated',event=>{products=(Array.isArray(event.detail)?event.detail:[]).filter(product=>rank.has(product.id)).sort((a,b)=>rank.get(a.id)-rank.get(b.id));render()});
   document.addEventListener('melatoni:language-change', event => { lang = event.detail || lang; render(); });
   render();
 })();

@@ -37,6 +37,14 @@ if(!product){document.querySelector('#productDetail')?.setAttribute('hidden','')
  document.querySelectorAll('.product-lang-picker [data-lang]').forEach(button=>button.addEventListener('click',()=>{window.MelatoniStorage?.set('melatoni-language',button.dataset.lang);location.reload()}));document.addEventListener('click',event=>{const menu=document.querySelector('.product-lang-picker');if(menu&&!menu.contains(event.target))menu.open=false});
 }
 
-
-
-
+if (product) document.addEventListener('melatoni:catalog-updated', event => {
+  const updated = Array.isArray(event.detail) ? event.detail.find(item => item.id === product.id) : null;
+  if (!updated) {
+    document.querySelector('#productDetail')?.setAttribute('hidden','');
+    document.querySelector('.material-story')?.setAttribute('hidden','');
+    document.querySelector('#productNotFound')?.removeAttribute('hidden');
+    return;
+  }
+  const url = new URL(location.href);
+  if (!url.searchParams.has('_catalog')) { url.searchParams.set('_catalog','live'); location.replace(url.href); }
+});

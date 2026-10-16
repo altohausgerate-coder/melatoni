@@ -11,7 +11,7 @@
     fabric: { crisp: ['linen-percale'], smooth: ['linen-satin'], breathable: ['linen-calm','duvet-airy'] },
     pillow: { soft: ['pillow-cloud'], neck: ['pillow-balance'], light: ['pillow-down'] },
   };
-  const products = [...sourceProducts].filter(item => item && typeof item === 'object').sort((a, b) => (rank.get(a.id) ?? 999) - (rank.get(b.id) ?? 999));
+  let products = [...sourceProducts].filter(item => item && typeof item === 'object').sort((a, b) => (rank.get(a.id) ?? 999) - (rank.get(b.id) ?? 999));
   const labels = {
     az: { heading: 'Bu həftə populyar', headingPersonalized: 'Sizin üçün seçildi', all: 'Hamısı', linen: 'Yataq dəstləri', sleepSet: 'Yastıq və yorğan', bedcare: 'Döşək və çarşaf', homeTextile: 'Ev geyimi', bath: 'Hamam və qulluq', accessory: 'Yuxu aksessuarları', previous: 'Əvvəlki məhsullar', next: 'Növbəti məhsullar', product: 'Məhsula bax', wishlistAdd: 'İstək siyahısına əlavə et', wishlistRemove: 'İstək siyahısından çıxar', region: 'Bu həftə seçilmiş məhsullar', personalizedRegion: 'Sizə uyğun seçilmiş məhsullar', filters: 'Məhsul kateqoriyası', controls: 'Məhsulları dəyişin' },
     ru: { heading: 'Популярное на этой неделе', headingPersonalized: 'Подобрано для вас', all: 'Все', linen: 'Постельное бельё', sleepSet: 'Подушки и одеяла', bedcare: 'Матрасы и простыни', homeTextile: 'Домашняя одежда', bath: 'Ванная и уход', accessory: 'Аксессуары для сна', previous: 'Предыдущие товары', next: 'Следующие товары', product: 'О товаре', wishlistAdd: 'Добавить в избранное', wishlistRemove: 'Убрать из избранного', region: 'Подборка недели', personalizedRegion: 'Товары, подобранные для вас', filters: 'Категории товаров', controls: 'Листать товары' },
@@ -175,5 +175,6 @@
   } else { visible = true; start(); }
   const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
   motionPreference.addEventListener?.('change', event => { reducedMotion = event.matches; start(); });
+  document.addEventListener('melatoni:catalog-updated',event=>{products=(Array.isArray(event.detail)?event.detail:[]).filter(item=>item&&typeof item==='object').sort((a,b)=>(rank.get(a.id)??999)-(rank.get(b.id)??999));render()});
   renderLabels();
 })();

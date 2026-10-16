@@ -1,5 +1,5 @@
 (()=>{
-  const items=Array.isArray(window.MELATONI_PRODUCTS)?window.MELATONI_PRODUCTS:[];
+  let items=Array.isArray(window.MELATONI_PRODUCTS)?window.MELATONI_PRODUCTS:[];
   const grid=document.querySelector('#productGrid'),count=document.querySelector('#productCount'),empty=document.querySelector('#emptyState');
   const categories=['all','linen','pillow','duvet','bedcare','sleepwear','bath','accessory','gift'];
   const state={category:new URLSearchParams(location.search).get('category')||'all',query:new URLSearchParams(location.search).get('q')||'',sort:'featured',max:400};
@@ -24,5 +24,6 @@
   document.querySelectorAll('.product-image img').forEach(image=>image.addEventListener('error',()=>image.closest('.product-image')?.classList.add('image-unavailable')));
   updateBagCount();document.querySelector('#maxPrice').value=state.max;document.querySelector('#priceValue').textContent=money(state.max);document.querySelectorAll('.category-filter').forEach(button=>button.classList.toggle('active',button.dataset.category===state.category));
   items.forEach(product=>{const node=document.querySelector(`[data-count="${product.category}"]`);if(node)node.textContent=Number(node.textContent)+1});const all=document.querySelector('[data-count="all"]');if(all)all.textContent=items.length;
+document.addEventListener('melatoni:catalog-updated',event=>{items=Array.isArray(event.detail)?event.detail:[];document.querySelectorAll('[data-count]').forEach(node=>node.textContent='0');items.forEach(product=>{const node=document.querySelector(`[data-count="${product.category}"]`);if(node)node.textContent=Number(node.textContent)+1});const all=document.querySelector('[data-count="all"]');if(all)all.textContent=items.length;render();});
   render();
 })();
