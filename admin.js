@@ -8,6 +8,8 @@
   const form = document.querySelector('#adminProductForm');
   const orderList = document.querySelector('#adminOrdersList');
   const analytics = document.querySelector('#analyticsBreakdown');
+  const supportList = document.querySelector('#adminSupportList');
+  const alertList = document.querySelector('#adminAlertsList');
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[char]);
   const say = (message, error = false) => { if (!status) return; status.textContent = message; status.classList.toggle('is-error', error); };
   const value = (name, item) => { const input = form.elements.namedItem(name); if (input) input.value = item || ''; };
@@ -15,6 +17,18 @@
   const money = amount => `${new Intl.NumberFormat('az-AZ',{maximumFractionDigits:2}).format(Number(amount)||0)} AZN`;
   const orderStatus = { pending:'Gözləyir', confirmed:'Təsdiqlənib', shipping:'Çatdırılır', delivered:'Çatdırılıb', cancelled:'Ləğv edilib' };
   const orderStatuses = Object.keys(orderStatus);
+  const adminLang = () => window.MelatoniStorage?.get('melatoni-language') || 'az';
+  const adminCopy = {
+    az:{views:'Baxış',sold:'Satılan məhsul',revenue:'Təsdiqli dövriyyə',abandoned:'Sifarişsiz səbət sessiyası · təxmini',cartAdds:'Səbətə əlavə',cartRemoves:'Səbətdən çıxarılan',recommendations:'Razılıqlı maraq siqnalları',supportEmpty:'Dəstək müraciəti yoxdur.',alertEmpty:'Məhsul bildirişi yoxdur.',subject:'Mövzu',reply:'Cavab',save:'Yadda saxla',open:'Açıq',progress:'Baxılır',answered:'Cavablandırılıb',closed:'Bağlanıb',price:'Qiymət düşəndə',stock:'Stoka qayıdanda',recent:'Son bildiriş',mailUnavailable:'Məhsul yadda saxlandı, amma e-poçt bildirişi göndərilmədi. Poçt xidməti qurulmayıb.',tabSupport:'Dəstək müraciətləri',tabAlerts:'Məhsul bildirişləri',supportEyebrow:'MÜŞTƏRİ XİDMƏTİ',supportTitle:'Dəstək müraciətləri',alertsEyebrow:'MƏHSUL ABUNƏLİKLƏRİ',alertsTitle:'Qiymət və stok bildirişləri',refresh:'Yenilə ↻',emailNote:'E-poçt çatdırılması üçün Supabase Edge Function və poçt xidməti qoşulmalıdır.',orders30:'Sifariş sayı · 30 gün',confirmed:'Təsdiqlənmiş sifariş',pageView:'Səhifə baxışı',productView:'Məhsul baxışı',productClick:'Məhsula klik',checkout:'Sifarişə keçid',search:'Axtarış',wishlist:'İstək siyahısı',orderEvent:'Sifariş',topViewed:'Ən çox baxılan',topSold:'Ən çox satılan',salesDynamics:'Satış dinamikası · 7 gün',topAdded:'Ən çox səbətə əlavə edilən',topRemoved:'Ən çox səbətdən çıxarılan',noSales:'Hələ satış məlumatı yoxdur.',supportLoadError:'Dəstək müraciətləri yüklənmədi. Miqrasiyanı yoxlayın.',alertsLoadError:'Məhsul bildirişləri yüklənmədi. Miqrasiyanı yoxlayın.',ticketSaved:'Cavab və status yadda saxlandı.',ticketError:'Dəstək cavabı yadda saxlanmadı.',orderLabel:'Sifariş'},
+    ru:{views:'Просмотры',sold:'Продано товаров',revenue:'Подтверждённый оборот',abandoned:'Сессии с корзиной без заказа · оценка',cartAdds:'Добавлено в корзину',cartRemoves:'Удалено из корзины',recommendations:'Сигналы интереса с согласием',supportEmpty:'Обращений нет.',alertEmpty:'Уведомлений о товарах нет.',subject:'Тема',reply:'Ответ',save:'Сохранить',open:'Открыто',progress:'В работе',answered:'Ответ отправлен',closed:'Закрыто',price:'Снижение цены',stock:'Поступление',recent:'Последнее уведомление',mailUnavailable:'Товар сохранён, но письмо не отправлено. Почтовый сервис не настроен.',tabSupport:'Обращения в поддержку',tabAlerts:'Уведомления о товарах',supportEyebrow:'ПОДДЕРЖКА КЛИЕНТОВ',supportTitle:'Обращения в поддержку',alertsEyebrow:'ПОДПИСКИ НА ТОВАРЫ',alertsTitle:'Уведомления о цене и наличии',refresh:'Обновить ↻',emailNote:'Для отправки писем подключите Supabase Edge Function и почтовый сервис.',orders30:'Заказов · 30 дней',confirmed:'Подтверждённые заказы',pageView:'Просмотры страниц',productView:'Просмотры товаров',productClick:'Переходы к товару',checkout:'Переход к заказу',search:'Поиск',wishlist:'Избранное',orderEvent:'Заказы',topViewed:'Чаще просматривают',topSold:'Чаще покупают',salesDynamics:'Продажи · 7 дней',topAdded:'Чаще добавляют в корзину',topRemoved:'Чаще удаляют из корзины',noSales:'Данных о продажах пока нет.',supportLoadError:'Не удалось загрузить обращения. Проверьте миграцию.',alertsLoadError:'Не удалось загрузить уведомления. Проверьте миграцию.',ticketSaved:'Ответ и статус сохранены.',ticketError:'Не удалось сохранить ответ.',orderLabel:'Заказ'},
+    en:{views:'Views',sold:'Units sold',revenue:'Confirmed revenue',abandoned:'Cart sessions without an order · estimated',cartAdds:'Added to cart',cartRemoves:'Removed from cart',recommendations:'Consented interest signals',supportEmpty:'No support requests.',alertEmpty:'No product alerts.',subject:'Subject',reply:'Reply',save:'Save',open:'Open',progress:'In progress',answered:'Answered',closed:'Closed',price:'Price drop',stock:'Back in stock',recent:'Last notification',mailUnavailable:'Product saved, but the email was not sent. Email delivery is not configured.',tabSupport:'Support requests',tabAlerts:'Product alerts',supportEyebrow:'CUSTOMER CARE',supportTitle:'Support requests',alertsEyebrow:'PRODUCT SUBSCRIPTIONS',alertsTitle:'Price and stock alerts',refresh:'Refresh ↻',emailNote:'Connect the Supabase Edge Function and an email provider to deliver emails.',orders30:'Orders · 30 days',confirmed:'Confirmed orders',pageView:'Page views',productView:'Product views',productClick:'Product clicks',checkout:'Checkout starts',search:'Searches',wishlist:'Wishlist additions',orderEvent:'Orders',topViewed:'Most viewed',topSold:'Best sellers',salesDynamics:'Sales · 7 days',topAdded:'Most added to cart',topRemoved:'Most removed from cart',noSales:'No sales data yet.',supportLoadError:'Could not load support requests. Check the migration.',alertsLoadError:'Could not load product alerts. Check the migration.',ticketSaved:'Reply and status saved.',ticketError:'Could not save the support reply.',orderLabel:'Order'}
+  };
+  const at = key => adminCopy[adminLang()]?.[key] || adminCopy.az[key] || key;
+  function localizeAdmin() {
+    document.documentElement.lang = adminLang();
+    document.querySelectorAll('[data-admin-copy]').forEach(node=>{node.textContent=at(node.dataset.adminCopy)});
+    const summary=document.querySelector('#adminLanguageSummary');if(summary)summary.textContent=adminLang().toUpperCase();
+  }
   const orderItems = items => Array.isArray(items) ? items.map(item => `${escape(item.name || item.id || 'Məhsul')} × ${Math.max(1,Number(item.qty)||1)}${item.size ? ` · ${escape(item.size)}` : ''}`).join(' · ') : '';
   let products = [];
   let newOrders = 0;
@@ -36,7 +50,8 @@
       workspace.hidden = false;
       logout.hidden = false;
       say('Admin panelinə xoş gəlmisiniz.');
-      await Promise.all([loadProducts(), loadOrders(), loadAnalytics()]);
+      await loadProducts();
+      await Promise.all([loadOrders(), loadAnalytics(), loadSupportTickets(), loadProductAlerts()]);
       subscribeOrders();
     } catch { showLogin('Supabase ilə əlaqə qurulmadı. İnterneti yoxlayıb yenidən cəhd edin.'); }
   }
@@ -75,7 +90,8 @@
       const id = String(data.get('id') || '').trim().toLowerCase();
       if (!/^[a-z0-9-]+$/.test(id)) { say('ID yalnız kiçik hərf, rəqəm və defisdən ibarət olsun.', true); return; }
       const previousId = String(data.get('original_id') || '');
-      let imageUrl = products.find(product => product.id === previousId)?.image_url || '';
+      const previousProduct = products.find(product => product.id === previousId) || null;
+      let imageUrl = previousProduct?.image_url || '';
       const file = data.get('image_file');
       if (file instanceof File && file.size) {
         if (file.size > 5 * 1024 * 1024) { say('Şəkil 5 MB-dan kiçik olmalıdır.', true); return; }
@@ -95,7 +111,22 @@
       const { error } = await client.from('products').upsert(row,{onConflict:'id'});
       if (error) { say('Məhsul yadda saxlanmadı. Məlumatları və admin icazəsini yoxlayın.',true); return; }
       if (previousId && previousId !== id) await client.from('products').delete().eq('id',previousId);
-      say('Məhsul yadda saxlandı.'); form.reset(); fillProduct(null); await loadProducts();
+      let notificationPending = false;
+      if (previousProduct && previousId === id) {
+        const oldPrice = Number(previousProduct.sale_price ?? previousProduct.price);
+        const newPrice = Number(row.sale_price ?? row.price);
+        const oldStock = previousProduct.stock_quantity;
+        const newStock = row.stock_quantity;
+        const priceDropped = Number.isFinite(oldPrice) && newPrice < oldPrice;
+        const restocked = oldStock !== null && oldStock !== undefined && Number(oldStock) === 0 && Number(newStock) > 0;
+        if (priceDropped || restocked) {
+          try {
+            const result = await client.functions.invoke('product-alerts',{body:{product_id:id,previous_price:oldPrice,previous_stock:oldStock}});
+            notificationPending = !!result.error || result.data?.configured === false || Number(result.data?.failed) > 0;
+          } catch { notificationPending = true; }
+        }
+      }
+      say(notificationPending ? at('mailUnavailable') : 'Məhsul yadda saxlandı.'); form.reset(); fillProduct(null); await loadProducts();
     } catch { say('Məhsul yadda saxlanmadı. Yenidən cəhd edin.',true); }
     finally { button.disabled = false; }
   }
@@ -109,15 +140,49 @@
   }
   async function loadAnalytics() {
     const since = new Date(Date.now()-30*24*60*60*1000).toISOString();
-    const { data, error } = await client.from('storefront_events').select('event_name,product_id,created_at').gte('created_at',since).order('created_at',{ascending:false}).limit(5000);
-    if (error) { analytics.innerHTML = '<p class="admin-empty">Analitika yüklənmədi. Miqrasiyanın tətbiq olunduğunu yoxlayın.</p>'; return; }
-    const rows = data || [], counts = new Map(), productsById = new Map(products.map(item => [item.id,item]));
-    rows.forEach(row => { counts.set(row.event_name,(counts.get(row.event_name)||0)+1); if (row.product_id && ['product_view','product_click'].includes(row.event_name)) counts.set(`product:${row.product_id}`,(counts.get(`product:${row.product_id}`)||0)+1); });
-    document.querySelector('#metricViews').textContent = (counts.get('page_view')||0)+(counts.get('product_view')||0);
-    const top = [...counts.entries()].filter(([key])=>key.startsWith('product:')).sort((a,b)=>b[1]-a[1])[0];
-    document.querySelector('#metricTopProduct').textContent = top ? languageValue(productsById.get(top[0].slice(8))?.name,'az') || top[0].slice(8) : '—';
-    const labels = { page_view:'Səhifə baxışı', product_view:'Məhsul baxışı', product_click:'Məhsula klik', add_to_cart:'Səbətə əlavə', search:'Axtarış', wishlist_add:'İstək siyahısı', order_created:'Sifariş' };
-    analytics.innerHTML = Object.keys(labels).map(key=>`<article class="analytics-event"><strong>${counts.get(key)||0}</strong><span>${labels[key]}</span></article>`).join('') + (top ? `<div class="analytics-top"><h3>Ən çox baxılan məhsullar</h3><ol>${[...counts.entries()].filter(([key])=>key.startsWith('product:')).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([key,count])=>`<li>${escape(languageValue(productsById.get(key.slice(8))?.name,'az')||key.slice(8))} · ${count}</li>`).join('')}</ol></div>` : '');
+    const [eventResult,orderResult,interactionResult] = await Promise.all([
+      client.from('storefront_events').select('event_name,product_id,session_id,created_at').gte('created_at',since).order('created_at',{ascending:false}).limit(10000),
+      client.from('orders').select('items,total,status,created_at').gte('created_at',since).order('created_at',{ascending:false}).limit(5000),
+      client.from('customer_interactions').select('product_id,event_name').gte('created_at',since).limit(10000)
+    ]);
+    if (eventResult.error || orderResult.error) { analytics.innerHTML = `<p class="admin-empty">${escape(adminLang()==='ru'?'Не удалось загрузить аналитику. Проверьте миграцию.':adminLang()==='en'?'Could not load analytics. Check the migration.':'Analitika yüklənmədi. Miqrasiyanın tətbiq olunduğunu yoxlayın.')}</p>`; return; }
+    const rows=eventResult.data||[], orderRows=orderResult.data||[], interactionRows=interactionResult.error?[]:(interactionResult.data||[]);
+    const counts=new Map(), views=new Map(), adds=new Map(), removed=new Map(), sold=new Map(), revenueByDay=new Map(), addSessions=new Set(), orderSessions=new Set();
+    const productsById=new Map(products.map(item=>[item.id,item]));
+    rows.forEach(row=>{counts.set(row.event_name,(counts.get(row.event_name)||0)+1);if(row.product_id&&row.event_name==='product_view')views.set(row.product_id,(views.get(row.product_id)||0)+1);if(row.product_id&&row.event_name==='add_to_cart')adds.set(row.product_id,(adds.get(row.product_id)||0)+1);if(row.product_id&&row.event_name==='cart_removed')removed.set(row.product_id,(removed.get(row.product_id)||0)+1);if(row.session_id&&row.event_name==='add_to_cart')addSessions.add(row.session_id);if(row.session_id&&['order_created','checkout_started'].includes(row.event_name))orderSessions.add(row.session_id)});
+    let revenue=0,confirmedOrders=0,units=0;
+    orderRows.forEach(order=>{
+      const date=new Date(order.created_at).toLocaleDateString('az-AZ',{day:'2-digit',month:'2-digit'});
+      if(['confirmed','shipping','delivered'].includes(order.status)){revenue+=Number(order.total)||0;confirmedOrders+=1;revenueByDay.set(date,(revenueByDay.get(date)||0)+(Number(order.total)||0));(Array.isArray(order.items)?order.items:[]).forEach(item=>{const qty=Math.max(0,Number(item.qty)||0);if(!item.id)return;sold.set(item.id,(sold.get(item.id)||0)+qty);units+=qty})}
+    });
+    const topView=[...views.entries()].sort((a,b)=>b[1]-a[1])[0], topSold=[...sold.entries()].sort((a,b)=>b[1]-a[1])[0];
+    const viewsTotal=(counts.get('page_view')||0)+(counts.get('product_view')||0);
+    document.querySelector('#metricViews').textContent=viewsTotal;
+    document.querySelector('#metricTopProduct').textContent=topView?languageValue(productsById.get(topView[0])?.name,'az')||topView[0]:'—';
+    const labels={page_view:at('pageView'),product_view:at('productView'),product_click:at('productClick'),add_to_cart:at('cartAdds'),cart_removed:at('cartRemoves'),checkout_started:at('checkout'),search:at('search'),wishlist_add:at('wishlist'),order_created:at('orderEvent')};
+    const topList=entries=>entries.slice(0,8).map(([id,count])=>`<li>${escape(languageValue(productsById.get(id)?.name,'az')||id)} · ${count}</li>`).join('')||'<li>—</li>';
+    const maxRevenue=Math.max(1,...revenueByDay.values());
+    const chart=[...revenueByDay.entries()].reverse().slice(-7).map(([day,total])=>`<div class="admin-sales-day"><span>${escape(day)}</span><div class="admin-sales-bar"><i style="width:${Math.max(2,Math.round(total/maxRevenue*100))}%"></i></div><span>${money(total)}</span></div>`).join('')||`<p class="admin-empty">${at('noSales')}</p>`;
+    const personalized=interactionRows.reduce((sum,row)=>sum+(row.event_name==='view'?1:0),0);
+    const abandoned=[...addSessions].filter(session=>!orderSessions.has(session)).length;
+    analytics.innerHTML=Object.keys(labels).map(key=>`<article class="analytics-event"><strong>${counts.get(key)||0}</strong><span>${labels[key]}</span></article>`).join('')+
+      `<div class="admin-report-grid"><article><strong>${orderRows.length}</strong><span>${at('orders30')}</span></article><article><strong>${confirmedOrders}</strong><span>${at('confirmed')}</span></article><article><strong>${money(revenue)}</strong><span>${at('revenue')}</span></article><article><strong>${units}</strong><span>${at('sold')}</span></article><article><strong>${counts.get('add_to_cart')||0}</strong><span>${at('cartAdds')}</span></article><article><strong>${counts.get('cart_removed')||0}</strong><span>${at('cartRemoves')}</span></article><article><strong>${abandoned}</strong><span>${at('abandoned')}</span></article><article><strong>${personalized}</strong><span>${at('recommendations')}</span></article></div>`+
+      `<div class="admin-report-columns"><section><h3>${at('topViewed')}</h3><ol>${topList([...views.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section><section><h3>${at('topSold')}</h3><ol>${topList([...sold.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section><section><h3>${at('salesDynamics')}</h3><div class="admin-sales-chart">${chart}</div></section><section><h3>${at('topAdded')}</h3><ol>${topList([...adds.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section><section><h3>${at('topRemoved')}</h3><ol>${topList([...removed.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section></div>`;
+  }
+
+  async function loadSupportTickets() {
+    if (!supportList) return;
+    const {data,error}=await client.from('support_tickets').select('id,user_id,order_id,subject,message,status,admin_reply,created_at').order('created_at',{ascending:false}).limit(200);
+    if(error){supportList.innerHTML=`<p class="admin-empty">${at('supportLoadError')}</p>`;return}
+    const statuses={open:at('open'),in_progress:at('progress'),answered:at('answered'),closed:at('closed')};
+    supportList.innerHTML=(data||[]).length?(data||[]).map(ticket=>`<article class="admin-support-card" data-ticket="${escape(ticket.id)}"><header><strong>${escape(ticket.subject)}</strong><small>${escape(new Date(ticket.created_at).toLocaleString('az-AZ'))} · ${escape(ticket.user_id)}</small></header><p>${escape(ticket.message)}</p>${ticket.order_id?`<small>Sifariş: ${escape(ticket.order_id)}</small>`:''}<label>${at('reply')}<textarea data-ticket-reply>${escape(ticket.admin_reply||'')}</textarea></label><div class="admin-support-actions"><select data-ticket-status aria-label="Müraciətin statusu">${Object.entries(statuses).map(([key,label])=>`<option value="${key}" ${ticket.status===key?'selected':''}>${escape(label)}</option>`).join('')}</select><button type="button" class="admin-order-action" data-save-ticket="${escape(ticket.id)}">${at('save')}</button></div></article>`).join(''):`<p class="admin-empty">${at('supportEmpty')}</p>`;
+  }
+
+  async function loadProductAlerts() {
+    if (!alertList) return;
+    const {data,error}=await client.from('product_alerts').select('user_id,product_id,email,target_price,notify_price_drop,notify_restock,last_notified_at,created_at').order('created_at',{ascending:false}).limit(300);
+    if(error){alertList.innerHTML=`<p class="admin-empty">${at('alertsLoadError')}</p>`;return}
+    alertList.innerHTML=(data||[]).length?(data||[]).map(item=>`<article class="admin-alert-card"><strong>${escape(languageValue(products.find(product=>product.id===item.product_id)?.name,adminLang())||item.product_id)}</strong><p>${escape(item.email)} · ${item.notify_price_drop?at('price'):''}${item.notify_price_drop&&item.notify_restock?' · ':''}${item.notify_restock?at('stock'):''}${item.target_price!=null?` · ≤ ${money(item.target_price)}`:''}</p><small>${at('recent')}: ${item.last_notified_at?escape(new Date(item.last_notified_at).toLocaleString('az-AZ')):'—'}</small></article>`).join(''):`<p class="admin-empty">${at('alertEmpty')}</p>`;
   }
   function subscribeOrders() {
     if (channel) client.removeChannel(channel);
@@ -140,7 +205,12 @@
   orderList?.addEventListener('click',async event=>{const button=event.target.closest('[data-save-order]');if(!button)return;const select=orderList.querySelector(`[data-order-status="${CSS.escape(button.dataset.saveOrder)}"]`);button.disabled=true;try{const {error}=await client.from('orders').update({status:select.value}).eq('id',button.dataset.saveOrder);say(error?'Sifariş statusu dəyişmədi.':'Sifariş statusu yadda saxlandı.',!!error);if(!error)await loadOrders()}catch{say('Sifariş statusu dəyişmədi.',true)}finally{button.disabled=false}});
   document.querySelector('#refreshOrders')?.addEventListener('click',loadOrders);
   document.querySelector('#refreshAnalytics')?.addEventListener('click',loadAnalytics);
-  document.querySelector('.admin-tabs')?.addEventListener('click',event=>{const button=event.target.closest('[data-admin-tab]');if(!button)return;document.querySelectorAll('[data-admin-tab]').forEach(item=>item.classList.toggle('is-active',item===button));document.querySelectorAll('[data-admin-panel]').forEach(panel=>panel.hidden=panel.dataset.adminPanel!==button.dataset.adminTab);if(button.dataset.adminTab==='orders')loadOrders();if(button.dataset.adminTab==='analytics')loadAnalytics()});
+  document.querySelector('#refreshSupport')?.addEventListener('click',loadSupportTickets);
+  document.querySelector('#refreshAlerts')?.addEventListener('click',loadProductAlerts);
+  supportList?.addEventListener('click',async event=>{const button=event.target.closest('[data-save-ticket]');if(!button)return;const card=button.closest('[data-ticket]'),reply=card.querySelector('[data-ticket-reply]'),statusSelect=card.querySelector('[data-ticket-status]');button.disabled=true;try{const replyText=String(reply.value||'').trim();const result=await client.from('support_tickets').update({admin_reply:replyText,status:statusSelect.value,replied_at:replyText?new Date().toISOString():null,updated_at:new Date().toISOString()}).eq('id',button.dataset.saveTicket);say(result.error?'Dəstək cavabı yadda saxlanmadı.':'Cavab və status yadda saxlandı.',!!result.error);if(!result.error)await loadSupportTickets()}catch{say('Dəstək cavabı yadda saxlanmadı.',true)}finally{button.disabled=false}});
+  document.querySelector('.admin-tabs')?.addEventListener('click',event=>{const button=event.target.closest('[data-admin-tab]');if(!button)return;document.querySelectorAll('[data-admin-tab]').forEach(item=>item.classList.toggle('is-active',item===button));document.querySelectorAll('[data-admin-panel]').forEach(panel=>panel.hidden=panel.dataset.adminPanel!==button.dataset.adminTab);if(button.dataset.adminTab==='orders')loadOrders();if(button.dataset.adminTab==='analytics')loadAnalytics();if(button.dataset.adminTab==='support')loadSupportTickets();if(button.dataset.adminTab==='alerts')loadProductAlerts()});
+  document.querySelectorAll('.admin-language-options [data-lang]').forEach(button=>button.addEventListener('click',()=>{const next=button.dataset.lang;if(!['az','ru','en'].includes(next))return;window.MelatoniStorage?.set('melatoni-language',next);localizeAdmin();document.querySelector('.admin-language-picker')?.removeAttribute('open');loadAnalytics();loadSupportTickets();loadProductAlerts()}));
+  localizeAdmin();
   document.addEventListener('melatoni:catalog-updated',event=>{if(!Array.isArray(event.detail))return;products=event.detail;loadProducts()});
   if (client) client.auth.onAuthStateChange((_event,session)=>{if(!session?.user)showLogin('Admin hesabı ilə daxil olun.')});
   currentUser();

@@ -1,0 +1,4 @@
+project_id = "zjmfvtcclecmbjcimddc"
+
+[functions.product-alerts]
+verify_jwt = true

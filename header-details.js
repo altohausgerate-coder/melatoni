@@ -17,7 +17,7 @@
   const localize = () => {
     const copy = window.MelatoniAccountCopy?.[window.MelatoniStorage?.get('melatoni-language') || 'az'];
     if (!copy) return;
-    const values = { accountEyebrow:'title', accountIntro:'subtitle', accountLogin:'login', accountRegister:'register', accountName:'name', accountEmail:'email', accountPhone:'phone', accountPassword:'password', accountForgot:'forgot' };
+    const values = { accountEyebrow:'title', accountIntro:'subtitle', accountLogin:'login', accountRegister:'register', accountName:'name', accountEmail:'email', accountPhone:'phone', accountPassword:'password', accountForgot:'forgot', accountGoogle:'google' };
     Object.entries(values).forEach(([selector,key]) => { const node = $(`[data-account-label="${selector}"]`); if (node) node.textContent = copy[key]; });
     setMode(accountMode, false);
     const signedLink = $('.account-initials');
@@ -32,6 +32,7 @@
     const nameInput = $('[name="name"]'); if (nameInput) nameInput.required = registering;
     const phoneInput = $('[name="phone"]'); if (phoneInput) phoneInput.required = registering;
     const passwordInput = $('[name="password"]'); if (passwordInput) { passwordInput.autocomplete = registering ? 'new-password' : 'current-password'; passwordInput.minLength = registering ? 8 : 0; }
+    const googleButton = $('.account-google'); if (googleButton) googleButton.hidden = registering;
     const title = $('#accountTitle'); if (title) title.textContent = registering ? text('register') : text('login');
     const submit = $('.account-submit'); if (submit) submit.innerHTML = `${registering ? text('submitRegister') : text('submitLogin')} <span aria-hidden="true">↗</span>`;
     document.querySelectorAll('[data-account-mode]').forEach(button => { const active = button.dataset.accountMode === accountMode; button.classList.toggle('is-active', active); button.setAttribute('aria-selected', String(active)); });
@@ -81,6 +82,13 @@
     try {
       const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}${location.pathname.replace(/[^/]*$/, '')}reset-password.html` });
       if (status) status.textContent = error ? text('genericError') : text('resetSent');
+    } catch { if (status) status.textContent = text('genericError'); }
+  });
+  $('.account-google')?.addEventListener('click', async () => {
+    if (!client) { if (status) status.textContent = text('supabaseMissing'); return; }
+    try {
+      const { error } = await client.auth.signInWithOAuth({ provider:'google', options:{ redirectTo:new URL('./', location.href).toString() } });
+      if (error && status) status.textContent = text('genericError');
     } catch { if (status) status.textContent = text('genericError'); }
   });
   accountForm?.addEventListener('submit', async event => {

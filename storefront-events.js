@@ -17,9 +17,28 @@
     }).then(() => {}).catch(() => {});
   };
   window.MELATONI_LOG_EVENT = log;
+  let recommendationUserId = null;
+  let recommendationConsent = false;
+  const pendingInteractions = [];
+  const seenViews = new Set();
+  const trackCustomerInteraction = (productId, eventName) => {
+    if (!productId || !['view','add_to_cart'].includes(eventName)) return;
+    if (recommendationUserId && recommendationConsent) {
+      client.from('customer_interactions').insert({ user_id: recommendationUserId, product_id: productId, event_name: eventName }).then(() => {}).catch(() => {});
+    } else if (recommendationUserId === null && pendingInteractions.length < 20) pendingInteractions.push({ productId, eventName });
+  };
+  client.auth.getUser().then(async ({data}) => {
+    const user = data?.user;
+    if (!user) { recommendationUserId = ''; pendingInteractions.length = 0; return; }
+    recommendationUserId = user.id;
+    const {data: preferences, error} = await client.from('customer_preferences').select('recommendations_consent').eq('user_id',user.id).maybeSingle();
+    recommendationConsent = !error && preferences?.recommendations_consent === true;
+    if (recommendationConsent) pendingInteractions.splice(0).forEach(item => trackCustomerInteraction(item.productId,item.eventName));
+    else pendingInteractions.length = 0;
+  }).catch(() => { recommendationUserId = ''; pendingInteractions.length = 0; });
   log('page_view');
   const id = new URLSearchParams(location.search).get('id');
-  if (id) log('product_view', id);
+  if (id) { log('product_view', id); if (!seenViews.has(id)) { seenViews.add(id); trackCustomerInteraction(id,'view'); } }
   let searchTimer;
   document.querySelector('#searchInput')?.addEventListener('input', event => {
     clearTimeout(searchTimer);
@@ -41,7 +60,7 @@
       }
     }
     const add = event.target.closest('#productGrid [data-add], [data-add-to-bag], #detailAdd');
-    if (add) { log('add_to_cart', add.dataset.add || add.dataset.addToBag || id, { source: location.pathname }); return; }
+    if (add) { const productId = add.dataset.add || add.dataset.addToBag || id; log('add_to_cart', productId, { source: location.pathname }); trackCustomerInteraction(productId,'add_to_cart'); return; }
     const link = event.target.closest('a[href*="product.html?id="]');
     if (link) {
       const productId = new URL(link.href).searchParams.get('id');
@@ -49,6 +68,16 @@
     }
     const favorite = event.target.closest('[data-save], [data-favorite]');
     if (favorite) log('wishlist_add', favorite.dataset.save || favorite.dataset.favorite);
+    const cartRemove = event.target.closest('#cartItems [data-remove], #cartItems [data-qty][data-delta="-1"]');
+    if (cartRemove) {
+      const currentQuantity = Number(cartRemove.parentElement?.querySelector('span')?.textContent?.replace(/[^0-9]/g,''));
+      if (cartRemove.hasAttribute('data-remove') || currentQuantity <= 1) {
+        let productId = null;
+        try { productId = JSON.parse(decodeURIComponent(cartRemove.dataset.key || ''))?.[0] || null; } catch { /* Ignore malformed cart row keys. */ }
+        log('cart_removed', productId, { source: location.pathname });
+      }
+    }
   });
   document.addEventListener('melatoni:order-created', event => log('order_created', null, { source: event.detail?.source || 'checkout' }));
+  document.querySelector('#cartOrder')?.addEventListener('click', () => log('checkout_started', null, { source: 'cart' }));
 })();
