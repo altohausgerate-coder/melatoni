@@ -46,7 +46,15 @@
     if (signedInUser) {
       const name = signedInUser.user_metadata?.full_name || signedInUser.email || '';
       const initials = name.trim().split(/[\s@.]+/).filter(Boolean).slice(0,2).map(part => part[0]).join('').toUpperCase() || 'M';
-      const link = document.createElement('a'); link.className = 'account-initials'; link.href = 'account.html'; link.textContent = initials; link.setAttribute('aria-label', text('menuProfile'));
+      const link = document.createElement('a'); link.className = 'account-initials'; link.href = 'account.html'; link.setAttribute('aria-label', text('menuProfile'));
+      const avatarUrl = signedInUser.user_metadata?.avatar_url || signedInUser.user_metadata?.picture;
+      let safeAvatarUrl = '';
+      try { const parsedAvatarUrl = new URL(avatarUrl, location.href); if (parsedAvatarUrl.protocol === 'https:') safeAvatarUrl = parsedAvatarUrl.href; } catch {}
+      if (safeAvatarUrl) {
+        const avatar = document.createElement('img'); avatar.src = safeAvatarUrl; avatar.alt = ''; avatar.referrerPolicy = 'no-referrer';
+        avatar.addEventListener('error', () => { avatar.remove(); link.textContent = initials; }, { once:true });
+        link.append(avatar);
+      } else link.textContent = initials;
       trigger.replaceWith(link);
     } else if (!trigger.isConnected) {
       const link = $('.account-initials');
