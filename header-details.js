@@ -97,7 +97,12 @@
       if (!error) { accountForm.reset(); setMode('login',false); }
     } else {
       const { error } = await client.auth.signInWithPassword({ email, password });
-      if (status) status.textContent = error ? text('genericError') : text('loginOk');
+      const loginErrorKey = error?.code === 'email_not_confirmed'
+        ? 'emailNotConfirmed'
+        : error?.code === 'invalid_credentials'
+          ? 'invalidCredentials'
+          : 'genericError';
+      if (status) status.textContent = error ? text(loginErrorKey) : text('loginOk');
       const pass = $('[name="password"]'); if (pass) pass.value = '';
       if (!error) setTimeout(() => account?.close(), 650);
     }
