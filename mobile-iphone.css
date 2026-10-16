@@ -169,10 +169,24 @@
   .popular-filters { scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
   .popular-filter { scroll-snap-align: start; }
   .popular-grid { gap: 18px 12px; }
+  .popular-card { flex-basis: min(84vw, 360px); }
+  .popular-image-wrap { aspect-ratio: .9 / 1; }
   .popular-save { width: 42px; height: 42px; }
   .popular-open { width: 42px; height: 42px; }
   .popular-name { font-size: clamp(15px, 4.2vw, 18px); }
   .popular-description { font-size: 13px; line-height: 1.5; }
+
+  .collection-products { padding: 58px var(--mobile-inline) 62px; }
+  .collection-products-heading h2 { font-size: clamp(39px, 10vw, 52px); }
+  .collection-products-filters { scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .collection-products-filters button { min-height: 42px; scroll-snap-align: start; }
+  .collection-products-track { gap: 12px; }
+  .collection-products-page .collection-product-card,
+  .collection-products-page.is-compact .collection-product-card { flex-basis: min(88vw, 380px); }
+  .collection-product-image { aspect-ratio: .92 / 1; }
+  .collection-product-name { font-size: 17px; }
+  .collection-product-description { font-size: 12px; }
+  .collection-product-prices strong { font-size: 17px; }
 
   .sleep-showcase { padding: 58px var(--mobile-inline) 50px; }
   .showcase-gallery { aspect-ratio: 1.08 / 1; min-height: 0; max-height: 530px; }
