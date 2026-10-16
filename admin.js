@@ -42,7 +42,12 @@
   }
   async function currentUser() {
     if (!client) return showLogin('Supabase bağlantısı hazır deyil. Konfiqurasiyanı yoxlayın.');
-    try { const { data, error } = await client.auth.getUser(); if (error) return showLogin('Hesab yoxlanmadı. Yenidən daxil olun.'); await authorize(data.user); }
+    try {
+      const { data, error } = await client.auth.getUser();
+      if (data?.user) return await authorize(data.user);
+      if (error?.name === 'AuthSessionMissingError' || !error) return showLogin('Admin hesabı ilə daxil olun.');
+      return showLogin('Hesab yoxlanmadı. Yenidən daxil olun.');
+    }
     catch { showLogin('Supabase ilə əlaqə qurulmadı.'); }
   }
   async function loadProducts() {
