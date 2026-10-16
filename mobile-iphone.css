@@ -141,17 +141,20 @@
   .brand-showcase-inner { padding-inline: var(--mobile-inline); }
   .brand-showcase-heading h2 { font-size: clamp(37px, 9.5vw, 48px); }
   .brand-controls button { width: 44px; height: 44px; }
-  .brand-track {
-    height: clamp(350px, 112vw, 470px);
-    padding-inline: var(--mobile-inline);
+  .brand-carousel {
+    width: calc(100% + 2 * var(--mobile-inline));
     margin-inline: calc(-1 * var(--mobile-inline));
+  }
+  .brand-track {
+    height: min(105vw, 430px);
+    padding-inline: var(--mobile-inline);
     scroll-padding-inline: var(--mobile-inline);
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
   }
   .brand-panel,
-  .brand-panel.is-active { flex-basis: min(84%, 360px); }
+  .brand-panel.is-active { flex: 0 0 calc(100vw - 2 * var(--mobile-inline)); }
   .brand-panel-copy { bottom: 24px; }
   .brand-panel-arrow { bottom: 22px; width: 44px; height: 44px; }
   .brand-pagination { padding-top: 18px; }
