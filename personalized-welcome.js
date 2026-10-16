@@ -16,8 +16,8 @@
   const PROFILE_KEY = 'melatoni-shop-profile';
   const SHOWN_KEY = 'melatoni-profile-prompt-shown-v2';
   const consentApi = window.MelatoniConsent;
-  const language = () => ['az', 'ru', 'en'].includes(localStorage.getItem('melatoni-language'))
-    ? localStorage.getItem('melatoni-language')
+  const language = () => ['az', 'ru', 'en'].includes(window.MelatoniStorage?.get('melatoni-language'))
+    ? window.MelatoniStorage?.get('melatoni-language')
     : document.documentElement.lang?.slice(0, 2) || 'az';
 
   const copy = {
@@ -109,8 +109,8 @@
     try {
       const functionalAllowed = Boolean(consentApi?.has('functional'));
       const raw = functionalAllowed
-        ? localStorage.getItem(PROFILE_KEY)
-        : sessionStorage.getItem(PROFILE_KEY);
+        ? window.MelatoniStorage?.get(PROFILE_KEY)
+        : window.MelatoniStorage?.get(PROFILE_KEY,null,'session');
       if (!raw) return null;
       const value = JSON.parse(raw);
       if (!value || !Array.isArray(value.interests)) return null;
@@ -133,7 +133,7 @@
   }
 
   function openPrompt(force = false) {
-    if (modalOpen || (!force && sessionStorage.getItem(SHOWN_KEY))) return;
+    if (modalOpen || (!force && window.MelatoniStorage?.get(SHOWN_KEY,null,'session'))) return;
     const existing = storedProfile();
     if (existing && !force) {
       publishProfile(existing);
@@ -217,9 +217,9 @@
       updatedAt: new Date().toISOString(),
     };
     try {
-      const target = consentApi?.has('functional') ? localStorage : sessionStorage;
-      target.setItem(PROFILE_KEY, JSON.stringify(profile));
-      sessionStorage.setItem(SHOWN_KEY, '1');
+      const target = consentApi?.has('functional') ? 'local' : 'session';
+      window.MelatoniStorage?.set(PROFILE_KEY, JSON.stringify(profile), target);
+      window.MelatoniStorage?.set(SHOWN_KEY, '1','session');
     } catch (_) { /* Recommendations still work for this page view. */ }
     publishProfile(profile);
     closePrompt();
@@ -254,7 +254,7 @@
       layer.querySelector('[data-gender="woman"]').focus();
     } else if (event.target.closest('[data-personalize-submit]')) saveProfile();
     else if (event.target.closest('[data-personalize-close]') || event.target === layer) {
-      sessionStorage.setItem(SHOWN_KEY, '1');
+      window.MelatoniStorage?.set(SHOWN_KEY, '1','session');
       closePrompt();
     }
   });
@@ -264,7 +264,7 @@
   document.addEventListener('keydown', event => {
     if (!modalOpen) return;
     if (event.key === 'Escape') {
-      sessionStorage.setItem(SHOWN_KEY, '1');
+      window.MelatoniStorage?.set(SHOWN_KEY, '1','session');
       closePrompt();
       return;
     }
@@ -283,11 +283,11 @@
   });
 
   document.addEventListener('melatoni:language-change', localize);
-  document.addEventListener('melatoni:consent-change', () => {
+  window.addEventListener('melatoni:consent-change', () => {
     if (waitingForConsent) showAfterConsent();
   });
   consentApi?.on('functional', () => {}, () => {
-    try { localStorage.removeItem(PROFILE_KEY); } catch (_) { /* Storage may be unavailable. */ }
+    try { window.MelatoniStorage?.remove(PROFILE_KEY); } catch (_) { /* Storage may be unavailable. */ }
   });
 
   localize();

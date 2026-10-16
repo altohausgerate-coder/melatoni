@@ -120,6 +120,12 @@
   dots.forEach(dot => dot.addEventListener('click', () => { setActive(Number(dot.dataset.brandDot), true); syncTimer(); }));
 
   panels.forEach((panel, index) => {
+    const image = panel.querySelector('img');
+    // Confirm image permission with each brand before publishing externally hosted photography.
+    image?.addEventListener('error', () => {
+      image.hidden = true;
+      panel.classList.add('brand-image-unavailable');
+    }, { once: true });
     panel.addEventListener('pointerenter', () => {
       panelPointerActive = true;
       setActive(index);
@@ -175,7 +181,7 @@
     root.closest('.brand-showcase')?.classList.add('is-inview');
   }
 
-  localize(localStorage.getItem('melatoni-language') || document.documentElement.lang || 'az');
+  localize(window.MelatoniStorage?.get('melatoni-language') || document.documentElement.lang || 'az');
   root.closest('.brand-showcase')?.setAttribute('data-motion-ready', 'true');
   setActive(0);
   syncTimer();

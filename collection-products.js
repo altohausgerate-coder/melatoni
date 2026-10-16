@@ -25,14 +25,14 @@
     bath: product => product.category === 'bath',
   };
   const copy = {
-    az: { eyebrow: 'MELATONI KOLLEKSİYALARI', heading: 'Rahat yuxu üçün hər detal.', intro: 'Yataq dəstindən pijamaya, yuxu maskasından axşam rahatlığına qədər.', allProducts: 'Bütün məhsullar', all: 'Hamısı', linen: 'Yataq tekstili', sleepSet: 'Yastıq və yorğan', comfort: 'Pijama və ev geyimi', accessory: 'Yuxu aksesuarları', bath: 'Hamam və qulluq', product: 'Məhsula bax', offer: 'Xüsusi qiymət' },
-    ru: { eyebrow: 'КОЛЛЕКЦИИ MELATONI', heading: 'Каждая деталь для спокойного сна.', intro: 'От постельного белья и пижам до масок для сна и вечерних аксессуаров.', allProducts: 'Все товары', all: 'Все', linen: 'Текстиль для спальни', sleepSet: 'Подушки и одеяла', comfort: 'Пижамы и домашняя одежда', accessory: 'Аксессуары для сна', bath: 'Ванная и уход', product: 'Подробнее', offer: 'Специальная цена' },
-    en: { eyebrow: 'MELATONI COLLECTIONS', heading: 'Every detail for better rest.', intro: 'From bed linen and pajamas to sleep masks and calming evening essentials.', allProducts: 'All products', all: 'All', linen: 'Bedroom textiles', sleepSet: 'Pillows & duvets', comfort: 'Pajamas & loungewear', accessory: 'Sleep accessories', bath: 'Bath & care', product: 'View product', offer: 'Special price' },
+    az: { eyebrow: 'MELATONI KOLLEKSİYALARI', heading: 'Rahat yuxu üçün hər detal.', intro: 'Yataq dəstindən pijamaya, yuxu maskasından axşam rahatlığına qədər.', allProducts: 'Bütün məhsullar', all: 'Hamısı', linen: 'Yataq tekstili', sleepSet: 'Yastıq və yorğan', comfort: 'Pijama və ev geyimi', accessory: 'Yuxu aksessuarları', bath: 'Hamam və qulluq', product: 'Məhsula bax', offer: 'Xüsusi qiymət', filters: 'Kolleksiyaya görə məhsulları seçin', pagination: 'Kolleksiya səhifələri' },
+    ru: { eyebrow: 'КОЛЛЕКЦИИ MELATONI', heading: 'Каждая деталь для спокойного сна.', intro: 'От постельного белья и пижам до масок для сна и вечерних аксессуаров.', allProducts: 'Все товары', all: 'Все', linen: 'Текстиль для спальни', sleepSet: 'Подушки и одеяла', comfort: 'Пижамы и домашняя одежда', accessory: 'Аксессуары для сна', bath: 'Ванная и уход', product: 'Подробнее', offer: 'Специальная цена', filters: 'Выбрать категорию товаров', pagination: 'Страницы коллекции' },
+    en: { eyebrow: 'MELATONI COLLECTIONS', heading: 'Every detail for better rest.', intro: 'From bed linen and pajamas to sleep masks and calming evening essentials.', allProducts: 'All products', all: 'All', linen: 'Bedroom textiles', sleepSet: 'Pillows & duvets', comfort: 'Pajamas & loungewear', accessory: 'Sleep accessories', bath: 'Bath & care', product: 'View product', offer: 'Special price', filters: 'Choose a product category', pagination: 'Collection pages' },
   };
   const text = value => typeof value === 'string' ? value : (value?.[lang] || value?.az || '');
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char]);
   const money = value => `${new Intl.NumberFormat(lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US', { maximumFractionDigits: 0 }).format(Number(value) || 0)} AZN`;
-  let lang = ['az', 'ru', 'en'].includes(localStorage.getItem('melatoni-language')) ? localStorage.getItem('melatoni-language') : 'az';
+  let lang = ['az', 'ru', 'en'].includes(window.MelatoniStorage?.get('melatoni-language')) ? window.MelatoniStorage?.get('melatoni-language') : 'az';
   let active = 'all';
   const pagination = root.querySelector('.collection-products-pagination');
   let pages = [];
@@ -44,6 +44,8 @@
     root.querySelector('#collectionProductsTitle').textContent = labels.heading;
     root.querySelector('.collection-products-intro').textContent = labels.intro;
     root.querySelector('.collection-products-all').innerHTML = `${labels.allProducts} <span aria-hidden="true">↗</span>`;
+    root.querySelector('.collection-products-filters')?.setAttribute('aria-label', labels.filters);
+    pagination.setAttribute('aria-label', labels.pagination);
     const tabLabels = { all: labels.all, linen: labels.linen, 'sleep-set': labels.sleepSet, comfort: labels.comfort, accessory: labels.accessory, bath: labels.bath };
     root.querySelectorAll('[data-collection-filter]').forEach(button => {
       button.textContent = tabLabels[button.dataset.collectionFilter];
@@ -52,6 +54,18 @@
       button.setAttribute('aria-pressed', String(selected));
     });
     const selected = products.filter(product => filters[active](product));
+    const emptyText = { az: 'Bu kateqoriyada hazırda məhsul yoxdur.', ru: 'В этой категории пока нет товаров.', en: 'There are no products in this category yet.' }[lang] || 'Bu kateqoriyada hazırda məhsul yoxdur.';
+    root.querySelector('.collection-products-empty')?.remove();
+    if (!selected.length) {
+      track.innerHTML = '';
+      pagination.innerHTML = '';
+      const message = document.createElement('p');
+      message.className = 'collection-products-empty';
+      message.setAttribute('role', 'status');
+      message.textContent = emptyText;
+      track.after(message);
+      return;
+    }
     pages = [];
     for (let start = 0; start < selected.length; start += 5) pages.push(selected.slice(start, start + 5));
     activePage = 0;
@@ -75,7 +89,7 @@
       dot.setAttribute('aria-current', String(selected));
     });
   }
-  root.querySelector('.collection-products-filters').addEventListener('click', event => {
+  root.querySelector('.collection-products-filters')?.addEventListener('click', event => {
     const button = event.target.closest('[data-collection-filter]');
     if (!button) return;
     active = button.dataset.collectionFilter;

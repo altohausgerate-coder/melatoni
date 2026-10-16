@@ -46,3 +46,4 @@
 .brand-showcase[data-motion-ready="true"].is-inview .brand-panel:nth-child(4){transition-delay:180ms}
 @media(max-width:900px){.brand-panel.is-active{flex-grow:2}}
 @media(prefers-reduced-motion:reduce){.brand-panel,.brand-panel img,.brand-panel-copy,.brand-description,.brand-panel-arrow,.brand-pagination button,.brand-controls button,.brand-all-link{transition:none!important;scroll-behavior:auto!important}}
+.brand-panel.brand-image-unavailable{background:#e7e3dc}.brand-panel.brand-image-unavailable::before{content:"MELATONI · BRAND IMAGE";position:absolute;inset:0;display:grid;place-items:center;color:rgba(21,42,61,.46);font:500 10px var(--sans);letter-spacing:.16em;background:linear-gradient(135deg,#eeeae3,#d9d5ce)}

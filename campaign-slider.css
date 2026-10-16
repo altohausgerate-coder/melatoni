@@ -54,7 +54,8 @@
   line-height: .98;
   text-wrap: balance;
 }
-.campaign-copy h1 {
+.campaign-copy h1,
+.campaign-copy .campaign-title {
   margin: 9px 0 0;
   color: var(--melatoni-ivory);
   font: 400 clamp(44px, 5.2vw, 72px)/1.02 var(--hero-serif);
@@ -71,7 +72,7 @@
   .campaign-image { object-position: 57% center; }
   .campaign-copy { left: 7%; right: 7%; top: auto; bottom: 116px; width: auto; transform: none; }
   .campaign-offer { font-size: clamp(35px, 9vw, 54px); }
-  .campaign-copy h1 { font-size: clamp(35px, 9vw, 48px); line-height: 1.02; }
+  .campaign-copy h1, .campaign-copy .campaign-title { font-size: clamp(35px, 9vw, 48px); line-height: 1.02; }
   .campaign-description { max-width: 36ch; margin: 12px 0 19px; font-size: 14px; }
   .campaign-cta { min-height: 49px; min-width: 198px; font-size: 11px; }
 }
@@ -79,7 +80,7 @@
   .campaign-hero { min-height: 590px; }
   .campaign-copy { bottom: 109px; }
   .campaign-offer { font-size: 35px; }
-  .campaign-copy h1 { font-size: 27px; }
+  .campaign-copy h1, .campaign-copy .campaign-title { font-size: 27px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .campaign-slide, .campaign-image { transition: none; transform: none; }

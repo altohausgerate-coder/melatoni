@@ -13,19 +13,20 @@
   };
   const products = [...sourceProducts].filter(item => item && typeof item === 'object').sort((a, b) => (rank.get(a.id) ?? 999) - (rank.get(b.id) ?? 999));
   const labels = {
-    az: { heading: 'Bu həftə populyar', headingPersonalized: 'Sizin üçün seçildi', all: 'Hamısı', linen: 'Yataq dəstləri', sleepSet: 'Yastıq və yorğan', bedcare: 'Döşək və çarşaf', homeTextile: 'Ev tekstili', accessory: 'Aksesuarlar', previous: 'Əvvəlki məhsullar', next: 'Növbəti məhsullar', product: 'Məhsula bax', wishlistAdd: 'İstək siyahısına əlavə et', wishlistRemove: 'İstək siyahısından çıxar', region: 'Bu həftə seçilmiş məhsullar', personalizedRegion: 'Sizə uyğun seçilmiş məhsullar' },
-    ru: { heading: 'Популярное на этой неделе', headingPersonalized: 'Подобрано для вас', all: 'Все', linen: 'Постельное бельё', sleepSet: 'Подушки и одеяла', bedcare: 'Матрасы и простыни', homeTextile: 'Домашний текстиль', accessory: 'Аксессуары', previous: 'Предыдущие товары', next: 'Следующие товары', product: 'О товаре', wishlistAdd: 'Добавить в избранное', wishlistRemove: 'Убрать из избранного', region: 'Подборка недели', personalizedRegion: 'Товары, подобранные для вас' },
-    en: { heading: 'Popular this week', headingPersonalized: 'Picked for you', all: 'All', linen: 'Bed linen', sleepSet: 'Pillows & duvets', bedcare: 'Mattresses & sheets', homeTextile: 'Home textiles', accessory: 'Accessories', previous: 'Previous products', next: 'Next products', product: 'View product', wishlistAdd: 'Add to wishlist', wishlistRemove: 'Remove from wishlist', region: 'This week’s selected products', personalizedRegion: 'Products picked for you' },
+    az: { heading: 'Bu həftə populyar', headingPersonalized: 'Sizin üçün seçildi', all: 'Hamısı', linen: 'Yataq dəstləri', sleepSet: 'Yastıq və yorğan', bedcare: 'Döşək və çarşaf', homeTextile: 'Ev geyimi', bath: 'Hamam və qulluq', accessory: 'Yuxu aksessuarları', previous: 'Əvvəlki məhsullar', next: 'Növbəti məhsullar', product: 'Məhsula bax', wishlistAdd: 'İstək siyahısına əlavə et', wishlistRemove: 'İstək siyahısından çıxar', region: 'Bu həftə seçilmiş məhsullar', personalizedRegion: 'Sizə uyğun seçilmiş məhsullar', filters: 'Məhsul kateqoriyası', controls: 'Məhsulları dəyişin' },
+    ru: { heading: 'Популярное на этой неделе', headingPersonalized: 'Подобрано для вас', all: 'Все', linen: 'Постельное бельё', sleepSet: 'Подушки и одеяла', bedcare: 'Матрасы и простыни', homeTextile: 'Домашняя одежда', bath: 'Ванная и уход', accessory: 'Аксессуары для сна', previous: 'Предыдущие товары', next: 'Следующие товары', product: 'О товаре', wishlistAdd: 'Добавить в избранное', wishlistRemove: 'Убрать из избранного', region: 'Подборка недели', personalizedRegion: 'Товары, подобранные для вас', filters: 'Категории товаров', controls: 'Листать товары' },
+    en: { heading: 'Popular this week', headingPersonalized: 'Picked for you', all: 'All', linen: 'Bed linen', sleepSet: 'Pillows & duvets', bedcare: 'Mattresses & sheets', homeTextile: 'Loungewear', bath: 'Bath & care', accessory: 'Sleep accessories', previous: 'Previous products', next: 'Next products', product: 'View product', wishlistAdd: 'Add to wishlist', wishlistRemove: 'Remove from wishlist', region: 'This week’s selected products', personalizedRegion: 'Products picked for you', filters: 'Product categories', controls: 'Browse products' },
   };
   const filters = {
     all: product => true,
     linen: product => product.category === 'linen',
     'sleep-set': product => ['pillow', 'duvet'].includes(product.category),
     bedcare: product => product.category === 'bedcare',
-    'home-textile': product => ['sleepwear', 'bath'].includes(product.category),
+    'home-textile': product => product.category === 'sleepwear',
+    bath: product => product.category === 'bath',
     accessory: product => ['accessory', 'gift'].includes(product.category),
   };
-  const langFromStore = () => ['az', 'ru', 'en'].includes(localStorage.getItem('melatoni-language')) ? localStorage.getItem('melatoni-language') : 'az';
+  const langFromStore = () => ['az', 'ru', 'en'].includes(window.MelatoniStorage?.get('melatoni-language')) ? window.MelatoniStorage?.get('melatoni-language') : 'az';
   let lang = langFromStore();
   let activeFilter = 'all';
   let timer = 0;
@@ -65,7 +66,10 @@
     root.querySelector('[data-popular-filter="sleep-set"]').textContent = copy.sleepSet;
     root.querySelector('[data-popular-filter="bedcare"]').textContent = copy.bedcare;
     root.querySelector('[data-popular-filter="home-textile"]').textContent = copy.homeTextile;
+    root.querySelector('[data-popular-filter="bath"]').textContent = copy.bath;
     root.querySelector('[data-popular-filter="accessory"]').textContent = copy.accessory;
+    root.querySelector('.popular-filters')?.setAttribute('aria-label', copy.filters);
+    root.querySelector('.popular-controls')?.setAttribute('aria-label', copy.controls);
     root.querySelector('[data-popular-prev]').setAttribute('aria-label', copy.previous);
     root.querySelector('[data-popular-next]').setAttribute('aria-label', copy.next);
     grid.setAttribute('aria-label', personalized ? copy.personalizedRegion : copy.region);
