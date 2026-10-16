@@ -3,6 +3,10 @@
 .catalog-header .product-brand img{filter:none}.catalog-header .back-to-shop{justify-self:center}.catalog-header .product-header-tools{gap:28px}
 .catalog-header .product-about-link{font-size:11px;color:var(--catalog-ink)}
 .catalog-header .bag-shortcut #catalogBagCount{min-width:19px;height:19px;display:grid;place-items:center;border-radius:50%;background:#e7edf0;color:var(--catalog-ink);font-size:9px}
+.catalog-header .bag-shortcut{color:#fff;background:#0a4181;box-shadow:0 4px 14px rgba(10,65,129,.2)}
+.catalog-header .bag-shortcut .bag-symbol{width:17px;height:15px;border-width:1.7px}
+.catalog-header .bag-shortcut .bag-symbol::before{width:9px;height:7px;left:3px;top:-8px;border-width:1.7px}
+.catalog-header .bag-shortcut #catalogBagCount{background:#f7f7f3;color:#0a4181}
 .catalog-main{width:min(1540px,100%);margin:0 auto;padding:clamp(52px,7vw,100px) 6.5% 76px}
 .catalog-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-bottom:50px}
 .catalog-eyebrow{margin:0 0 17px;color:var(--catalog-muted);font-size:10px;font-weight:600;letter-spacing:.17em}
@@ -69,7 +73,7 @@
   .catalog-toolbar strong{font-size:15px}
   .catalog-toolbar .sort-control{gap:8px}
   .catalog-toolbar select{min-height:40px;padding:0 24px 0 10px;border-radius:999px;background-color:#eaf0f3;font-size:12px}
-  .catalog-grid{width:100%;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:22px 12px}
+  .catalog-grid{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:22px 12px}
   .catalog-grid .product-card{min-width:0}
   .catalog-grid .product-image{aspect-ratio:1.08}
   .catalog-grid .product-detail{padding-top:10px}
