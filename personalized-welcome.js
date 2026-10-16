@@ -5,12 +5,9 @@
   if (!layer) return;
 
   const dialog = layer.querySelector('.personalize-dialog');
-  const genderStep = layer.querySelector('[data-personalize-step="gender"]');
   const interestStep = layer.querySelector('[data-personalize-step="interests"]');
   const detailsStep = layer.querySelector('[data-personalize-step="details"]');
   const interests = [...layer.querySelectorAll('[data-interest]')];
-  const genderTitle = layer.querySelector('#personalizeGenderTitle');
-  const genderDescription = layer.querySelector('#personalizeDescription');
   const interestTitle = layer.querySelector('#personalizeTitle');
   const interestDescription = layer.querySelector('#personalizeInterestDescription');
   const PROFILE_KEY = 'melatoni-shop-profile';
@@ -22,8 +19,7 @@
 
   const copy = {
     az: {
-      eyebrow: 'MELATONI · SİZƏ ÖZƏL', title: 'Sizə uyğun rahatlığı tapaq.', intro: 'Seçimlərinizi paylaşın, Melatoni sizə maraqlı məhsulları önə çıxarsın.',
-      genderLabel: 'Məhsul seçimlərini uyğunlaşdırın', woman: 'Qadın', man: 'Kişi', skipGender: 'Cinsiyyət seçmədən davam et',
+      eyebrow: 'MELATONI · SİZƏ ÖZƏL',
       back: 'Geri', interestTitle: 'Ən çox nə ilə maraqlanırsınız?', interestIntro: 'Bir və ya bir neçə seçim edin. Tövsiyələriniz buna uyğun sıralanacaq.',
       all: 'Hamısı', linen: 'Yataq dəstləri', pillow: 'Yastıqlar', duvet: 'Yorğanlar', bedcare: 'Döşək və qoruyucular', sleepwear: 'Ev geyimi', bath: 'Hamam tekstili', accessory: 'Aksesuarlar',
       submit: 'Mənə uyğun məhsulları göstər', privacy: 'Seçimləriniz bu brauzerdə saxlanılır. İstənilən vaxt yeniləyə bilərsiniz.', close: 'Pəncərəni bağla',
@@ -34,8 +30,7 @@
       cool: 'Sərin', balanced: 'Balanslı', warm: 'İsti', crisp: 'Sərin və xırtıldayan', smooth: 'İpək kimi hamar', breathable: 'Nəfəs alan pambıq', soft: 'Yumşaq dəstək', neck: 'Boyun dəstəyi', light: 'Yüngül dolğu', under100: '100 AZN-dək', under200: '200 AZN-dək', noLimit: 'Məhdudiyyət yoxdur',
     },
     ru: {
-      eyebrow: 'MELATONI · ДЛЯ ВАС', title: 'Подберём комфорт для вас.', intro: 'Расскажите о своих предпочтениях, и Melatoni покажет интересные товары.',
-      genderLabel: 'Настроить подбор товаров', woman: 'Женщина', man: 'Мужчина', skipGender: 'Продолжить без выбора пола',
+      eyebrow: 'MELATONI · ДЛЯ ВАС',
       back: 'Назад', interestTitle: 'Что вас интересует?', interestIntro: 'Выберите одну или несколько категорий — рекомендации будут отсортированы по ним.',
       all: 'Все товары', linen: 'Постельное бельё', pillow: 'Подушки', duvet: 'Одеяла', bedcare: 'Матрасы и защита', sleepwear: 'Домашняя одежда', bath: 'Текстиль для ванной', accessory: 'Аксессуары',
       submit: 'Показать товары для меня', privacy: 'Настройки хранятся в этом браузере. Их можно изменить в любое время.', close: 'Закрыть окно',
@@ -46,8 +41,7 @@
       cool: 'Прохладно', balanced: 'Умеренно', warm: 'Тепло', crisp: 'Прохладная и хрустящая', smooth: 'Шёлковистая и гладкая', breathable: 'Дышащий хлопок', soft: 'Мягкая поддержка', neck: 'Поддержка шеи', light: 'Лёгкий наполнитель', under100: 'До 100 AZN', under200: 'До 200 AZN', noLimit: 'Без ограничений',
     },
     en: {
-      eyebrow: 'MELATONI · JUST FOR YOU', title: 'Find your kind of comfort.', intro: 'Share what you like and Melatoni will bring the most relevant products forward.',
-      genderLabel: 'Personalize product suggestions', woman: 'Woman', man: 'Man', skipGender: 'Continue without selecting',
+      eyebrow: 'MELATONI · JUST FOR YOU',
       back: 'Back', interestTitle: 'What are you looking for?', interestIntro: 'Choose one or more categories to sort your recommendations.',
       all: 'Everything', linen: 'Bed linen', pillow: 'Pillows', duvet: 'Duvets', bedcare: 'Mattresses & protectors', sleepwear: 'Loungewear', bath: 'Bath textiles', accessory: 'Accessories',
       submit: 'Show my recommendations', privacy: 'Your choices stay in this browser. You can update them any time.', close: 'Close window',
@@ -59,7 +53,6 @@
     },
   };
 
-  let selectedGender = 'unspecified';
   let lastFocus = null;
   let modalOpen = false;
   let waitingForConsent = !consentApi?.get();
@@ -72,13 +65,6 @@
 
   function localize() {
     layer.querySelector('.personalize-eyebrow').textContent = text('eyebrow');
-    genderTitle.textContent = text('title');
-    genderDescription.textContent = text('intro');
-    layer.querySelector('.personalize-genders').setAttribute('aria-label', text('genderLabel'));
-    layer.querySelector('[data-gender="woman"]').lastElementChild.textContent = text('woman');
-    layer.querySelector('[data-gender="man"]').lastElementChild.textContent = text('man');
-    layer.querySelector('[data-personalize-skip]').textContent = text('skipGender');
-    layer.querySelector('[data-personalize-back] span').textContent = text('back');
     interestTitle.textContent = text('interestTitle');
     interestDescription.textContent = text('interestIntro');
     layer.querySelector('[data-interest="all"]').textContent = text('all');
@@ -114,7 +100,7 @@
       if (!raw) return null;
       const value = JSON.parse(raw);
       if (!value || !Array.isArray(value.interests)) return null;
-      return value;
+      return { interests: value.interests, preferences: value.preferences && typeof value.preferences === 'object' ? value.preferences : {} };
     } catch (_) { return null; }
   }
 
@@ -138,7 +124,6 @@
     if (existing && !force) {
       publishProfile(existing);
     }
-    selectedGender = existing?.gender || 'unspecified';
     selectedInterests = new Set(existing?.interests?.length ? existing.interests : ['all']);
     selectedPreferences = { ...(existing?.preferences || {}) };
     interests.forEach(button => button.setAttribute('aria-pressed', String(selectedInterests.has(button.dataset.interest))));
@@ -148,11 +133,10 @@
     layer.hidden = false;
     layer.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    genderStep.hidden = false;
-    interestStep.hidden = true;
+    interestStep.hidden = false;
     detailsStep.hidden = true;
-    dialog.setAttribute('aria-labelledby', genderTitle.id);
-    dialog.setAttribute('aria-describedby', genderDescription.id);
+    dialog.setAttribute('aria-labelledby', interestTitle.id);
+    dialog.setAttribute('aria-describedby', interestDescription.id);
     localize();
     requestAnimationFrame(() => {
       layer.classList.add('is-open');
@@ -165,16 +149,6 @@
       waitingForConsent = false;
       window.setTimeout(openPrompt, 220);
     }
-  }
-
-  function moveToInterestStep(gender) {
-    selectedGender = gender;
-    genderStep.hidden = true;
-    interestStep.hidden = false;
-    detailsStep.hidden = true;
-    dialog.setAttribute('aria-labelledby', interestTitle.id);
-    dialog.setAttribute('aria-describedby', interestDescription.id);
-    interestStep.querySelector('[data-interest="all"]').focus();
   }
 
   function moveToDetailsStep() {
@@ -211,7 +185,6 @@
 
   function saveProfile() {
     const profile = {
-      gender: selectedGender,
       interests: selectedInterests.has('all') ? [] : [...selectedInterests],
       preferences: Object.fromEntries(Object.entries(selectedPreferences).filter(([, value]) => value)),
       updatedAt: new Date().toISOString(),
@@ -231,11 +204,9 @@
   }
 
   layer.addEventListener('click', event => {
-    const genderButton = event.target.closest('[data-gender]');
     const interestButton = event.target.closest('[data-interest]');
     const preferenceButton = event.target.closest('[data-pref]');
-    if (genderButton) moveToInterestStep(genderButton.dataset.gender);
-    else if (interestButton) toggleInterest(interestButton);
+    if (interestButton) toggleInterest(interestButton);
     else if (preferenceButton) togglePreference(preferenceButton);
     else if (event.target.closest('[data-personalize-next]')) moveToDetailsStep();
     else if (event.target.closest('[data-personalize-back-details]')) {
@@ -245,14 +216,7 @@
       dialog.setAttribute('aria-describedby', interestDescription.id);
       layer.querySelector('[data-interest="all"]').focus();
     }
-    else if (event.target.closest('[data-personalize-skip]')) moveToInterestStep('unspecified');
-    else if (event.target.closest('[data-personalize-back]')) {
-      interestStep.hidden = true;
-      genderStep.hidden = false;
-      dialog.setAttribute('aria-labelledby', genderTitle.id);
-      dialog.setAttribute('aria-describedby', genderDescription.id);
-      layer.querySelector('[data-gender="woman"]').focus();
-    } else if (event.target.closest('[data-personalize-submit]')) saveProfile();
+    else if (event.target.closest('[data-personalize-submit]')) saveProfile();
     else if (event.target.closest('[data-personalize-close]') || event.target === layer) {
       window.MelatoniStorage?.set(SHOWN_KEY, '1','session');
       closePrompt();
