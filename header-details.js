@@ -12,12 +12,13 @@
   const client = window.MELATONI_SUPABASE;
   const text = window.MelatoniAccountText || (key => key);
   let accountMode = 'login';
+  let emailLoginOpen = false;
   let signedInUser = null;
 
   const localize = () => {
     const copy = window.MelatoniAccountCopy?.[window.MelatoniStorage?.get('melatoni-language') || 'az'];
     if (!copy) return;
-    const values = { accountEyebrow:'title', accountIntro:'subtitle', accountLogin:'login', accountRegister:'register', accountName:'name', accountEmail:'email', accountPhone:'phone', accountPassword:'password', accountForgot:'forgot', accountGoogle:'google' };
+    const values = { accountEyebrow:'title', accountIntro:'subtitle', accountLogin:'login', accountRegister:'register', accountName:'name', accountEmail:'email', accountPhone:'phone', accountPassword:'password', accountForgot:'forgot', accountGoogle:'google', accountGmail:'gmail' };
     Object.entries(values).forEach(([selector,key]) => { const node = $(`[data-account-label="${selector}"]`); if (node) node.textContent = copy[key]; });
     setMode(accountMode, false);
     const signedLink = $('.account-initials');
@@ -25,7 +26,9 @@
     const trigger = $('.account-toggle'); if (trigger) trigger.setAttribute('aria-label', copy.login);
   };
   function setMode(mode, clearStatus = true) {
-    accountMode = mode === 'register' ? 'register' : 'login';
+    const nextMode = mode === 'register' ? 'register' : 'login';
+    if (nextMode !== accountMode) emailLoginOpen = nextMode === 'register';
+    accountMode = nextMode;
     const registering = accountMode === 'register';
     const nameField = $('.account-name-field'); if (nameField) nameField.hidden = !registering;
     const phoneField = $('.account-phone-field'); if (phoneField) phoneField.hidden = !registering;
@@ -33,8 +36,11 @@
     const phoneInput = $('[name="phone"]'); if (phoneInput) phoneInput.required = registering;
     const passwordInput = $('[name="password"]'); if (passwordInput) { passwordInput.autocomplete = registering ? 'new-password' : 'current-password'; passwordInput.minLength = registering ? 8 : 0; }
     const googleButton = $('.account-google'); if (googleButton) googleButton.hidden = registering;
+    const gmailButton = $('.account-gmail'); if (gmailButton) gmailButton.hidden = registering || emailLoginOpen;
+    if (accountForm) accountForm.hidden = !registering && !emailLoginOpen;
+    const forgotLink = $('.account-forgot'); if (forgotLink) forgotLink.hidden = registering || !emailLoginOpen;
     const title = $('#accountTitle'); if (title) title.textContent = registering ? text('register') : text('login');
-    const submit = $('.account-submit'); if (submit) submit.innerHTML = `${registering ? text('submitRegister') : text('submitLogin')} <span aria-hidden="true">↗</span>`;
+    const submit = $('.account-submit'); if (submit) submit.innerHTML = `${registering ? text('submitRegister') : emailLoginOpen ? text('gmail') : text('submitLogin')} <span aria-hidden="true">↗</span>`;
     document.querySelectorAll('[data-account-mode]').forEach(button => { const active = button.dataset.accountMode === accountMode; button.classList.toggle('is-active', active); button.setAttribute('aria-selected', String(active)); });
     if (clearStatus && status) status.textContent = '';
     if (whatsapp) whatsapp.hidden = true;
@@ -79,7 +85,7 @@
   $('.search-toggle')?.addEventListener('click', event => { if (matchMedia('(max-width: 760px)').matches) { event.preventDefault(); search?.classList.toggle('open'); searchInput?.focus(); } });
   resetSearch?.addEventListener('click', () => { resetSearch.hidden = true; searchInput?.dispatchEvent(new Event('input', { bubbles:true })); searchInput?.focus(); });
   searchInput?.addEventListener('input', () => { if (resetSearch) resetSearch.hidden = !searchInput.value; });
-  document.addEventListener('click', event => { if (event.target.closest('.account-toggle')) { if (account && !account.open) account.showModal(); $('[name="email"]')?.focus({preventScroll:true}); } });
+  document.addEventListener('click', event => { if (event.target.closest('.account-toggle')) { if (account && !account.open) account.showModal(); $('.account-google:not([hidden])')?.focus({preventScroll:true}); } });
   $('.account-close')?.addEventListener('click', () => account?.close());
   account?.addEventListener('click', event => { if (event.target === account) account.close(); });
   document.querySelectorAll('[data-account-mode]').forEach(button => button.addEventListener('click', () => setMode(button.dataset.accountMode)));
@@ -98,6 +104,11 @@
       const { error } = await client.auth.signInWithOAuth({ provider:'google', options:{ redirectTo:new URL('./', location.href).toString() } });
       if (error && status) status.textContent = text('genericError');
     } catch { if (status) status.textContent = text('genericError'); }
+  });
+  $('.account-gmail')?.addEventListener('click', () => {
+    emailLoginOpen = true;
+    setMode('login');
+    $('[name="email"]')?.focus({ preventScroll:true });
   });
   accountForm?.addEventListener('submit', async event => {
     event.preventDefault();

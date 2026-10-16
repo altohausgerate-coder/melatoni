@@ -25,9 +25,9 @@
     alertsTitle:'Product alerts', alertsIntro:'Get an email when a selected item is back in stock or its price drops.', alertProduct:'Product', alertTarget:'Notify me at this price (AZN, optional)', alertPrice:'Notify me when the price drops', alertStock:'Notify me when back in stock', alertConsent:'I agree to use my account email for these alerts.', alertSave:'Create alert', alertSaved:'Your alert preference is saved.', alertRemove:'Turn off alert', alertEmpty:'No product alerts yet.', alertPending:'Email delivery needs an email provider to be connected.',
     alertConsentRequired:'Please agree to product email alerts.', alertTypeRequired:'Choose a price-drop or back-in-stock alert.', supportTitle:'Support requests', supportIntro:'Ask us about an order or product. Replies will stay here.', supportOrder:'Order (optional)', supportNoOrder:'No order selected', supportSubject:'Subject', supportMessage:'Your message', supportSend:'Send request', supportSent:'Your request was sent. Replies will appear here.', supportEmpty:'No support requests yet.', supportOpen:'Open', supportProgress:'In progress', supportAnswered:'Answered', supportClosed:'Closed', supportReply:'Melatoni reply', featuresUnavailable:'Apply the Supabase update to enable these sections.'
   });
-  Object.assign(copy.az, { google:'Google ilə davam et' });
-  Object.assign(copy.ru, { google:'Продолжить с Google' });
-  Object.assign(copy.en, { google:'Continue with Google' });
+  Object.assign(copy.az, { google:'Google ilə davam et', gmail:'Gmail ilə davam et' });
+  Object.assign(copy.ru, { google:'Продолжить с Google', gmail:'Продолжить с Gmail' });
+  Object.assign(copy.en, { google:'Continue with Google', gmail:'Continue with Gmail' });
   const language = () => {
     const stored = window.MelatoniStorage?.get('melatoni-language');
     return copy[stored] ? stored : 'az';
