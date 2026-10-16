@@ -31,6 +31,7 @@
   };
   const text = value => typeof value === 'string' ? value : (value?.[lang] || value?.az || '');
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char]);
+  const mobileImageFor = value => /^assets\/products\/[\w-]+\.(?:jpe?g|png|webp|avif)$/i.test(value || '') ? value.replace(/^assets\/products\/([\w-]+)\.(?:jpe?g|png|webp|avif)$/i, 'assets/products/mobile/$1.webp') : '';
   const money = value => `${new Intl.NumberFormat(lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US', { maximumFractionDigits: 0 }).format(Number(value) || 0)} AZN`;
   let lang = ['az', 'ru', 'en'].includes(window.MelatoniStorage?.get('melatoni-language')) ? window.MelatoniStorage?.get('melatoni-language') : 'az';
   let active = 'all';
@@ -74,7 +75,8 @@
       const sale = Number(product.salePrice) > 0 && Number(product.salePrice) < Number(product.price);
       const selectedImage = collectionImages[product.id] || product.image;
       const image = /^assets\/products\/[\w-]+\.(?:jpe?g|png|webp|avif)$/i.test(selectedImage || '') ? selectedImage : '';
-      return `<article class="collection-product-card" style="--collection-order:${index}"><a class="collection-product-image" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(labels.product)}: ${name}">${image ? `<img src="${escape(image)}" alt="${name}" loading="lazy">` : ''}${sale ? `<span class="collection-product-sale">${escape(labels.offer)}</span>` : ''}<span class="collection-product-image-arrow" aria-hidden="true">↗</span></a><div class="collection-product-info"><a class="collection-product-name" href="product.html?id=${encodeURIComponent(product.id)}">${name}</a><p class="collection-product-description">${escape(text(product.desc))}</p><div class="collection-product-prices">${sale ? `<del>${money(product.price)}</del>` : ''}<strong>${money(sale ? product.salePrice : product.price)}</strong></div></div></article>`;
+      const mobileImage = mobileImageFor(selectedImage);
+      return `<article class="collection-product-card" style="--collection-order:${index}"><a class="collection-product-image" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(labels.product)}: ${name}">${image ? `<picture>${mobileImage ? `<source media="(max-width: 760px)" srcset="${escape(mobileImage)}">` : ''}<img src="${escape(image)}" alt="${name}" loading="lazy" decoding="async"></picture>` : ''}${sale ? `<span class="collection-product-sale">${escape(labels.offer)}</span>` : ''}<span class="collection-product-image-arrow" aria-hidden="true">↗</span></a><div class="collection-product-info"><a class="collection-product-name" href="product.html?id=${encodeURIComponent(product.id)}">${name}</a><p class="collection-product-description">${escape(text(product.desc))}</p><div class="collection-product-prices">${sale ? `<del>${money(product.price)}</del>` : ''}<strong>${money(sale ? product.salePrice : product.price)}</strong></div></div></article>`;
     }).join('')}</div>`).join('');
     pagination.innerHTML = pages.map((_, index) => `<button type="button" data-collection-page-dot="${index}" aria-label="${lang === 'en' ? 'Page' : lang === 'ru' ? 'Страница' : 'Səhifə'} ${index + 1}" aria-current="${index === 0}"></button>`).join('');
     track.scrollTo({ left: 0, behavior: 'auto' });

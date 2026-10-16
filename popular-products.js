@@ -43,6 +43,7 @@
   const formatPrice = value => `${new Intl.NumberFormat(lang === 'az' ? 'az-AZ' : lang === 'ru' ? 'ru-RU' : 'en-US', { maximumFractionDigits: 0 }).format(Number(value) || 0)} AZN`;
   const saleLabel = { az: 'Xüsusi qiymət', ru: 'Специальная цена', en: 'Special price' };
   const imageFor = value => /^assets\/products\/[\w-]+\.(?:jpe?g|png|webp|avif)$/i.test(String(value || '')) ? value : '';
+  const mobileImageFor = value => imageFor(value).replace(/^assets\/products\/([\w-]+)\.(?:jpe?g|png|webp|avif)$/i, 'assets/products/mobile/$1.webp');
   const list = () => {
     const maxBudget = preferences.budget && preferences.budget !== 'all' ? Number(preferences.budget) : Infinity;
     const matching = products.filter(product => (filters[activeFilter] || filters.all)(product) && Number(product.price) <= maxBudget);
@@ -93,13 +94,14 @@
       const name = escape(textFor(product.name));
       const description = escape(textFor(product.desc));
       const image = escape(imageFor(product.image));
+      const mobileImage = escape(mobileImageFor(product.image));
       const saved = savedIds.has(product.id);
       const salePrice = Number(product.salePrice);
       const hasSale = Number.isFinite(salePrice) && salePrice > 0 && salePrice < Number(product.price);
       return `<article class="popular-card" style="--popular-order:${index}" data-popular-card>
         <div class="popular-image-wrap">
           <a class="popular-image-link" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${escape(copy.product)}: ${name}">
-            ${image ? `<img src="${image}" alt="${name}" loading="lazy"/>` : '<span class="popular-image-empty">MELATONI</span>'}
+            ${image ? `<picture><source media="(max-width: 760px)" srcset="${mobileImage}"><img src="${image}" alt="${name}" loading="lazy" decoding="async"/></picture>` : '<span class="popular-image-empty">MELATONI</span>'}
           </a>
           ${hasSale ? `<span class="popular-sale">${escape(saleLabel[lang] || saleLabel.az)}</span>` : ''}
           <button class="popular-save${saved ? ' is-saved' : ''}" type="button" data-save="${id}" aria-label="${saved ? escape(copy.wishlistRemove) : escape(copy.wishlistAdd)}" aria-pressed="${saved}">${saved ? '♥' : '♡'}</button>

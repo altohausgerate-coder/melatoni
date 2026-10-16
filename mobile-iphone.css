@@ -316,3 +316,14 @@
   .campaign-image, .brand-panel, .brand-panel *, .showcase-slide,
   .showcase-slide *, .mobile-wa { scroll-behavior: auto !important; }
 }
+
+/* Keep phone product browsing compact and load lighter image variants. */
+@media (max-width: 760px) {
+  .popular-card { flex-basis: min(69vw, 276px); }
+  .popular-image-wrap { aspect-ratio: 1.12 / 1; }
+  .popular-image-link picture,
+  .collection-product-image picture { display: block; width: 100%; height: 100%; }
+  .collection-products-page .collection-product-card,
+  .collection-products-page.is-compact .collection-product-card { flex-basis: min(69vw, 276px); }
+  .collection-product-image { aspect-ratio: 1.12 / 1; }
+}
