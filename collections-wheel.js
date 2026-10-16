@@ -46,6 +46,16 @@
     section.style.setProperty('--wheel-entry-shift', `${(1 - entryProgress) * 38}px`);
     section.style.setProperty('--wheel-entry-scale', String(.965 + entryProgress * .035));
 
+    // On touch phones, page scrolling advances the same wheel animation that
+    // desktop users control with the mouse wheel. The sticky stage stays in
+    // view while the section provides enough scroll distance for every card.
+    if (window.matchMedia('(max-width: 760px)').matches) {
+      const travel = Math.max(1, section.offsetHeight - stage.clientHeight);
+      const progress = clamp(-sectionTop / travel, 0, 1);
+      const scrollTarget = progress * count;
+      if (Math.abs(scrollTarget - target) > .015) setTarget(scrollTarget);
+    }
+
     const hero = document.querySelector('.campaign-hero');
     if (hero) {
       const heroBottom = hero.getBoundingClientRect().bottom;

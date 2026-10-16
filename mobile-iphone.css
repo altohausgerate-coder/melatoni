@@ -116,11 +116,18 @@
 
   /* Keep the scroll-led collection transition, without swallowing the next section. */
   .collections-wheel {
-    min-height: clamp(600px, 92svh, 820px);
+    min-height: 220svh;
     margin-top: -7svh;
     scroll-margin-top: 58px;
+    overflow: visible;
   }
-  .wheel-stage { overscroll-behavior: contain; }
+  .wheel-stage {
+    position: sticky;
+    inset: auto;
+    top: var(--mobile-header-height);
+    height: calc(100svh - var(--mobile-header-height));
+    overscroll-behavior: contain;
+  }
   .wheel-card { -webkit-tap-highlight-color: transparent; }
 
   .brand-showcase,
@@ -192,7 +199,7 @@
   .footer { padding: 46px var(--mobile-inline) calc(32px + var(--mobile-safe-bottom)); }
   .footer a, .footer button { min-height: 40px; }
   .mobile-wa {
-    display: none;
+    display: none !important;
   }
 
   .cart-drawer { height: 100vh; height: 100dvh; padding: 22px 20px max(20px, var(--mobile-safe-bottom)); }
