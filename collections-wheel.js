@@ -101,13 +101,16 @@
 
     const morph = clamp(turn, 0, 1);
     const position = Math.max(0, turn - 1);
+    const finalCardFade = clamp((turn - Math.max(0, last - .55)) / .55, 0, 1);
     orbit.style.transform = `translateZ(${-morph * drumRadius}px)`;
 
     cards.forEach((card, i) => {
       const distance = i - position;
       const drumDegrees = distance * step;
       card.style.transform = cardTransform(distance * (360 / count), drumDegrees, morph);
-      card.style.opacity = morph > .5 && Math.abs(distance) > 1.6 ? '0' : '1';
+      const orbitOpacity = morph > .5 && Math.abs(distance) > 1.6 ? 0 : 1;
+      const finalOpacity = i === last ? 1 : 1 - finalCardFade;
+      card.style.opacity = String(Math.min(orbitOpacity, finalOpacity));
       card.style.zIndex = String(Math.round(100 - Math.abs(distance) * 2));
       card.firstElementChild.style.transform = `scale(${lerp(ringScale, 1, morph)})`;
     });
