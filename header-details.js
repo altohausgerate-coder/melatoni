@@ -259,7 +259,7 @@
         if (alreadySeen || signedInUser || !account || account.open) return;
         accountPromptActive = true;
         try { sessionStorage.setItem('melatoni-account-interest-prompt', 'seen'); } catch {}
-        setMode('register');
+        setMode('login');
         account.showModal();
       }, 900);
     }, { threshold:0.12, rootMargin:'0px 0px -12% 0px' });
