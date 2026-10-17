@@ -116,7 +116,7 @@ html[lang="ru"] .hero h1{font-size:clamp(44px,5.3vw,64px)}
 .product-card .product-save{transition:transform .25s ease,background .25s ease,color .25s ease}
 .product-card:hover .product-save{transform:scale(1.05)}
 .add-to-bag:active,.order-link:active,.button:active{transform:translateY(1px) scale(.98)}
-.bag-count{transition:transform .2s ease}.bag-toggle:hover .bag-count{transform:scale(1.14)}
+.bag-count[hidden]{display:none}.bag-count{transition:transform .2s ease}.bag-toggle:hover .bag-count{transform:scale(1.14)}
 .main-nav a:focus-visible,.button:focus-visible,.order-link:focus-visible,.add-to-bag:focus-visible,.category-filter:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 @media(prefers-reduced-motion:reduce){.hero-image{animation:heroSettle 1.4s ease both}.hero-copy .eyebrow,.hero h1,.hero-description,.hero-actions,.hero-stamp{animation:none}.motion-ready [data-motion-item]{opacity:1;transform:none;transition:none}.product-card,.category-card,.category-card img{transition:none}.category-card:hover,.product-card:hover,.product-card:hover .product-image img{transform:none}}
 
