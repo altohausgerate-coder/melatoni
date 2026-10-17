@@ -13,3 +13,16 @@
 .mc-banner{width:min(920px,100%);padding:22px 26px 20px;background:rgba(251,250,247,.97);border:1px solid rgba(18,63,122,.1);border-radius:22px;box-shadow:0 18px 54px rgba(16,42,67,.2);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .mc-banner-head{gap:14px;margin-bottom:10px}.mc-moon{width:38px;height:38px;background:#eaf2f8;color:#14559b;font-size:22px}.mc-banner-kicker{margin:0 0 3px!important;color:#668099!important;font-size:9px!important;font-weight:700;letter-spacing:.16em;line-height:1.3!important}.mc-banner h2{font-family:Manrope,system-ui,sans-serif;font-size:18px;letter-spacing:-.025em}.mc-banner>p{max-width:760px;font-size:12px;line-height:1.65}.mc-banner-actions{gap:8px;margin-top:15px}.mc-button{min-height:42px;border-radius:999px;padding:0 16px;font-size:12px}.mc-quiet{color:#123f7a}.mc-outline{background:#fff;border-color:rgba(18,63,122,.18)}.mc-primary{background:#123f7a;box-shadow:0 5px 14px rgba(18,63,122,.16)}
 @media(max-width:760px){.mc-consent{inset:auto 0 0;padding:0}.mc-banner{padding:21px 20px max(20px,env(safe-area-inset-bottom));border-radius:22px 22px 0 0}.mc-banner h2{font-size:17px}.mc-banner>p{font-size:12px}.mc-banner-actions{display:grid;grid-template-columns:1fr;gap:7px;margin-top:14px}.mc-button{min-height:45px}}
+
+/* Calm, choice-first consent: all three first-layer actions share equal prominence. */
+.mc-consent{inset:auto 24px 24px}
+.mc-banner{width:min(1040px,100%);padding:24px 28px 22px;background:#fbfaf7;border-color:rgba(18,63,122,.12);border-radius:24px;box-shadow:0 18px 54px rgba(16,42,67,.18)}
+.mc-banner-head{margin-bottom:12px}
+.mc-banner h2{font-size:20px;letter-spacing:-.025em}
+.mc-banner>p{max-width:880px;font-size:13px;line-height:1.7}
+.mc-banner .mc-reassurance{margin-top:8px;color:#668099;font-size:12px}
+.mc-banner-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px}
+.mc-banner-actions .mc-choice,.mc-modal-actions .mc-button{background:#fff;color:var(--mc-navy);border:1px solid rgba(18,63,122,.24);box-shadow:none}
+.mc-banner-actions .mc-choice:hover,.mc-modal-actions .mc-button:hover{background:#edf5fb;border-color:rgba(18,63,122,.4)}
+.mc-banner-actions .mc-choice:active,.mc-modal-actions .mc-button:active{transform:translateY(0)}
+@media(max-width:760px){.mc-consent{inset:auto 0 0;padding:0}.mc-banner{padding:21px 20px max(20px,env(safe-area-inset-bottom));border-radius:22px 22px 0 0}.mc-banner h2{font-size:17px}.mc-banner>p{font-size:12px}.mc-banner .mc-reassurance{font-size:11px}.mc-banner-actions{grid-template-columns:1fr;gap:7px;margin-top:14px}.mc-button{min-height:45px}}
