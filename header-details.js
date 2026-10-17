@@ -54,7 +54,7 @@
       setMode('login', false);
     };
     if (window.MelatoniConsent?.get()) show();
-    else document.addEventListener('melatoni:consent-change', show, { once:true });
+    else window.addEventListener('melatoni:consent-change', show, { once:true });
   };
   const handleSignedIn = user => {
     signedInUser = user || null;
