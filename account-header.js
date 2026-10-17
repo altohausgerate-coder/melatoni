@@ -6,10 +6,12 @@
       const label = user.user_metadata?.full_name || user.email || 'Melatoni';
       entry.href = 'account.html';
       entry.textContent = label.trim().split(/[\s@.]+/).filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase() || 'M';
+      entry.classList.add('account-avatar');
       entry.setAttribute('aria-label',window.MelatoniAccountText?.('menuProfile') || 'Profile');
     } else {
       entry.href = 'index.html#account';
       entry.textContent = window.MelatoniAccountText?.('login') || 'Daxil ol';
+      entry.classList.remove('account-avatar');
       entry.setAttribute('aria-label',window.MelatoniAccountText?.('login') || 'Sign in');
     }
   });

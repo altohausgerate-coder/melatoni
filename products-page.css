@@ -1,9 +1,9 @@
 .products-page{--catalog-ink:#152a3d;--catalog-blue:#2864a2;--catalog-muted:#718294;--catalog-line:rgba(21,42,61,.14);background:#f7f7f3;color:var(--catalog-ink)}
 .catalog-header{position:sticky;top:0;z-index:30;background:rgba(247,247,243,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-.catalog-header .product-brand img{filter:none}.catalog-header .back-to-shop{justify-self:center}.catalog-header .product-header-tools{gap:28px}
-.catalog-header .product-about-link{font-size:11px;color:var(--catalog-ink)}
+.catalog-header .product-brand{display:flex;align-items:center;width:190px;height:52px;padding:4px 12px;overflow:hidden;border-radius:12px;background:#0a4181;box-shadow:0 4px 14px rgba(10,65,129,.18)}.catalog-header .product-brand img{display:block;width:100%;height:42px;object-fit:contain;visibility:visible;opacity:1;filter:none;background:#0a4181}.catalog-header .back-to-shop{justify-self:center}.catalog-header .product-header-tools{gap:24px}
+.catalog-header .product-about-link{font-size:11px;color:var(--catalog-ink)}.catalog-header .product-about-link.account-avatar{display:grid;width:38px;height:38px;place-items:center;border-radius:50%;background:#e8edf0;color:#0a4181;font-size:11px;font-weight:700;letter-spacing:.04em}
 .catalog-header .bag-shortcut #catalogBagCount{min-width:19px;height:19px;display:grid;place-items:center;border-radius:50%;background:#e7edf0;color:var(--catalog-ink);font-size:9px}
-.catalog-header .bag-shortcut{color:#fff;background:#0a4181;box-shadow:0 4px 14px rgba(10,65,129,.2)}
+.catalog-header .bag-shortcut{min-height:42px;padding:0 13px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;color:#fff;background:#0a4181;box-shadow:0 4px 14px rgba(10,65,129,.2);white-space:nowrap}
 .catalog-header .bag-shortcut .bag-symbol{width:17px;height:15px;border-width:1.7px}
 .catalog-header .bag-shortcut .bag-symbol::before{width:9px;height:7px;left:3px;top:-8px;border-width:1.7px}
 .catalog-header .bag-shortcut #catalogBagCount{background:#f7f7f3;color:#0a4181}
@@ -51,7 +51,7 @@
   .catalog-header .product-brand{display:flex;align-items:center;width:min(146px,42vw);min-width:126px;height:50px;padding:4px 9px;position:relative;z-index:1;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#0a4181;box-shadow:0 4px 14px rgba(10,65,129,.18)}
   .catalog-header .product-brand img{display:block;width:100%;height:40px;max-height:40px;object-fit:contain;visibility:visible;opacity:1;filter:none;background:#0a4181}
   .catalog-header .product-header-tools{min-width:44px;gap:8px}
-  .catalog-header .bag-shortcut{position:relative;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:#e8edf0}
+  .catalog-header .bag-shortcut{position:relative;width:44px;height:44px;min-height:44px;padding:0;display:grid;place-items:center;border-radius:50%;background:#e8edf0}
   .catalog-header .bag-shortcut #catalogBagCount{position:absolute;top:-2px;right:-2px;min-width:19px;height:19px}
   .catalog-main{padding:30px 16px 48px}
   .catalog-intro{margin-bottom:24px}
