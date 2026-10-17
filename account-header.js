@@ -1,6 +1,5 @@
 (() => {
   const entries = [...document.querySelectorAll('[data-account-entry]')];
-  if (!entries.length) return;
   const client = window.MELATONI_SUPABASE;
   const update = user => entries.forEach(entry => {
     if (user) {
@@ -14,9 +13,25 @@
       entry.setAttribute('aria-label',window.MelatoniAccountText?.('login') || 'Sign in');
     }
   });
-  update(null);
+  if (entries.length) update(null);
+  const page = location.pathname.split('/').filter(Boolean).pop() || 'index.html';
+  const protectedPages = new Set(['products.html', 'product.html', 'about.html', 'contact.html']);
+  const redirectToLogin = () => {
+    const index = new URL('index.html', location.href);
+    index.searchParams.set('return', `${location.pathname}${location.search}${location.hash}`);
+    index.hash = 'account';
+    location.replace(index.toString());
+  };
   if (client) {
-    client.auth.getSession().then(({data})=>update(data.session?.user || null)).catch(()=>{});
-    client.auth.onAuthStateChange((_event,session)=>update(session?.user || null));
+    client.auth.getSession().then(({data})=>{
+      const user = data.session?.user || null;
+      if (entries.length) update(user);
+      if (!user && protectedPages.has(page)) redirectToLogin();
+    }).catch(()=>{});
+    client.auth.onAuthStateChange((_event,session)=>{
+      const user = session?.user || null;
+      if (entries.length) update(user);
+      if (!user && protectedPages.has(page)) redirectToLogin();
+    });
   }
 })();
