@@ -5,6 +5,12 @@
   background: var(--melatoni-blue-900);
   isolation: isolate;
 }
+@media (min-width: 761px) {
+  .campaign-hero {
+    height: calc(100svh - 78px);
+    min-height: min(540px, calc(100svh - 78px));
+  }
+}
 .campaign-hero::after { display: none; }
 .campaign-slides, .campaign-slide { position: absolute; inset: 0; }
 .campaign-slide {
