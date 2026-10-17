@@ -36,8 +36,21 @@
       if (permission === 'default') permission = await Notification.requestPermission();
       if (permission !== 'granted') throw new Error(permission === 'denied' ? 'blocked' : 'permission');
       const registration = await register();
+      const applicationServerKey = decodeKey(window.MELATONI_PUSH_VAPID_PUBLIC_KEY);
       let subscription = await registration.pushManager.getSubscription();
-      if (!subscription) subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: decodeKey(window.MELATONI_PUSH_VAPID_PUBLIC_KEY) });
+      if (subscription) {
+        const currentKey = subscription.options?.applicationServerKey;
+        const currentBytes = currentKey ? new Uint8Array(currentKey) : null;
+        const sameKey = currentBytes?.length === applicationServerKey.length
+          && applicationServerKey.every((byte, index) => byte === currentBytes[index]);
+        if (!sameKey) {
+          const removed = await client.from('push_subscriptions').delete().eq('user_id', userId).eq('endpoint', subscription.endpoint);
+          if (removed.error) throw new Error('save');
+          await subscription.unsubscribe();
+          subscription = null;
+        }
+      }
+      if (!subscription) subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });
       const result = await client.from('push_subscriptions').upsert({ user_id: userId, endpoint: subscription.endpoint, subscription: subscription.toJSON(), updated_at: new Date().toISOString() }, { onConflict: 'endpoint' });
       if (result.error) { await subscription.unsubscribe(); throw new Error('save'); }
       return true;
