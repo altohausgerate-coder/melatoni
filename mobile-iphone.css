@@ -219,9 +219,21 @@
     display: none !important;
   }
 
-  .cart-drawer { height: 100vh; height: 100dvh; padding: 22px 20px max(20px, var(--mobile-safe-bottom)); }
+  .cart-drawer { height: 100vh; height: 100dvh; padding: max(18px, env(safe-area-inset-top)) 18px max(18px, var(--mobile-safe-bottom)); }
+  .drawer-head { flex: 0 0 auto; padding-bottom: 16px; }
+  .drawer-head h2 { font-size: 27px; }
   .drawer-close, .modal-close { width: 44px; height: 44px; }
-  .cart-qty button { width: 40px; height: 40px; }
+  .cart-items { min-height: 0; overscroll-behavior: contain; }
+  .cart-row { grid-template-columns: 58px minmax(0, 1fr); gap: 10px; padding: 14px 0; }
+  .cart-row img { width: 58px; height: 66px; }
+  .cart-row h3 { font-size: 12px; }
+  .cart-row-price { grid-column: 2; justify-self: start; margin-top: -2px; }
+  .cart-qty { gap: 6px; margin-top: 8px; }
+  .cart-qty button { width: 36px; height: 36px; flex-basis: 36px; }
+  .cart-qty button[data-remove] { margin-left: auto; }
+  .cart-bottom { flex: 0 0 auto; padding-top: 14px; }
+  .cart-bottom > p { margin: 10px 0 0; line-height: 1.45; }
+  .cart-order { min-height: 48px; }
   .modal-wrap { align-items: end; padding: 0; }
   .modal-card { width: 100%; max-height: calc(100svh - 22px); overflow: auto; padding: 46px 22px max(24px, var(--mobile-safe-bottom)); border-radius: 22px 22px 0 0; }
   .quiz-options button { min-height: 50px; font-size: 14px; }
