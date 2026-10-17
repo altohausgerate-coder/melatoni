@@ -16,24 +16,25 @@
   const getProduct = id => products().find(item => item.id === id);
   const getProductName = id => { const p = getProduct(id); return p?.name?.[language()] || p?.name?.az || id; };
   let user = null;
-  let currentTab = location.hash === '#wishlist' ? 'wishlist' : 'profile';
+  let currentTab = location.hash === '#wishlist' ? 'wishlist' : location.hash === '#notifications' ? 'notifications' : 'profile';
   let profile = { full_name: '', phone: '' };
-  let addresses = [], orders = [], wishlist = [], preferences = null, interactions = [], alerts = [], tickets = [];
+  let addresses = [], orders = [], wishlist = [], preferences = null, interactions = [], alerts = [], tickets = [], notifications = [];
   let featureSchemaReady = true;
 
   async function loadData() {
     if (!client || !user) return;
     const uid = user.id;
     try {
-      const [p,a,o,w,pref,views,alertRows,ticketRows] = await Promise.all([
+      const [p,a,o,w,pref,views,alertRows,ticketRows,notificationRows] = await Promise.all([
         client.from('profiles').select('full_name,phone').eq('id',uid).maybeSingle(),
         client.from('addresses').select('*').eq('user_id',uid).order('is_default',{ascending:false}),
         client.from('orders').select('*').eq('user_id',uid).order('created_at',{ascending:false}),
         client.from('wishlist').select('product_id').eq('user_id',uid),
         client.from('customer_preferences').select('recommendations_consent,interests').eq('user_id',uid).maybeSingle(),
         client.from('customer_interactions').select('product_id,event_name,created_at').eq('user_id',uid).gte('created_at',new Date(Date.now()-90*86400000).toISOString()).order('created_at',{ascending:false}).limit(150),
-        client.from('product_alerts').select('product_id,target_price,notify_price_drop,notify_restock,last_notified_at').eq('user_id',uid),
-        client.from('support_tickets').select('id,order_id,subject,message,status,admin_reply,replied_at,created_at,updated_at').eq('user_id',uid).order('created_at',{ascending:false})
+        client.from('product_alerts').select('product_id,target_price,notify_price_drop,notify_restock,notify_email,notify_push,last_notified_at').eq('user_id',uid),
+        client.from('support_tickets').select('id,order_id,subject,message,status,admin_reply,replied_at,created_at,updated_at').eq('user_id',uid).order('created_at',{ascending:false}),
+        client.from('customer_notifications').select('id,kind,title,body,url,read_at,created_at').eq('user_id',uid).order('created_at',{ascending:false}).limit(50)
       ]);
       if ([p,a,o,w].some(result => result.error)) message(text('genericError'),true);
       if (!p.error && p.data) profile = p.data;
@@ -44,6 +45,7 @@
       interactions = views.error ? [] : (views.data || []);
       alerts = alertRows.error ? [] : (alertRows.data || []);
       tickets = ticketRows.error ? [] : (ticketRows.data || []);
+      notifications = notificationRows.error ? [] : (notificationRows.data || []);
       featureSchemaReady = ![pref,views,alertRows,ticketRows].some(result => result.error);
       window.MelatoniStorage?.set('melatoni-wishlist',JSON.stringify(wishlist));
     } catch { message(text('genericError'),true); }
@@ -70,8 +72,17 @@
   function renderAlerts() {
     if (!featureSchemaReady) return `<h2>${safe(text('alertsTitle'))}</h2>${empty('featuresUnavailable')}`;
     const options = products().map(product => `<option value="${safe(product.id)}">${safe(product.name?.[language()]||product.name?.az||product.id)}</option>`).join('');
-    const list = alerts.length ? `<div class="account-alert-list">${alerts.map(alert => `<article class="account-address"><strong>${safe(getProductName(alert.product_id))}</strong><span>${[alert.notify_price_drop?text('alertPrice'):'',alert.notify_restock?text('alertStock'):''].filter(Boolean).map(safe).join(' · ')}${alert.target_price != null?` · ≤ ${safe(alert.target_price)} AZN`:''}</span><button class="button button-light" type="button" data-alert-remove="${safe(alert.product_id)}">${safe(text('alertRemove'))}</button></article>`).join('')}</div>` : empty('alertEmpty');
-    return `<h2>${safe(text('alertsTitle'))}</h2><p class="account-feature-intro">${safe(text('alertsIntro'))}</p>${list}<form id="productAlertForm" class="account-form account-feature-form"><label class="wide"><span>${safe(text('alertProduct'))}</span><select name="product_id" required>${options}</select></label><label class="wide"><span>${safe(text('alertTarget'))}</span><input name="target_price" type="number" min="0" step="0.01"/></label><label class="account-check"><input name="notify_price_drop" type="checkbox"/><span>${safe(text('alertPrice'))}</span></label><label class="account-check"><input name="notify_restock" type="checkbox" checked/><span>${safe(text('alertStock'))}</span></label><label class="account-consent wide"><input name="consent" type="checkbox" required/><span>${safe(text('alertConsent'))} <strong>${safe(user.email||'')}</strong></span></label><button class="button button-dark" type="submit">${safe(text('alertSave'))}</button></form>`;
+    const list = alerts.length ? `<div class="account-alert-list">${alerts.map(alert => `<article class="account-address"><strong>${safe(getProductName(alert.product_id))}</strong><span>${[alert.notify_price_drop?text('alertPrice'):'',alert.notify_restock?text('alertStock'):'',alert.notify_email?text('alertEmailChannel'):'',alert.notify_push?text('alertPushChannel'):''].filter(Boolean).map(safe).join(' · ')}${alert.target_price != null?` · ≤ ${safe(alert.target_price)} AZN`:''}</span><button class="button button-light" type="button" data-alert-remove="${safe(alert.product_id)}">${safe(text('alertRemove'))}</button></article>`).join('')}</div>` : empty('alertEmpty');
+    return `<h2>${safe(text('alertsTitle'))}</h2><p class="account-feature-intro">${safe(text('alertsIntro'))}</p>${list}<form id="productAlertForm" class="account-form account-feature-form"><label class="wide"><span>${safe(text('alertProduct'))}</span><select name="product_id" required>${options}</select></label><label class="wide"><span>${safe(text('alertTarget'))}</span><input name="target_price" type="number" min="0" step="0.01"/></label><label class="account-check"><input name="notify_price_drop" type="checkbox"/><span>${safe(text('alertPrice'))}</span></label><label class="account-check"><input name="notify_restock" type="checkbox" checked/><span>${safe(text('alertStock'))}</span></label><label class="account-check"><input name="notify_push" type="checkbox"/><span>${safe(text('alertPushChannel'))}</span></label><label class="account-consent wide"><input name="consent" type="checkbox"/><span>${safe(text('alertConsent'))} <strong>${safe(user.email||'')}</strong></span></label><button class="button button-dark" type="submit">${safe(text('alertSave'))}</button></form>`;
+  }
+
+  function renderNotifications() {
+    const permission = 'Notification' in window ? Notification.permission : 'unsupported';
+    const pushButton = permission === 'granted'
+      ? `<button class="button button-light" type="button" id="pushDisable">${safe(text('pushDisable'))}</button>`
+      : `<button class="button button-dark" type="button" id="pushEnable">${safe(text('pushEnable'))}</button>`;
+    const list = notifications.length ? `<div class="account-alert-list">${notifications.map(item => `<article class="account-address" data-customer-notification="${safe(item.id)}"><strong>${safe(item.title)}</strong><span>${safe(item.body)}</span><small>${safe(new Date(item.created_at).toLocaleString(locale()))}</small>${item.read_at ? '' : `<a class="button button-light" href="${safe(item.url)}" data-open-notification="${safe(item.id)}">${safe(text('notificationOpen'))}</a>`}</article>`).join('')}</div>` : empty('notificationsEmpty');
+    return `<h2>${safe(text('pushTitle'))}</h2><p class="account-feature-intro">${safe(text('pushIntro'))}</p><p class="account-feature-intro">${permission === 'denied' ? safe(text('pushBlocked')) : ''}</p>${pushButton}<div class="account-feature-form">${list}</div>`;
   }
 
   const ticketStatusText = value => text(({open:'supportOpen',in_progress:'supportProgress',answered:'supportAnswered',closed:'supportClosed'})[value] || 'supportOpen');
@@ -90,6 +101,7 @@
     if (currentTab === 'wishlist') content.innerHTML = `<h2>${safe(text('menuWishlist'))}</h2>${wishlist.length ? `<div class="account-wishlist">${wishlist.map(id => `<article class="account-address"><a href="product.html?id=${encodeURIComponent(id)}">${safe(getProductName(id))}</a><button type="button" class="button button-dark" data-wishlist-remove="${safe(id)}">${safe(text('remove'))}</button></article>`).join('')}</div>` : empty('noWishlist')}`;
     if (currentTab === 'recommendations') content.innerHTML = renderRecommendations();
     if (currentTab === 'alerts') content.innerHTML = renderAlerts();
+    if (currentTab === 'notifications') content.innerHTML = renderNotifications();
     if (currentTab === 'support') content.innerHTML = renderSupport();
 
     content.querySelector('#profileForm')?.addEventListener('submit',async event=>{event.preventDefault();try{const data=new FormData(event.currentTarget);const result=await client.from('profiles').upsert({id:user.id,full_name:data.get('full_name'),phone:data.get('phone')||''});message(result.error?text('genericError'):text('saved'),!!result.error);if(!result.error)profile={full_name:data.get('full_name'),phone:data.get('phone')||''}}catch{message(text('genericError'),true)}});
@@ -97,8 +109,11 @@
     content.querySelectorAll('[data-address-remove]').forEach(button=>button.addEventListener('click',async()=>{try{const result=await client.from('addresses').delete().eq('id',button.dataset.addressRemove).eq('user_id',user.id);if(result.error)message(text('genericError'),true);else{await loadData();render()}}catch{message(text('genericError'),true)}}));
     content.querySelectorAll('[data-wishlist-remove]').forEach(button=>button.addEventListener('click',async()=>{try{const id=button.dataset.wishlistRemove;const result=await client.from('wishlist').delete().eq('user_id',user.id).eq('product_id',id);if(result.error)message(text('genericError'),true);else{wishlist=wishlist.filter(value=>value!==id);window.MelatoniStorage?.set('melatoni-wishlist',JSON.stringify(wishlist));document.dispatchEvent(new CustomEvent('melatoni:wishlist-change',{detail:wishlist}));render()}}catch{message(text('genericError'),true)}}));
     content.querySelector('#recommendationForm')?.addEventListener('submit',async event=>{event.preventDefault();if(!featureSchemaReady)return;const data=new FormData(event.currentTarget),consent=data.get('consent')==='on',interests=consent?data.getAll('interest'):[];try{const result=await client.from('customer_preferences').upsert({user_id:user.id,recommendations_consent:consent,interests,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(result.error){message(text('genericError'),true);return}if(!consent){const cleared=await client.from('customer_interactions').delete().eq('user_id',user.id);if(cleared.error){message(text('genericError'),true);return}}await loadData();message(text('recSaved'));render()}catch{message(text('genericError'),true)}});
-    content.querySelector('#productAlertForm')?.addEventListener('submit',async event=>{event.preventDefault();const data=new FormData(event.currentTarget);const priceText=String(data.get('target_price')||'').trim();const notifyPrice=data.get('notify_price_drop')==='on',notifyStock=data.get('notify_restock')==='on';if(!data.get('consent')){message(text('alertConsentRequired'),true);return}if(!notifyPrice&&!notifyStock){message(text('alertTypeRequired'),true);return}try{const result=await client.from('product_alerts').upsert({user_id:user.id,product_id:data.get('product_id'),email:user.email,language:language(),target_price:priceText?Number(priceText):null,notify_price_drop:notifyPrice,notify_restock:notifyStock},{onConflict:'user_id,product_id'});if(result.error){message(text('genericError'),true);return}await loadData();message(text('alertSaved'));render()}catch{message(text('genericError'),true)}});
+    content.querySelector('#productAlertForm')?.addEventListener('submit',async event=>{event.preventDefault();const data=new FormData(event.currentTarget);const priceText=String(data.get('target_price')||'').trim();const notifyPrice=data.get('notify_price_drop')==='on',notifyStock=data.get('notify_restock')==='on',notifyEmail=data.get('consent')==='on',notifyPush=data.get('notify_push')==='on';if(!notifyEmail&&!notifyPush){message(text('alertDeliveryRequired'),true);return}if(!notifyPrice&&!notifyStock){message(text('alertTypeRequired'),true);return}try{if(notifyPush){const {data:devices,error}=await client.from('push_subscriptions').select('id').eq('user_id',user.id).limit(1);if(error||!devices?.length){message(text('pushActivateForAlert'),true);return}}const result=await client.from('product_alerts').upsert({user_id:user.id,product_id:data.get('product_id'),email:notifyEmail?user.email:null,notify_email:notifyEmail,notify_push:notifyPush,language:language(),target_price:priceText?Number(priceText):null,notify_price_drop:notifyPrice,notify_restock:notifyStock},{onConflict:'user_id,product_id'});if(result.error){message(text('genericError'),true);return}await loadData();message(text('alertSaved'));render()}catch{message(text('genericError'),true)}});
     content.querySelectorAll('[data-alert-remove]').forEach(button=>button.addEventListener('click',async()=>{try{const result=await client.from('product_alerts').delete().eq('user_id',user.id).eq('product_id',button.dataset.alertRemove);if(result.error)message(text('genericError'),true);else{await loadData();render()}}catch{message(text('genericError'),true)}}));
+    content.querySelector('#pushEnable')?.addEventListener('click',async()=>{try{if(!window.MelatoniPush)throw new Error('unavailable');await window.MelatoniPush.subscribe(user.id);message(text('pushEnabled'));render()}catch(error){const code=error?.message||'';message(text(code==='blocked'?'pushBlocked':code==='unsupported'?'pushUnsupported':code==='ios-install'?'pushIosInstall':'pushError'),true)}});
+    content.querySelector('#pushDisable')?.addEventListener('click',async()=>{try{if(!window.MelatoniPush)throw new Error('unavailable');await window.MelatoniPush.unsubscribe(user.id);message(text('pushDisabled'));render()}catch{message(text('pushError'),true)}});
+    content.querySelectorAll('[data-open-notification]').forEach(link=>link.addEventListener('click',async event=>{event.preventDefault();try{await client.from('customer_notifications').update({read_at:new Date().toISOString()}).eq('id',link.dataset.openNotification).eq('user_id',user.id)}catch{}window.location.href=link.href}));
     content.querySelector('#supportForm')?.addEventListener('submit',async event=>{event.preventDefault();const data=new FormData(event.currentTarget);try{const result=await client.from('support_tickets').insert({user_id:user.id,order_id:data.get('order_id')||null,subject:String(data.get('subject')||'').trim(),message:String(data.get('message')||'').trim()});if(result.error){message(text('genericError'),true);return}await loadData();message(text('supportSent'));render()}catch{message(text('genericError'),true)}});
   }
 
@@ -109,7 +124,7 @@
     const current = document.querySelector('#langCurrent'); if (current) current.textContent = lang.toUpperCase();
     const title = document.querySelector('[data-account-title]'); if (title) title.textContent = copy.title;
     const subtitle = document.querySelector('[data-account-subtitle]'); if (subtitle) subtitle.textContent = copy.subtitle;
-    const keys = {profile:'menuProfile',addresses:'menuAddresses',orders:'menuOrders',wishlist:'menuWishlist',recommendations:'menuRecommendations',alerts:'menuAlerts',support:'menuSupport',logout:'logout'};
+    const keys = {profile:'menuProfile',addresses:'menuAddresses',orders:'menuOrders',wishlist:'menuWishlist',recommendations:'menuRecommendations',alerts:'menuAlerts',notifications:'menuNotifications',support:'menuSupport',logout:'logout'};
     document.querySelectorAll('[data-account-tab]').forEach(button => { button.textContent = copy[keys[button.dataset.accountTab]]; });
     document.querySelectorAll('.main-nav a').forEach((link,index)=>{const labels=lang==='ru'?['Товары','Коллекции','О нас']:lang==='en'?['Products','Collections','About us']:['Məhsullar','Kolleksiyalar','Haqqımızda'];if(labels[index])link.textContent=labels[index]});
   }

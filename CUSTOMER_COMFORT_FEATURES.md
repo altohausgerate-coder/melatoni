@@ -27,3 +27,20 @@ Until those secrets and the function are deployed, customers can save/manage ale
 ## Privacy and access
 
 Recommendation interaction rows are tied to a signed-in user only when they enabled recommendation consent. Customers can withdraw consent, which clears those rows. Product alerts store the account email because it is the selected delivery channel; removing an alert deletes that subscription. Support requests are visible to their owner and Melatoni admins. Analytics continues to use the existing low-PII event/session model, and abandoned-cart numbers are estimates based on sessions that added a product but did not log a checkout/order event.
+
+## Campaign push and signed-in cart reminders
+
+The storefront now supports browser push with a separate, deliberate opt-in under **Account → Site notifications**. “Accept all” cookies does not enable push. A customer can turn push off from that account section or browser settings. Campaign push is sent from **Admin → Campaign notices** only to opted-in devices. Price/restock alerts use push when configured, while retaining the existing email route.
+
+On iPhone, the customer needs a recent iOS version and must add the site to the Home Screen, then open that shortcut before enabling web push. Other unsupported browsers receive a friendly setup message.
+
+The one-time abandoned-cart reminder is limited to signed-in customers who have enabled push on at least one device. The site saves a small cart snapshot only while a push subscription exists. After 60 minutes of cart inactivity, a scheduled Supabase job sends one reminder; successful database orders suppress it. Guest carts stay in the browser and do not generate remote reminders.
+
+To activate delivery in the published site:
+
+1. Apply `supabase/migrations/20261017120000_push_and_cart_recovery.sql` in the Melatoni Supabase SQL Editor. It creates the RLS-protected tables, a private random recovery secret in Vault, and a 15-minute scheduler. It uses the publishable key and does not need a service-role key or database password.
+2. Deploy `send-campaign-push`, `send-cart-reminders`, and the updated `product-alerts` Edge Functions from this repository.
+3. In Supabase **Edge Functions → Secrets**, set `VAPID_PUBLIC_KEY` to the public value in `supabase-config.js`, and `VAPID_PRIVATE_KEY` to the matching private key created for this site. The private key is not stored in Git. The generated local copy is at `%TEMP%\melatoni-vapid-private.txt`; move it into the Supabase secret field and then remove that temporary copy.
+4. Publish the site branch containing the account opt-in and admin campaign form. Campaign sending is available to the Melatoni admin account only.
+
+The 7 requested conversion paths are covered across the existing and added site features: consent-based recommendations, price/restock alerts, account support, admin analytics, complementary product suggestions, the existing WhatsApp checkout, and opt-in campaign/cart push. Product email delivery still additionally needs the verified email provider secrets described above.
