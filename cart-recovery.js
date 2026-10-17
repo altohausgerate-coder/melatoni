@@ -22,5 +22,9 @@
     } catch { /* Guest checkout and local cart must keep working if recovery storage is unavailable. */ }
   };
   document.addEventListener('melatoni:cart-change', () => { clearTimeout(timer); timer = setTimeout(saveOptedInCart, 1200); });
+  document.addEventListener('click', event => {
+    if (!event.target.closest('.bag-toggle')) return;
+    setTimeout(() => { if (document.querySelector('#cartDrawer')?.classList.contains('open')) document.dispatchEvent(new Event('melatoni:cart-change')); }, 50);
+  });
   document.addEventListener('DOMContentLoaded', () => document.dispatchEvent(new Event('melatoni:cart-change')));
 })();
