@@ -44,6 +44,13 @@
     if (pushOnboarding?.open) pushOnboarding.close();
     continueToRequestedPage();
   };
+  const cleanAuthReturn = () => {
+    const url = new URL(location.href);
+    if (!url.searchParams.has('auth')) return;
+    url.searchParams.delete('auth');
+    url.hash = '';
+    history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  };
   const showRequiredAccount = () => {
     if (!account || signedInUser || account.open) return;
     const show = () => {
@@ -60,6 +67,7 @@
     signedInUser = user || null;
     updateHeader(signedInUser);
     if (signedInUser) {
+      cleanAuthReturn();
       syncWishlist(signedInUser);
       accountGateActive = false;
       const closeButton = $('.account-close'); if (closeButton) closeButton.hidden = false;
@@ -178,7 +186,8 @@
     if (!client) { if (status) status.textContent = text('supabaseMissing'); return; }
     try {
       const redirect = new URL('./', location.href);
-      redirect.hash = 'account';
+      redirect.hash = '';
+      redirect.searchParams.set('auth', 'account');
       const destination = new URLSearchParams(location.search).get('return'); if (destination) redirect.searchParams.set('return', destination);
       const { error } = await client.auth.signInWithOAuth({ provider:'google', options:{ redirectTo:redirect.toString() } });
       if (error && status) status.textContent = text('genericError');
@@ -223,7 +232,7 @@
   document.addEventListener('melatoni:wishlist-change', async event => { if (!client || !signedInUser || !Array.isArray(event.detail)) return; try { const ids = event.detail.filter(id => typeof id === 'string'); await client.from('wishlist').delete().eq('user_id',signedInUser.id); if (ids.length) await client.from('wishlist').upsert(ids.map(product_id => ({user_id:signedInUser.id,product_id})),{onConflict:'user_id,product_id'}); } catch {} });
   document.addEventListener('melatoni:language-change', () => { localize(); updatePushOnboardingCopy(); });
   localize();
-  if (location.hash === '#account' && account && client && !signedInUser) showRequiredAccount();
+  if ((location.hash === '#account' || new URLSearchParams(location.search).get('auth') === 'account') && account && client && !signedInUser) showRequiredAccount();
   if (client) client.auth.getSession().then(({data}) => handleSignedIn(data.session?.user || null)).catch(() => {});
   client?.auth.onAuthStateChange((_event,session) => handleSignedIn(session?.user || null));
 })();

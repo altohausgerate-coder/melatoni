@@ -3,6 +3,12 @@ window.MELATONI_SUPABASE_URL = 'https://zjmfvtcclecmbjcimddc.supabase.co';
 window.MELATONI_SUPABASE_ANON_KEY = 'sb_publishable_1pNMgE8BRyWcx50UQOknnQ_DPYy6HsA';
 // Public VAPID key is safe to publish. The matching private key belongs in Supabase Function secrets only.
 window.MELATONI_PUSH_VAPID_PUBLIC_KEY = 'BHy6d3fRr3UuHxHU56yO2lbAI12jrTcuC6KYFpy-mIVqmisyvT7-C-dXy5DdyxZytqySNc1fTAD95y5RwXX-_XI';
+// Older Google sign-ins appended the token after #account, which prevented Supabase from reading it.
+if (location.hash.startsWith('#account#access_token=')) {
+  const authUrl = new URL(location.href);
+  authUrl.hash = authUrl.hash.slice('#account'.length + 1);
+  history.replaceState(history.state, '', `${authUrl.pathname}${authUrl.search}${authUrl.hash}`);
+}
 window.MELATONI_SUPABASE_READY = Boolean(
   window.supabase?.createClient &&
   window.MELATONI_SUPABASE_URL &&
