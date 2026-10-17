@@ -14,7 +14,7 @@
   let accountMode = 'login';
   let emailLoginOpen = false;
   let signedInUser = null;
-  let accountGateActive = false;
+  let accountPromptActive = false;
   let pushPromptOpen = false;
   const pushOnboarding = $('#pushOnboarding');
   const pushStatus = $('#pushOnboardingStatus');
@@ -51,12 +51,16 @@
     url.hash = '';
     history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash}`);
   };
+  const clearAccountIntent = () => {
+    const url = new URL(location.href);
+    url.searchParams.delete('auth');
+    if (url.hash === '#account') url.hash = '';
+    history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  };
   const showRequiredAccount = () => {
     if (!account || signedInUser || account.open) return;
     const show = () => {
       if (signedInUser || !account || account.open) return;
-      accountGateActive = true;
-      const closeButton = $('.account-close'); if (closeButton) closeButton.hidden = true;
       account.showModal();
       setMode('login', false);
     };
@@ -69,20 +73,18 @@
     if (signedInUser) {
       cleanAuthReturn();
       syncWishlist(signedInUser);
-      accountGateActive = false;
-      const closeButton = $('.account-close'); if (closeButton) closeButton.hidden = false;
       if (account?.open) account.close();
       const prompted = showPushOnboarding(signedInUser);
       if (!prompted) continueToRequestedPage();
     } else {
-      showRequiredAccount();
+      if (location.hash === '#account' || new URLSearchParams(location.search).get('auth') === 'account') showRequiredAccount();
     }
   };
 
   const localize = () => {
     const copy = window.MelatoniAccountCopy?.[window.MelatoniStorage?.get('melatoni-language') || 'az'];
     if (!copy) return;
-    const values = { accountEyebrow:'title', accountIntro:'subtitle', accountLogin:'login', accountRegister:'register', accountName:'name', accountEmail:'email', accountPhone:'phone', accountPassword:'password', accountForgot:'forgot', accountGoogle:'google', accountGmail:'gmail' };
+    const values = { accountEyebrow:'title', accountIntro:'subtitle', accountLogin:'login', accountRegister:'register', accountName:'name', accountEmail:'email', accountPhone:'phone', accountPassword:'password', accountForgot:'forgot', accountGoogle:'google', accountGmail:'gmail', accountGuest:'accountGuest' };
     Object.entries(values).forEach(([selector,key]) => { const node = $(`[data-account-label="${selector}"]`); if (node) node.textContent = copy[key]; });
     setMode(accountMode, false);
     const signedLink = $('.account-initials');
@@ -149,11 +151,18 @@
   $('.search-toggle')?.addEventListener('click', event => { if (matchMedia('(max-width: 760px)').matches) { event.preventDefault(); search?.classList.toggle('open'); searchInput?.focus(); } });
   resetSearch?.addEventListener('click', () => { resetSearch.hidden = true; searchInput?.dispatchEvent(new Event('input', { bubbles:true })); searchInput?.focus(); });
   searchInput?.addEventListener('input', () => { if (resetSearch) resetSearch.hidden = !searchInput.value; });
+  const closeAccount = () => {
+    if (accountPromptActive) { try { sessionStorage.setItem('melatoni-account-interest-prompt', 'seen'); } catch {} }
+    accountPromptActive = false;
+    clearAccountIntent();
+    if (account?.open) account.close();
+  };
   document.addEventListener('click', event => { if (event.target.closest('.account-toggle')) { if (account && !account.open) account.showModal(); $('.account-google:not([hidden])')?.focus({preventScroll:true}); } });
-  $('.account-close')?.addEventListener('click', () => { if (!accountGateActive) account?.close(); });
-  account?.addEventListener('cancel', event => { if (accountGateActive) event.preventDefault(); });
-  account?.addEventListener('close', () => { if (accountGateActive && !signedInUser) setTimeout(showRequiredAccount, 0); });
-  account?.addEventListener('click', event => { if (event.target === account && !accountGateActive) account.close(); });
+  $('.account-close')?.addEventListener('click', closeAccount);
+  $('.account-guest')?.addEventListener('click', closeAccount);
+  account?.addEventListener('cancel', event => { event.preventDefault(); closeAccount(); });
+  account?.addEventListener('close', () => { if (accountPromptActive) { try { sessionStorage.setItem('melatoni-account-interest-prompt', 'seen'); } catch {} } accountPromptActive = false; });
+  account?.addEventListener('click', event => { if (event.target === account) closeAccount(); });
   pushOnboarding?.querySelectorAll('[data-push-later]').forEach(button => button.addEventListener('click', closePushOnboarding));
   pushOnboarding?.addEventListener('cancel', event => { event.preventDefault(); closePushOnboarding(); });
   pushOnboarding?.querySelector('[data-push-enable]')?.addEventListener('click', async () => {
@@ -235,4 +244,28 @@
   if ((location.hash === '#account' || new URLSearchParams(location.search).get('auth') === 'account') && account && client && !signedInUser) showRequiredAccount();
   if (client) client.auth.getSession().then(({data}) => handleSignedIn(data.session?.user || null)).catch(() => {});
   client?.auth.onAuthStateChange((_event,session) => handleSignedIn(session?.user || null));
+
+  const observeProductInterest = () => {
+    const sections = [...document.querySelectorAll('#popular, #melatoni-collections')];
+    if (!sections.length || !('IntersectionObserver' in window)) return;
+    let shown = false;
+    const observer = new IntersectionObserver(entries => {
+      if (shown || !entries.some(entry => entry.isIntersecting)) return;
+      shown = true;
+      observer.disconnect();
+      setTimeout(() => {
+        let alreadySeen = false;
+        try { alreadySeen = sessionStorage.getItem('melatoni-account-interest-prompt') === 'seen'; } catch {}
+        if (alreadySeen || signedInUser || !account || account.open) return;
+        accountPromptActive = true;
+        try { sessionStorage.setItem('melatoni-account-interest-prompt', 'seen'); } catch {}
+        setMode('register');
+        account.showModal();
+      }, 900);
+    }, { threshold:0.12, rootMargin:'0px 0px -12% 0px' });
+    sections.forEach(section => observer.observe(section));
+  };
+  const startProductInterestPrompt = () => observeProductInterest();
+  if (window.MelatoniConsent?.get()) startProductInterestPrompt();
+  else window.addEventListener('melatoni:consent-change', startProductInterestPrompt, { once:true });
 })();
