@@ -1,5 +1,8 @@
 /* Scroll-driven collection wheel, adapted to the site's plain HTML stack. */
 .collections-wheel{position:relative;z-index:2;isolation:isolate;margin-top:-15svh;min-height:115svh;overflow:hidden;background:transparent;color:var(--ink)}
+@media (min-width: 761px) {
+  .collections-wheel { margin-top: 0; }
+}
 .wheel-stage{position:absolute;inset:0;overflow:hidden;outline:none;touch-action:pan-x;perspective:1200px;perspective-origin:50% 50%;cursor:grab;opacity:var(--wheel-entry-alpha,1);transform:translate3d(0,var(--wheel-entry-shift,0px),0) scale(var(--wheel-entry-scale,1));transform-origin:center top;will-change:opacity,transform}
 .wheel-stage:active{cursor:grabbing}
 .wheel-orbit{position:absolute;top:50%;left:50%;transform-style:preserve-3d;will-change:transform}
