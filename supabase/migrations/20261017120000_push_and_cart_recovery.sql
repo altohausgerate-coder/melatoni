@@ -1,9 +1,8 @@
 -- Opt-in web push notifications and scheduled reminders for signed-in carts.
 -- Uses the public anon key and a random Vault secret; no service_role key.
 
-create schema if not exists net;
 create extension if not exists pg_cron;
-create extension if not exists pg_net with schema net;
+create extension if not exists pg_net with schema extensions;
 create extension if not exists pgcrypto with schema extensions;
 create extension if not exists supabase_vault with schema vault;
 
