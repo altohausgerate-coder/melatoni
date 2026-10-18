@@ -21,15 +21,29 @@
     'linen-kids-dream':'assets/products/mobile/linen-set-studio.webp',
     'pillowcase-pair-soft':'assets/products/mobile/linen-set-studio.webp',
     'pillow-cloud':'assets/products/mobile/pillow-cloud-clean.webp',
-    'pillow-down':'assets/products/mobile/pillow-cloud-studio.webp',
+    'pillow-down':'assets/products/mobile/pillow-cloud-clean.webp',
     'pillow-side-cloud':'assets/products/mobile/pillow-cloud-clean.webp',
     'pillow-cool-rest':'assets/products/mobile/pillow-cloud-clean.webp',
     'pillow-duo-rest':'assets/products/mobile/pillow-cloud-studio.webp',
     'pillow-balance':'assets/products/mobile/pillow-balance-studio.webp',
     'pillow-support-high':'assets/products/mobile/pillow-balance-studio.webp',
     'duvet-dream':'assets/products/mobile/duvet-dream-studio.webp',
+    'duvet-airy':'assets/products/mobile/duvet-airy-studio.webp',
+    'duvet-winter':'assets/products/mobile/duvet-winter-studio.webp',
+    'duvet-summer-light':'assets/products/mobile/duvet-airy-studio.webp',
+    'duvet-four-season':'assets/products/mobile/duvet-dream-studio.webp',
+    'protector-pure':'assets/products/mobile/protector-pure-studio.webp',
+    'sheet-cloud':'assets/products/mobile/sheet-cloud-studio.webp',
+    'mattress-rest':'assets/products/mobile/mattress-rest-studio.webp',
     'throw-knit':'assets/products/mobile/throw-knit-studio.webp',
-    'towel-spa':'assets/products/mobile/towel-spa-studio.webp'
+    'towel-spa':'assets/products/mobile/towel-spa-studio.webp',
+    'candle-night':'assets/products/mobile/candle-night-studio.webp',
+    'diffuser-calm':'assets/products/mobile/diffuser-calm-studio.webp',
+    'mask-silk':'assets/products/mobile/mask-silk-studio.webp',
+    'robe-soft':'assets/products/mobile/robe-soft-studio.webp',
+    'pajama-cotton':'assets/products/mobile/pajama-cotton-studio.webp',
+    'slippers-cloud':'assets/products/mobile/slippers-cloud-studio.webp',
+    'gift-rest':'assets/products/mobile/gift-rest-studio.webp'
   };
   const toastNode=document.querySelector('.catalog-toast');let toastTimer;
   function toast(message){toastNode.textContent=message;toastNode.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastNode.classList.remove('show'),1800)}
