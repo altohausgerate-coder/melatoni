@@ -191,3 +191,7 @@ html,body{background-color:var(--page-background)}
 .product-price.has-sale{display:flex;flex-direction:column;align-items:flex-end;gap:2px}.product-old-price{color:#87939a;font-size:.82em;font-weight:400}.product-price.has-sale strong{color:#a45e44;font:inherit}
 
 .stock-notice{position:fixed;z-index:1300;left:50%;bottom:24px;transform:translateX(-50%);max-width:min(90vw,480px);margin:0;padding:13px 20px;border-radius:99px;background:#15283b;color:#fff;box-shadow:0 12px 34px #10203338;font-size:14px}
+
+
+/* Product cards keep the name and price as the only details below the image. */
+.products-section .product-meta{display:flex;flex-direction:column;align-items:flex-start;gap:5px}.products-section .product-price{font-size:13px}.products-section .product-price.has-sale{display:flex;flex-direction:row;align-items:baseline;gap:7px}

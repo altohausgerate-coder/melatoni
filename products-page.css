@@ -88,3 +88,7 @@
   .catalog-end-note{margin-top:26px;font-size:13px;line-height:1.5}
 }
 @media(prefers-reduced-motion:reduce){.catalog-home-link,.catalog-grid .product-image img,.catalog-toast{transition:none}}
+
+
+/* Catalogue cards use a quiet product name and price stack. */
+.catalog-grid .product-meta{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:5px}.catalog-grid .product-price,.catalog-grid .product-price.has-sale{display:flex;align-items:baseline;justify-items:initial;gap:7px;font-size:13px}.catalog-grid .product-desc,.catalog-grid .product-actions{display:none}
