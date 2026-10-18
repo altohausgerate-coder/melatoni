@@ -16,7 +16,9 @@
   const getProduct = id => products().find(item => item.id === id);
   const getProductName = id => { const p = getProduct(id); return p?.name?.[language()] || p?.name?.az || id; };
   let user = null;
-  let currentTab = location.hash === '#wishlist' ? 'wishlist' : location.hash === '#notifications' ? 'notifications' : 'profile';
+  const requestedTab = new URLSearchParams(location.search).get('tab');
+  const hashTab = location.hash.slice(1);
+  let currentTab = ['profile','orders','wishlist','notifications'].includes(requestedTab) ? requestedTab : ['orders','wishlist','notifications'].includes(hashTab) ? hashTab : 'profile';
   let profile = { full_name: '', phone: '' };
   let addresses = [], orders = [], wishlist = [], preferences = null, interactions = [], alerts = [], tickets = [], notifications = [];
   let featureSchemaReady = true;
