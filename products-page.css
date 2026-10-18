@@ -16,10 +16,11 @@
 .catalog-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:42px;align-items:start}
 .catalog-sidebar{top:104px;border-color:var(--catalog-line)}
 .catalog-sidebar .shop-filter-group h2{margin:0 0 14px;font:600 10px var(--sans);text-transform:uppercase;letter-spacing:.13em}
-.catalog-sidebar .category-filter{font:400 11px var(--sans);padding:10px 8px 10px 11px}
-.catalog-sidebar .category-filter.active{border-left-color:var(--catalog-blue);background:#eaf1f6;color:var(--catalog-ink)}
-.catalog-sidebar .category-filter:hover{background:#eef1f1;color:var(--catalog-ink)}
-.catalog-sidebar .category-filter [data-count]{color:#9a958a;font-size:10px}
+.catalog-sidebar .category-filter{min-height:40px;border:1px solid transparent;border-radius:8px;font:400 11px var(--sans);padding:8px 10px 8px 12px}
+.catalog-sidebar .category-filter.active{border-color:rgba(40,100,162,.12);border-left-color:var(--catalog-blue);background:#eaf1f6;color:var(--catalog-ink)}
+.catalog-sidebar .category-filter:hover{border-color:var(--catalog-line);background:#eef1f1;color:var(--catalog-ink)}
+.catalog-sidebar .category-filter [data-count]{min-width:22px;height:22px;display:grid;place-items:center;border-radius:999px;background:#f0f0eb;color:#777f83;font-size:10px}
+.catalog-sidebar .category-filter.active [data-count]{background:#d9e6ef;color:var(--catalog-blue)}
 .catalog-sidebar .price-filter{border-color:var(--catalog-line)}
 .catalog-sidebar .price-filter input{accent-color:var(--catalog-blue)}
 .catalog-toolbar{display:flex;justify-content:space-between;align-items:center;margin:-1px 0 20px;padding-bottom:14px;border-bottom:1px solid var(--catalog-line);color:var(--catalog-muted);font-size:12px}
@@ -65,6 +66,9 @@
   .catalog-sidebar .category-list::-webkit-scrollbar{display:none}
   .catalog-sidebar .category-filter{min-height:40px;padding:0 13px;border-radius:999px;font-size:12px;scroll-snap-align:start}
   .catalog-sidebar .category-filter.active{background:#eaf1f6;color:var(--catalog-ink)}
+  .catalog-sidebar .category-filter{border:1px solid var(--catalog-line);border-radius:999px;background:#fff;color:#586b7a;font-size:12px;font-weight:500;transition:background-color .18s ease,border-color .18s ease,color .18s ease}
+  .catalog-sidebar .category-filter:hover{border-color:rgba(40,100,162,.32);background:#f0f5f8}
+  .catalog-sidebar .category-filter.active{border-color:var(--catalog-blue);background:var(--catalog-blue);color:#fff}
   .catalog-sidebar .price-filter{grid-template-columns:1fr auto;gap:5px 12px;padding-top:12px}
   .catalog-sidebar .price-filter h2{font-size:10px}
   .catalog-toolbar{margin-bottom:12px;padding-bottom:10px;font-size:12px}
