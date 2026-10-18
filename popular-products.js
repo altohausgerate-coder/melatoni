@@ -36,6 +36,7 @@
   let preferences = {};
   let personalized = false;
   let reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const autoAdvanceAllowed = matchMedia('(hover: hover) and (pointer: fine)');
   const savedIds = new Set();
 
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char]);
@@ -118,7 +119,7 @@
   function stop() { window.clearInterval(timer); timer = 0; }
   function start() {
     stop();
-    if (visible && !focusInside && !reducedMotion && !document.hidden && list().length > 2) {
+    if (visible && autoAdvanceAllowed.matches && !focusInside && !reducedMotion && !document.hidden && list().length > 2) {
       timer = window.setInterval(() => step(1), 3300);
     }
   }
@@ -177,6 +178,7 @@
   } else { visible = true; start(); }
   const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
   motionPreference.addEventListener?.('change', event => { reducedMotion = event.matches; start(); });
+  autoAdvanceAllowed.addEventListener?.('change', start);
   document.addEventListener('melatoni:catalog-updated',event=>{products=(Array.isArray(event.detail)?event.detail:[]).filter(item=>item&&typeof item==='object').sort((a,b)=>(rank.get(a.id)??999)-(rank.get(b.id)??999));render()});
   renderLabels();
 })();
