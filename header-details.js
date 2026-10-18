@@ -84,7 +84,7 @@
   const localize = () => {
     const copy = window.MelatoniAccountCopy?.[window.MelatoniStorage?.get('melatoni-language') || 'az'];
     if (!copy) return;
-    const values = { accountEyebrow:'title', accountIntro:'subtitle', accountLogin:'login', accountRegister:'register', accountName:'name', accountEmail:'email', accountPhone:'phone', accountPassword:'password', accountForgot:'forgot', accountGoogle:'google', accountGmail:'gmail', accountGuest:'accountGuest' };
+    const values = { accountEyebrow:'title', accountIntro:'subtitle', accountLogin:'login', accountRegister:'register', accountName:'name', accountEmail:'email', accountPhone:'phone', accountPassword:'password', accountForgot:'forgot', accountGoogle:'google', accountFacebook:'facebook', accountGmail:'gmail', accountGuest:'accountGuest' };
     Object.entries(values).forEach(([selector,key]) => { const node = $(`[data-account-label="${selector}"]`); if (node) node.textContent = copy[key]; });
     setMode(accountMode, false);
     const signedLink = $('.account-initials');
@@ -102,6 +102,7 @@
     const phoneInput = $('[name="phone"]'); if (phoneInput) phoneInput.required = registering;
     const passwordInput = $('[name="password"]'); if (passwordInput) { passwordInput.autocomplete = registering ? 'new-password' : 'current-password'; passwordInput.minLength = registering ? 8 : 0; }
     const googleButton = $('.account-google'); if (googleButton) googleButton.hidden = registering;
+    const facebookButton = $('.account-facebook'); if (facebookButton) facebookButton.hidden = registering;
     const gmailButton = $('.account-gmail'); if (gmailButton) gmailButton.hidden = registering || emailLoginOpen;
     if (accountForm) accountForm.hidden = !registering && !emailLoginOpen;
     const forgotLink = $('.account-forgot'); if (forgotLink) forgotLink.hidden = registering || !emailLoginOpen;
@@ -199,6 +200,17 @@
       redirect.searchParams.set('auth', 'account');
       const destination = new URLSearchParams(location.search).get('return'); if (destination) redirect.searchParams.set('return', destination);
       const { error } = await client.auth.signInWithOAuth({ provider:'google', options:{ redirectTo:redirect.toString() } });
+      if (error && status) status.textContent = text('genericError');
+    } catch { if (status) status.textContent = text('genericError'); }
+  });
+  $('.account-facebook')?.addEventListener('click', async () => {
+    if (!client) { if (status) status.textContent = text('supabaseMissing'); return; }
+    try {
+      const redirect = new URL('./', location.href);
+      redirect.hash = '';
+      redirect.searchParams.set('auth', 'account');
+      const destination = new URLSearchParams(location.search).get('return'); if (destination) redirect.searchParams.set('return', destination);
+      const { error } = await client.auth.signInWithOAuth({ provider:'facebook', options:{ redirectTo:redirect.toString() } });
       if (error && status) status.textContent = text('genericError');
     } catch { if (status) status.textContent = text('genericError'); }
   });
