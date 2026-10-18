@@ -271,8 +271,10 @@
   .product-header-tools { gap: 7px; }
   .product-header-tools > .product-about-link:not([data-account-entry]), .product-lang-picker { display: none; }
   .product-header .product-about-link[data-account-entry] { width: 40px; height: 40px; display: grid; place-items: center; }
-  .product-header .bag-shortcut { display: grid; width: 44px; height: 44px; place-items: center; padding: 0; border-radius: 0; background: transparent !important; color: #193247; box-shadow: none; font-size: 0; }
+  .product-header .bag-shortcut { position: relative; display: grid; width: 44px; height: 44px; place-items: center; padding: 0; border: 0; border-radius: 0; background: transparent !important; color: #193247; box-shadow: none; font-size: 0; }
   .product-header .bag-symbol { width: 15px; height: 13px; }
+  .product-header .bag-shortcut #bagCount { position: absolute; top: 1px; right: 1px; z-index: 1; min-width: 16px; width: 16px; height: 16px; display: grid; place-items: center; border-radius: 50%; background: #d7e4e6; color: #314b5d; font-size: 8px; line-height: 1; }
+  .product-header .bag-shortcut #bagCount[hidden] { display: none; }
   .product-main { padding-bottom: calc(34px + var(--mobile-safe-bottom, 0px)); }
   .product-photo picture { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
   .product-photo.studio-product-photo img { object-fit: contain; padding: 8px; background: #eeefec; }
