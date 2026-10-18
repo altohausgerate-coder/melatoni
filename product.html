@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="soft-header.css?v=20261016" />
   <link rel="stylesheet" href="cookie-consent.css?v=20261028" />
   <link rel="stylesheet" href="mobile-iphone.css?v=20261021" />
-  <link rel="stylesheet" href="mobile-shopping.css?v=20261018-v1" />
+  <link rel="stylesheet" href="mobile-shopping.css?v=20261018-brooklinen-inspired" />
 </head>
 <body>
   <header class="product-header">
@@ -37,7 +37,7 @@
     <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="index.html" data-copy="home">Ana səhifə</a><span>/</span><a href="products.html" data-copy="products">Məhsullar</a><span>/</span><span id="crumbName"></span></nav>
     <section class="product-not-found" id="productNotFound" hidden aria-labelledby="productNotFoundTitle"><p class="product-kicker">MELATONI · THE ART OF SLEEP</p><h1 id="productNotFoundTitle">Məhsul tapılmadı</h1><p>Bu məhsul kataloqda mövcud deyil və ya keçid yanlışdır.</p><a class="button button-dark" href="products.html">Məhsullara qayıt <span aria-hidden="true">↗</span></a></section>
     <section class="product-detail-layout" id="productDetail" aria-live="polite">
-      <div class="product-photo"><img id="detailImage" alt=""/><span class="image-mark">THE ART OF SLEEP</span></div>
+      <div class="product-photo"><picture><source id="detailMobileImage" media="(max-width: 680px)"/><img id="detailImage" alt=""/></picture><span class="image-mark">THE ART OF SLEEP</span></div>
       <div class="product-content">
         <p class="product-kicker"><span data-copy="brandLine">MELATONI · YUXU ÜÇÜN SEÇİLİB</span></p>
         <p class="product-category" id="detailCategory"></p>
@@ -58,7 +58,9 @@
     </section>
     <section class="product-companions" id="productCompanions" hidden aria-labelledby="companionsTitle"><div class="product-companions-head"><p class="product-kicker">MELATONI · RAHAT YUXU ÜÇÜN</p><h2 id="companionsTitle"></h2></div><div class="product-companions-grid" id="companionsGrid"></div></section>
     <p class="back-row"><a href="products.html" data-copy="browseMore">Digər məhsullara bax</a><span aria-hidden="true">↗</span></p>
-  </main>  <script src="storage.js?v=20261016"></script><script src="account-i18n.js?v=20261017"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js?v=20261017.4"></script><script src="cart-auth.js?v=20261030.1"></script><script src="account-header.js?v=20261030.1"></script><script src="products-data.js?v=20261016"></script><script src="catalog-sync.js?v=20261016"></script><script src="storefront-events.js?v=20261017.1"></script><script src="cart-recovery.js?v=20261017.2"></script><script src="product-page.js?v=20261017.2"></script><script src="product-companions.js?v=20261017.1"></script>  <script src="header-scroll.js?v=20261016"></script>  <script src="cookie-consent.js?v=20261028"></script>
+  </main>
+  <div class="product-sticky-buy" id="productStickyBuy" hidden><span class="sticky-buy-price" id="mobileStickyPrice"></span><button type="button" id="mobileStickyAdd" aria-label="Səbətə əlavə et"><span data-copy="addBag">Səbətə əlavə et</span><span aria-hidden="true">＋</span></button></div>
+  <script src="storage.js?v=20261016"></script><script src="account-i18n.js?v=20261017"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js?v=20261017.4"></script><script src="cart-auth.js?v=20261030.1"></script><script src="account-header.js?v=20261030.1"></script><script src="products-data.js?v=20261016"></script><script src="catalog-sync.js?v=20261016"></script><script src="storefront-events.js?v=20261017.1"></script><script src="cart-recovery.js?v=20261017.2"></script><script src="product-page.js?v=20261018-mobile-sticky"></script><script src="product-companions.js?v=20261017.1"></script>  <script src="header-scroll.js?v=20261016"></script>  <script src="cookie-consent.js?v=20261028"></script>
   <script src="footer-year.js?v=20261016"></script></body>
 </html>
 
