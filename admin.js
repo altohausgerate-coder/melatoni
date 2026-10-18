@@ -10,6 +10,9 @@
   const analytics = document.querySelector('#analyticsBreakdown');
   const supportList = document.querySelector('#adminSupportList');
   const alertList = document.querySelector('#adminAlertsList');
+  const orderPushButton = document.querySelector('#enableOrderPush');
+  const orderPushStatus = document.querySelector('#orderPushStatus');
+  let orderPushUserId = null;
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[char]);
   const say = (message, error = false) => { if (!status) return; status.textContent = message; status.classList.toggle('is-error', error); };
   const value = (name, item) => { const input = form.elements.namedItem(name); if (input) input.value = item || ''; };
@@ -43,12 +46,63 @@
     login.hidden = false;
     say(message);
   }
+  async function refreshOrderPushState() {
+    if (!orderPushButton || !orderPushStatus) return;
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      orderPushButton.disabled = true;
+      orderPushStatus.textContent = 'Bu brauzer push bildirişlərini dəstəkləmir.';
+      return;
+    }
+    try {
+      const registration = await navigator.serviceWorker.getRegistration('./');
+      const subscription = await registration?.pushManager.getSubscription();
+      orderPushButton.disabled = Boolean(subscription);
+      orderPushButton.textContent = subscription ? 'Bu cihaz aktivdir' : 'Bu cihazda bildirişləri aktiv et';
+      orderPushStatus.textContent = subscription
+        ? 'Bu cihaz yeni sifarişlər üçün bildiriş alacaq.'
+        : 'Yeni sifariş bildirişlərini almaq üçün bu cihazda icazə verin.';
+    } catch {
+      orderPushStatus.textContent = 'Bildiriş statusunu yoxlamaq mümkün olmadı.';
+    }
+  }
+  function activateAdminTab(name) {
+    const button = document.querySelector(`[data-admin-tab="${CSS.escape(name)}"]`);
+    if (!button) return;
+    document.querySelectorAll('[data-admin-tab]').forEach(item => item.classList.toggle('is-active', item === button));
+    document.querySelectorAll('[data-admin-panel]').forEach(panel => { panel.hidden = panel.dataset.adminPanel !== name; });
+    if (name === 'orders') { loadOrders(); refreshOrderPushState(); }
+    if (name === 'analytics') loadAnalytics();
+    if (name === 'support') loadSupportTickets();
+    if (name === 'alerts') loadProductAlerts();
+  }
+  orderPushButton?.addEventListener('click', async () => {
+    if (!orderPushUserId || !window.MelatoniPush) return say('Bildiriş xidməti hazır deyil.', true);
+    orderPushButton.disabled = true;
+    try {
+      await window.MelatoniPush.subscribe(orderPushUserId);
+      if (orderPushStatus) orderPushStatus.textContent = 'Bu cihaz yeni sifarişlər üçün aktiv edildi.';
+      orderPushButton.textContent = 'Bu cihaz aktivdir';
+      say('Sifariş bildirişləri bu cihazda aktiv edildi.');
+    } catch (error) {
+      const message = error?.message === 'ios-install'
+        ? 'iPhone-da əvvəlcə Paylaş → Ana ekrana əlavə et seçin, sonra saytı həmin ikonadan açıb yenidən aktiv edin.'
+        : error?.message === 'blocked'
+          ? 'Bildiriş icazəsi bloklanıb. Brauzer ayarlarından Melatoni bildirişlərini aktiv edin.'
+          : error?.message === 'unsupported'
+            ? 'Bu brauzer push bildirişlərini dəstəkləmir.'
+            : 'Bildiriş aktiv olmadı. Yenidən cəhd edin.';
+      if (orderPushStatus) orderPushStatus.textContent = message;
+      orderPushButton.disabled = false;
+      say(message, true);
+    }
+  });
   async function authorize(user) {
     if (!user) return showLogin('Admin hesabı ilə daxil olun.');
     try {
       const { data, error } = await client.from('profiles').select('is_admin').eq('id', user.id).maybeSingle();
       if (error) return showLogin('İdarəetmə sxemi tətbiq edilməyib. Supabase miqrasiyasını işə salın.');
       if (!data?.is_admin) return showLogin('Bu hesab üçün admin icazəsi yoxdur.');
+      orderPushUserId = user.id;
       login.hidden = true;
       workspace.hidden = false;
       logout.hidden = false;
@@ -56,6 +110,7 @@
       await loadProducts();
       await Promise.all([loadOrders(), loadAnalytics(), loadSupportTickets(), loadProductAlerts()]);
       subscribeOrders();
+      if (location.hash === '#orders') activateAdminTab('orders');
     } catch { showLogin('Supabase ilə əlaqə qurulmadı. İnterneti yoxlayıb yenidən cəhd edin.'); }
   }
   async function currentUser() {
@@ -212,7 +267,7 @@
   document.querySelector('#refreshAlerts')?.addEventListener('click',loadProductAlerts);
   document.querySelector('#campaignPushForm')?.addEventListener('submit',async event=>{event.preventDefault();const button=event.currentTarget.querySelector('button[type="submit"]');button.disabled=true;try{const data=new FormData(event.currentTarget);const result=await client.functions.invoke('send-campaign-push',{body:{title:String(data.get('title')||'').trim(),body:String(data.get('body')||'').trim(),url:String(data.get('url')||'products.html').trim()}});if(result.error||result.data?.error)say(at('campaignFailed'),true);else say(`${at('campaignSent')} (${result.data?.sent||0})`)}catch{say(at('campaignFailed'),true)}finally{button.disabled=false}});
   supportList?.addEventListener('click',async event=>{const button=event.target.closest('[data-save-ticket]');if(!button)return;const card=button.closest('[data-ticket]'),reply=card.querySelector('[data-ticket-reply]'),statusSelect=card.querySelector('[data-ticket-status]');button.disabled=true;try{const replyText=String(reply.value||'').trim();const result=await client.from('support_tickets').update({admin_reply:replyText,status:statusSelect.value,replied_at:replyText?new Date().toISOString():null,updated_at:new Date().toISOString()}).eq('id',button.dataset.saveTicket);say(result.error?'Dəstək cavabı yadda saxlanmadı.':'Cavab və status yadda saxlandı.',!!result.error);if(!result.error)await loadSupportTickets()}catch{say('Dəstək cavabı yadda saxlanmadı.',true)}finally{button.disabled=false}});
-  document.querySelector('.admin-tabs')?.addEventListener('click',event=>{const button=event.target.closest('[data-admin-tab]');if(!button)return;document.querySelectorAll('[data-admin-tab]').forEach(item=>item.classList.toggle('is-active',item===button));document.querySelectorAll('[data-admin-panel]').forEach(panel=>panel.hidden=panel.dataset.adminPanel!==button.dataset.adminTab);if(button.dataset.adminTab==='orders')loadOrders();if(button.dataset.adminTab==='analytics')loadAnalytics();if(button.dataset.adminTab==='support')loadSupportTickets();if(button.dataset.adminTab==='alerts')loadProductAlerts()});
+  document.querySelector('.admin-tabs')?.addEventListener('click',event=>{const button=event.target.closest('[data-admin-tab]');if(button)activateAdminTab(button.dataset.adminTab)});
   document.querySelectorAll('.admin-language-options [data-lang]').forEach(button=>button.addEventListener('click',()=>{const next=button.dataset.lang;if(!['az','ru','en'].includes(next))return;window.MelatoniStorage?.set('melatoni-language',next);localizeAdmin();document.querySelector('.admin-language-picker')?.removeAttribute('open');loadAnalytics();loadSupportTickets();loadProductAlerts()}));
   localizeAdmin();
   document.addEventListener('melatoni:catalog-updated',event=>{if(!Array.isArray(event.detail))return;products=event.detail;loadProducts()});
