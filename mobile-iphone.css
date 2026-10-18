@@ -1,5 +1,20 @@
 /* Mobile-first finishing layer. Keep the existing section order and desktop layouts. */
 @media (max-width: 760px) {
+  .site-header,
+  .site-header.scrolled { z-index: 110; }
+  .site-header .menu-toggle {
+    position: relative;
+    z-index: 112;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .site-header .main-nav {
+    z-index: 111;
+    touch-action: pan-y;
+    pointer-events: none;
+  }
+  .site-header .main-nav.open { pointer-events: auto; }
+
   :root {
     --mobile-inline: clamp(18px, 5.5vw, 28px);
     --mobile-header-height: 68px;
