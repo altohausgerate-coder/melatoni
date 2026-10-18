@@ -4,17 +4,7 @@
   const categories=['linen','pillow','duvet','bedcare','sleepwear','bath','accessory','gift'];
   const state={query:new URLSearchParams(location.search).get('q')||'',sort:'featured'};
   const swatchHex={ivory:'#e8dfd0',white:'#faf9f4',sand:'#cbb99d',sage:'#a1a58f',taupe:'#9b8d7c',stone:'#aaa69e',charcoal:'#575650',cream:'#e7d9c5',blush:'#d6b8b2',blue:'#aab8c2',rust:'#a86d50',amber:'#ae8045',rose:'#b78086'};
-  window.MELATONI_PRODUCT_COLORS={
-    'pillow-cloud':['white','ivory','sage','blue'],'pillow-balance':['white'],'pillow-down':['cream'],
-    'pillow-side-cloud':['ivory'],'pillow-cool-rest':['white'],'pillow-support-high':['white'],'pillow-duo-rest':['ivory'],
-    'linen-calm':['ivory','sand','sage','blue'],'linen-percale':['white'],'linen-satin':['ivory'],
-    'duvet-dream':['ivory'],'duvet-airy':['white'],'duvet-winter':['ivory'],'duvet-summer-light':['white'],'duvet-four-season':['ivory'],
-    'protector-pure':['white'],'sheet-cloud':['white'],'mattress-rest':['white'],
-    'throw-knit':['sand'],'candle-night':['ivory'],'diffuser-calm':['ivory'],
-    'mask-silk':['ivory'],'robe-soft':['ivory'],'slippers-cloud':['cream'],
-    'towel-spa':['white'],'gift-rest':['ivory']
-  };
-  Object.keys(window.MELATONI_PRODUCT_COLORS).forEach(id=>{window.MELATONI_PRODUCT_COLORS[id]=window.MELATONI_PRODUCT_COLORS[id].map(key=>({key,hex:swatchHex[key]}))});
+  window.MELATONI_PRODUCT_COLORS=Object.fromEntries(Object.entries(window.MELATONI_PRODUCT_COLOR_KEYS||{}).map(([id,keys])=>[id,keys.map(key=>({key,hex:swatchHex[key]}))]));
   const money=value=>`${new Intl.NumberFormat('az-AZ',{maximumFractionDigits:2}).format(value)} AZN`;
   const normalizeSearch=value=>String(value??'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('az').replace(/ı/g,'i').replace(/ə/g,'e').replace(/ğ/g,'g').replace(/ş/g,'s').replace(/ç/g,'c').replace(/ö/g,'o').replace(/ü/g,'u');
   const safe=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
