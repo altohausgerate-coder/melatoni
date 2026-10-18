@@ -344,5 +344,77 @@ window.MELATONI_PRODUCTS=[
   "price": 159,
   "salePrice": 135,
   "image": "assets/products/gift-rest.jpg"
+ },
+ {
+  "id": "pillow-side-cloud", "localOnly": true, "category": "pillow",
+  "name": {"az":"Side Comfort Yastıq","ru":"Подушка Side Comfort","en":"Side Comfort Pillow"},
+  "desc": {"az":"Yan üstə yatanlar üçün daha dolğun, yumşaq dəstək; hündürlük və dolğunluq sifariş zamanı təsdiqlənir.","ru":"Более объёмная мягкая поддержка для сна на боку; высота и плотность подтверждаются при заказе.","en":"A fuller, softer feel for side sleepers; loft and fill are confirmed when ordering."},
+  "price": 89, "image": "assets/products/pillow-cloud.jpg"
+ },
+ {
+  "id": "pillow-cool-rest", "localOnly": true, "category": "pillow",
+  "name": {"az":"Cool Rest Yastıq","ru":"Подушка Cool Rest","en":"Cool Rest Pillow"},
+  "desc": {"az":"Yüngül və sərin hiss üçün nəzərdə tutulmuş rahat yastıq; örtük və dolğu məlumatı sifariş zamanı dəqiqləşdirilir.","ru":"Комфортная подушка с лёгким ощущением прохлады; состав чехла и наполнителя уточняется при заказе.","en":"A comfortable pillow with a light, cool feel; cover and fill details are confirmed when ordering."},
+  "price": 109, "image": "assets/products/pillow-cloud.jpg"
+ },
+ {
+  "id": "pillow-support-high", "localOnly": true, "category": "pillow",
+  "name": {"az":"High Support Yastıq","ru":"Подушка High Support","en":"High Support Pillow"},
+  "desc": {"az":"Daha hündür və dəstəkləyici forma axtaranlar üçün; uyğun ölçü və sərtlik WhatsApp-da dəqiqləşdirilir.","ru":"Для тех, кто предпочитает более высокую и поддерживающую форму; размер и упругость уточняются в WhatsApp.","en":"For sleepers who prefer a higher, more supportive shape; size and firmness are confirmed on WhatsApp."},
+  "price": 119, "image": "assets/products/pillow-balance.jpg"
+ },
+ {
+  "id": "pillow-duo-rest", "localOnly": true, "category": "pillow",
+  "name": {"az":"Duo Rest Yastıq Dəsti","ru":"Набор подушек Duo Rest","en":"Duo Rest Pillow Pair"},
+  "desc": {"az":"Yataq otağı üçün iki uyğun yastıqdan ibarət dəst; ölçü və rəng seçimi sifarişdən əvvəl təsdiqlənir.","ru":"Комплект из двух сочетающихся подушек; размер и цвет подтверждаются перед заказом.","en":"A matching pair of pillows for your bed; size and color are confirmed before ordering."},
+  "price": 149, "image": "assets/products/pillow-cloud.jpg"
+ },
+ {
+  "id": "linen-tencel-touch", "localOnly": true, "category": "linen",
+  "name": {"az":"Tencel Touch Yataq Dəsti","ru":"Комплект Tencel Touch","en":"Tencel Touch Bedding Set"},
+  "desc": {"az":"Hamar, yüngül toxunuşlu yataq dəsti seçimi. Parça tərkibi, ölçü və komplektasiya sifarişdən əvvəl təsdiqlənir.","ru":"Гладкий и лёгкий комплект постельного белья. Состав ткани, размер и комплектность подтверждаются перед заказом.","en":"A smooth, lightweight bedding option. Fabric content, sizing, and set contents are confirmed before ordering."},
+  "price": 219, "image": "assets/products/linen-calm.jpg"
+ },
+ {
+  "id": "linen-cotton-blend", "localOnly": true, "category": "linen",
+  "name": {"az":"Everyday Yataq Dəsti","ru":"Комплект Everyday","en":"Everyday Bedding Set"},
+  "desc": {"az":"Gündəlik istifadə üçün rahat yataq dəsti. Ölçü, rəng və dəstə daxil olan parçalar sifariş zamanı dəqiqləşdirilir.","ru":"Удобный комплект для повседневного использования. Размер, цвет и состав комплекта уточняются при заказе.","en":"An easy everyday bedding set. Size, color, and included pieces are confirmed when ordering."},
+  "price": 169, "image": "assets/products/linen-percale.jpg"
+ },
+ {
+  "id": "linen-winter-soft", "localOnly": true, "category": "linen",
+  "name": {"az":"Winter Soft İsti Yataq Dəsti","ru":"Тёплый комплект Winter Soft","en":"Winter Soft Bedding Set"},
+  "desc": {"az":"Soyuq mövsüm üçün yumşaq və isti hiss verən yataq dəsti. Parça və ölçü mövcudluğu sifariş zamanı təsdiqlənir.","ru":"Мягкий и тёплый комплект для прохладного сезона. Наличие ткани и размеров подтверждается при заказе.","en":"A soft, warm-feel bedding option for cooler nights. Fabric and sizing are confirmed when ordering."},
+  "price": 239, "image": "assets/products/linen-satin.jpg"
+ },
+ {
+  "id": "pillowcase-pair-soft", "localOnly": true, "category": "linen",
+  "name": {"az":"Soft Touch Yastıq Üzü Dəsti","ru":"Комплект наволочек Soft Touch","en":"Soft Touch Pillowcase Pair"},
+  "desc": {"az":"Yastıqlarınızı yataq dəstinizlə uyğunlaşdırmaq üçün iki üzlük. Ölçü, rəng və parça tərkibi sifarişdən əvvəl təsdiqlənir.","ru":"Две наволочки, которые легко сочетать с постельным бельём. Размер, цвет и состав подтверждаются перед заказом.","en":"Two pillowcases to coordinate with your bedding. Size, color, and fabric details are confirmed before ordering."},
+  "price": 49, "image": "assets/products/linen-calm.jpg"
+ },
+ {
+  "id": "duvet-summer-light", "localOnly": true, "category": "duvet",
+  "name": {"az":"Summer Light Yay Yorğanı","ru":"Летнее одеяло Summer Light","en":"Summer Light Duvet"},
+  "desc": {"az":"İsti gecələrdə daha yüngül örtük istəyənlər üçün. Dolğu, ölçü və qulluq qaydaları sifariş zamanı dəqiqləşdirilir.","ru":"Лёгкое одеяло для тёплых ночей. Наполнитель, размер и уход уточняются при заказе.","en":"A lighter cover for warm nights. Fill, size, and care details are confirmed when ordering."},
+  "price": 109, "image": "assets/products/duvet-airy.jpg"
+ },
+ {
+  "id": "duvet-four-season", "localOnly": true, "category": "duvet",
+  "name": {"az":"Four Season Yorğan","ru":"Одеяло Four Season","en":"Four Season Duvet"},
+  "desc": {"az":"İlboyu istifadə üçün nəzərdə tutulan orta istilikli seçim. Ölçü və dolğu məlumatı sifarişdən əvvəl təsdiqlənir.","ru":"Вариант средней теплоты для использования круглый год. Размер и наполнитель подтверждаются перед заказом.","en":"A medium-warmth option for year-round use. Size and fill details are confirmed before ordering."},
+  "price": 169, "image": "assets/products/duvet-dream.jpg"
+ },
+ {
+  "id": "linen-wedding-set", "localOnly": true, "category": "linen",
+  "name": {"az":"Cehizlik Yataq Dəsti","ru":"Комплект постельного белья для свадьбы","en":"Wedding Bedding Set"},
+  "desc": {"az":"Xüsusi günlər və hədiyyə üçün zərif yataq dəsti seçimi. Parça, ölçü və dəstə daxil olan məhsullar sifarişdən əvvəl təsdiqlənir.","ru":"Элегантный комплект для особого события или подарка. Ткань, размер и состав подтверждаются перед заказом.","en":"A considered bedding choice for a special occasion or gift. Fabric, sizing, and set contents are confirmed before ordering."},
+  "price": 289, "image": "assets/products/linen-satin.jpg"
+ },
+ {
+  "id": "linen-kids-dream", "localOnly": true, "category": "linen",
+  "name": {"az":"Little Dream Uşaq Yataq Dəsti","ru":"Детский комплект Little Dream","en":"Little Dream Kids Bedding Set"},
+  "desc": {"az":"Uşaq yatağı üçün yumşaq, sakit rəngli yataq dəsti. Dəqiq ölçü, naxış və parça tərkibi sifariş zamanı dəqiqləşdirilir.","ru":"Комплект спокойных оттенков для детской кровати. Размер, рисунок и состав ткани уточняются при заказе.","en":"A calm-toned bedding choice for a child's bed. Exact size, print, and fabric content are confirmed when ordering."},
+  "price": 159, "image": "assets/products/linen-calm.jpg"
  }
 ];

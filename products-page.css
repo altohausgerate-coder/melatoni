@@ -27,9 +27,9 @@
 .catalog-toolbar p{margin:0}.catalog-toolbar strong{color:var(--catalog-ink);font-size:16px;font-weight:500}
 .catalog-toolbar .sort-control{gap:10px}.catalog-toolbar select{font:500 12px var(--sans)}
 .catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px 18px}
-.catalog-grid .product-image{height:auto;aspect-ratio:1.08;overflow:hidden;background:#e9e6df}
+.catalog-grid .product-image{height:auto;aspect-ratio:1.08;overflow:hidden;background:#eeefec}
 .catalog-grid .product-open picture{position:absolute;inset:0;display:block;width:100%;height:100%}
-.catalog-grid .product-image img{width:100%;height:100%;object-fit:cover;transition:transform .55s cubic-bezier(.2,.7,.25,1)}
+.catalog-grid .product-image img{width:100%;height:100%;padding:4px;object-fit:contain;transition:transform .55s cubic-bezier(.2,.7,.25,1)}
 .catalog-grid .product-card:hover .product-image img{transform:scale(1.035)}
 .catalog-grid .product-detail{padding-top:13px}.catalog-grid .product-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .catalog-grid .product-name{margin:0;font:500 clamp(14px,1.15vw,17px)/1.3 var(--sans);letter-spacing:-.025em}

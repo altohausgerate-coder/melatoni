@@ -5,13 +5,14 @@
   const state={query:new URLSearchParams(location.search).get('q')||'',sort:'featured'};
   const swatchHex={ivory:'#e8dfd0',white:'#faf9f4',sand:'#cbb99d',sage:'#a1a58f',taupe:'#9b8d7c',stone:'#aaa69e',charcoal:'#575650',cream:'#e7d9c5',blush:'#d6b8b2',blue:'#aab8c2',rust:'#a86d50',amber:'#ae8045',rose:'#b78086'};
   window.MELATONI_PRODUCT_COLORS={
-    'pillow-cloud':['white','ivory','sage'],'pillow-balance':['white','taupe','stone'],'pillow-down':['cream','ivory','blush'],
-    'linen-calm':['ivory','sand','sage','blue'],'linen-percale':['white','stone','blue'],'linen-satin':['ivory','blush','stone'],
-    'duvet-dream':['ivory','sage','taupe'],'duvet-airy':['white','sand','ivory'],'duvet-winter':['ivory','taupe','charcoal'],
-    'protector-pure':['white','ivory','stone'],'sheet-cloud':['white','sand','stone'],'mattress-rest':['white','ivory'],
-    'throw-knit':['sand','taupe','rust'],'candle-night':['ivory','amber','charcoal'],'diffuser-calm':['ivory','sage','amber'],
-    'mask-silk':['ivory','blush','charcoal'],'robe-soft':['ivory','taupe','sage'],'slippers-cloud':['cream','taupe','stone'],
-    'towel-spa':['white','sand','sage'],'gift-rest':['ivory','blush','sand']
+    'pillow-cloud':['white','ivory','sage','blue'],'pillow-balance':['white'],'pillow-down':['cream'],
+    'pillow-side-cloud':['ivory'],'pillow-cool-rest':['white'],'pillow-support-high':['white'],'pillow-duo-rest':['ivory'],
+    'linen-calm':['ivory','sand','sage','blue'],'linen-percale':['white'],'linen-satin':['ivory'],
+    'duvet-dream':['ivory'],'duvet-airy':['white'],'duvet-winter':['ivory'],'duvet-summer-light':['white'],'duvet-four-season':['ivory'],
+    'protector-pure':['white'],'sheet-cloud':['white'],'mattress-rest':['white'],
+    'throw-knit':['sand'],'candle-night':['ivory'],'diffuser-calm':['ivory'],
+    'mask-silk':['ivory'],'robe-soft':['ivory'],'slippers-cloud':['cream'],
+    'towel-spa':['white'],'gift-rest':['ivory']
   };
   Object.keys(window.MELATONI_PRODUCT_COLORS).forEach(id=>{window.MELATONI_PRODUCT_COLORS[id]=window.MELATONI_PRODUCT_COLORS[id].map(key=>({key,hex:swatchHex[key]}))});
   const money=value=>`${new Intl.NumberFormat('az-AZ',{maximumFractionDigits:2}).format(value)} AZN`;
@@ -19,8 +20,22 @@
   const safe=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const mobileImageFor=value=>/^assets\/products\/[\w-]+\.(?:jpe?g|png|webp|avif)$/i.test(value||'')?value.replace(/^assets\/products\/([\w-]+)\.(?:jpe?g|png|webp|avif)$/i,'assets/products/mobile/$1.webp'):'';
   const mobileImageById={
-    'linen-calm':'assets/products/mobile/linen-calm-studio.webp',
-    'pillow-cloud':'assets/products/mobile/pillow-cloud-studio.webp',
+    'linen-calm':'assets/products/mobile/linen-set-studio.webp',
+    'linen-percale':'assets/products/mobile/linen-set-studio.webp',
+    'linen-satin':'assets/products/mobile/linen-set-studio.webp',
+    'linen-tencel-touch':'assets/products/mobile/linen-set-studio.webp',
+    'linen-cotton-blend':'assets/products/mobile/linen-set-studio.webp',
+    'linen-winter-soft':'assets/products/mobile/linen-set-studio.webp',
+    'linen-wedding-set':'assets/products/mobile/linen-set-studio.webp',
+    'linen-kids-dream':'assets/products/mobile/linen-set-studio.webp',
+    'pillowcase-pair-soft':'assets/products/mobile/linen-set-studio.webp',
+    'pillow-cloud':'assets/products/mobile/pillow-cloud-clean.webp',
+    'pillow-down':'assets/products/mobile/pillow-cloud-studio.webp',
+    'pillow-side-cloud':'assets/products/mobile/pillow-cloud-clean.webp',
+    'pillow-cool-rest':'assets/products/mobile/pillow-cloud-clean.webp',
+    'pillow-duo-rest':'assets/products/mobile/pillow-cloud-studio.webp',
+    'pillow-balance':'assets/products/mobile/pillow-balance-studio.webp',
+    'pillow-support-high':'assets/products/mobile/pillow-balance-studio.webp',
     'duvet-dream':'assets/products/mobile/duvet-dream-studio.webp',
     'throw-knit':'assets/products/mobile/throw-knit-studio.webp',
     'towel-spa':'assets/products/mobile/towel-spa-studio.webp'
@@ -33,7 +48,7 @@
     const normalizedQuery=normalizeSearch(state.query);const matching=items.filter(product=>product&&categories.includes(product.category)).filter(product=>normalizeSearch(`${product.name?.az||product.name} ${product.desc?.az||product.desc}`).includes(normalizedQuery));
     if(state.sort==='price-low')matching.sort((a,b)=>selectedPrice(a)-selectedPrice(b));if(state.sort==='price-high')matching.sort((a,b)=>selectedPrice(b)-selectedPrice(a));
     count.textContent=matching.length;empty.hidden=matching.length>0;grid.hidden=!matching.length;
-    grid.innerHTML=matching.map((product,index)=>{const sale=Number(product.salePrice)>0&&Number(product.salePrice)<Number(product.price);const id=safe(product.id),name=safe(product.name?.az||product.name),image=safe(product.image),studio=Boolean(mobileImageById[product.id]),mobileImage=safe(mobileImageById[product.id]||mobileImageFor(product.image));const colors=(window.MELATONI_PRODUCT_COLORS?.[product.id]||[]);const discount=sale?Math.round((1-Number(product.salePrice)/Number(product.price))*100):0;const swatches=colors.map((color,i)=>`<span class="catalog-swatch${i===0?' is-selected':''}" style="--swatch:${safe(color.hex)}" aria-hidden="true"></span>`).join('');return `<article class="product-card" style="--motion-order:${index%8}"><div class="product-image"><a class="product-open" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${name}"><picture${studio?' class="studio-product-image"':''}>${mobileImage?`<source media="(max-width: 680px)" srcset="${mobileImage}">`:''}<img src="${image}" alt="${name}" loading="lazy" decoding="async"></picture></a>${sale?`<span class="catalog-sale-badge">-${discount}%</span>`:''}<button class="product-save" type="button" data-favorite="${id}" aria-label="Sevimlilərə əlavə et">♡</button><a class="product-quick-add" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${name} — rəng və ölçü seç">+</a></div><div class="product-detail"><div class="product-meta"><h2 class="product-name"><a href="product.html?id=${encodeURIComponent(product.id)}">${name}</a></h2><span class="product-price${sale?' has-sale':''}">${sale?`<strong>${money(product.salePrice)}</strong><del class="product-old-price">${money(product.price)}</del>`:`<strong>${money(product.price)}</strong>`}</span></div>${swatches?`<div class="catalog-swatches" aria-label="Mövcud rənglər">${swatches}</div>`:''}</div></article>`}).join('');
+    grid.innerHTML=matching.map((product,index)=>{const sale=Number(product.salePrice)>0&&Number(product.salePrice)<Number(product.price);const id=safe(product.id),name=safe(product.name?.az||product.name),image=safe(product.image),studio=Boolean(mobileImageById[product.id]),mobileImage=safe(mobileImageById[product.id]||mobileImageFor(product.image)),cardImage=studio?mobileImage:image;const colors=(window.MELATONI_PRODUCT_COLORS?.[product.id]||[]);const discount=sale?Math.round((1-Number(product.salePrice)/Number(product.price))*100):0;const swatches=colors.length>1?colors.map((color,i)=>`<span class="catalog-swatch${i===0?' is-selected':''}" style="--swatch:${safe(color.hex)}" aria-hidden="true"></span>`).join(''):'';return `<article class="product-card" style="--motion-order:${index%8}"><div class="product-image"><a class="product-open" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${name}"><picture${studio?' class="studio-product-image"':''}>${mobileImage&&mobileImage!==cardImage?`<source media="(max-width: 680px)" srcset="${mobileImage}">`:''}<img src="${cardImage}" alt="${name}" loading="lazy" decoding="async"></picture></a>${sale?`<span class="catalog-sale-badge">-${discount}%</span>`:''}<button class="product-save" type="button" data-favorite="${id}" aria-label="Sevimlilərə əlavə et">♡</button><a class="product-quick-add" href="product.html?id=${encodeURIComponent(product.id)}" aria-label="${name} — rəng və ölçü seç">+</a></div><div class="product-detail"><div class="product-meta"><h2 class="product-name"><a href="product.html?id=${encodeURIComponent(product.id)}">${name}</a></h2><span class="product-price${sale?' has-sale':''}">${sale?`<strong>${money(product.salePrice)}</strong><del class="product-old-price">${money(product.price)}</del>`:`<strong>${money(product.price)}</strong>`}</span></div>${swatches?`<div class="catalog-swatches" aria-label="Mövcud rənglər">${swatches}</div>`:''}</div></article>`}).join('');
   }
   document.querySelector('#sortSelect').addEventListener('change',event=>{state.sort=event.target.value;render()});
   document.addEventListener('click',event=>{const addButton=event.target.closest('[data-add]');if(addButton){let bag=[];try{bag=JSON.parse(window.MelatoniStorage?.get('melatoni-cart')||'[]')}catch{}const row=bag.find(item=>item.id===addButton.dataset.add&&!item.color&&!item.size);if(row)row.qty=(Number(row.qty)||0)+1;else bag.push({id:addButton.dataset.add,qty:1});window.MelatoniStorage?.set('melatoni-cart',JSON.stringify(bag));updateBagCount();document.dispatchEvent(new Event('melatoni:cart-change'));toast('Məhsul səbətə əlavə edildi');return}const favorite=event.target.closest('[data-favorite]');if(favorite){favorite.classList.toggle('saved');favorite.textContent=favorite.classList.contains('saved')?'♥':'♡';toast(favorite.classList.contains('saved')?'Sevimlilərə əlavə edildi':'Sevimlilərdən çıxarıldı')}});
