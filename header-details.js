@@ -107,7 +107,7 @@
     if (accountForm) accountForm.hidden = !registering && !emailLoginOpen;
     const forgotLink = $('.account-forgot'); if (forgotLink) forgotLink.hidden = registering || !emailLoginOpen;
     const title = $('#accountTitle'); if (title) title.textContent = registering ? text('register') : text('login');
-    const submit = $('.account-submit'); if (submit) submit.innerHTML = `${registering ? text('submitRegister') : emailLoginOpen ? text('gmail') : text('submitLogin')} <span aria-hidden="true">↗</span>`;
+    const submit = $('.account-submit'); if (submit) submit.innerHTML = `${registering ? text('submitRegister') : text('submitLogin')} <span aria-hidden="true">↗</span>`;
     document.querySelectorAll('[data-account-mode]').forEach(button => { const active = button.dataset.accountMode === accountMode; button.classList.toggle('is-active', active); button.setAttribute('aria-selected', String(active)); });
     if (clearStatus && status) status.textContent = '';
     if (whatsapp) whatsapp.hidden = true;
