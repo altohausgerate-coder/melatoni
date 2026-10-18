@@ -31,7 +31,7 @@
   };
 
   const loginFor = intent => {
-    const destination = appRoot();
+    const destination = new URL('products.html', appRoot());
     destination.searchParams.set('cartAction', intent.type);
     if (intent.type === 'add') {
       destination.searchParams.set('id', intent.id);
@@ -73,7 +73,7 @@
 
   const params = new URLSearchParams(location.search);
   const requested = params.get('cartAction');
-  if (requested === 'open' || requested === 'add') {
+  if (requested === 'open' || requested === 'add' || requested === 'confirm') {
     resumeAction({ type: requested, id: params.get('id') || '', color: params.get('color') || '', size: params.get('size') || '' });
   } else if (location.hash === '#bag') {
     resumeAction({ type: 'open' });
