@@ -137,3 +137,4 @@ window.MELATONI_PRODUCT_COLOR_KEYS={
     "sage"
   ]
 };
+Object.assign(window.MELATONI_PRODUCT_COLOR_KEYS,Object.fromEntries((window.MELATONI_PRODUCTS||[]).filter(product=>product?.brand==='Mark Cross').map(product=>[product.id,['ivory','sand']])));
