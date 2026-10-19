@@ -68,8 +68,13 @@
   function activateAdminTab(name) {
     const button = document.querySelector(`[data-admin-tab="${CSS.escape(name)}"]`);
     if (!button) return;
-    document.querySelectorAll('[data-admin-tab]').forEach(item => item.classList.toggle('is-active', item === button));
+    document.querySelectorAll('[data-admin-tab]').forEach(item => {
+      item.classList.toggle('is-active', item === button);
+      item.setAttribute('aria-pressed', String(item === button));
+    });
     document.querySelectorAll('[data-admin-panel]').forEach(panel => { panel.hidden = panel.dataset.adminPanel !== name; });
+    if (location.hash !== `#${name}`) history.replaceState(null, '', `#${name}`);
+    button.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     if (name === 'orders') { loadOrders(); refreshOrderPushState(); }
     if (name === 'analytics') loadAnalytics();
     if (name === 'support') loadSupportTickets();
@@ -110,7 +115,8 @@
       await loadProducts();
       await Promise.all([loadOrders(), loadAnalytics(), loadSupportTickets(), loadProductAlerts()]);
       subscribeOrders();
-      if (location.hash === '#orders') activateAdminTab('orders');
+      const requestedTab = location.hash.slice(1);
+      if (requestedTab && document.querySelector(`[data-admin-tab="${CSS.escape(requestedTab)}"]`)) activateAdminTab(requestedTab);
     } catch { showLogin('Supabase ilə əlaqə qurulmadı. İnterneti yoxlayıb yenidən cəhd edin.'); }
   }
   async function currentUser() {
@@ -268,6 +274,7 @@
   document.querySelector('#campaignPushForm')?.addEventListener('submit',async event=>{event.preventDefault();const button=event.currentTarget.querySelector('button[type="submit"]');button.disabled=true;try{const data=new FormData(event.currentTarget);const result=await client.functions.invoke('send-campaign-push',{body:{title:String(data.get('title')||'').trim(),body:String(data.get('body')||'').trim(),url:String(data.get('url')||'products.html').trim()}});if(result.error||result.data?.error)say(at('campaignFailed'),true);else say(`${at('campaignSent')} (${result.data?.sent||0})`)}catch{say(at('campaignFailed'),true)}finally{button.disabled=false}});
   supportList?.addEventListener('click',async event=>{const button=event.target.closest('[data-save-ticket]');if(!button)return;const card=button.closest('[data-ticket]'),reply=card.querySelector('[data-ticket-reply]'),statusSelect=card.querySelector('[data-ticket-status]');button.disabled=true;try{const replyText=String(reply.value||'').trim();const result=await client.from('support_tickets').update({admin_reply:replyText,status:statusSelect.value,replied_at:replyText?new Date().toISOString():null,updated_at:new Date().toISOString()}).eq('id',button.dataset.saveTicket);say(result.error?'Dəstək cavabı yadda saxlanmadı.':'Cavab və status yadda saxlandı.',!!result.error);if(!result.error)await loadSupportTickets()}catch{say('Dəstək cavabı yadda saxlanmadı.',true)}finally{button.disabled=false}});
   document.querySelector('.admin-tabs')?.addEventListener('click',event=>{const button=event.target.closest('[data-admin-tab]');if(button)activateAdminTab(button.dataset.adminTab)});
+  window.addEventListener('hashchange',()=>{const name=location.hash.slice(1);if(document.querySelector(`[data-admin-tab="${CSS.escape(name)}"]`)&&!workspace.hidden)activateAdminTab(name)});
   document.querySelectorAll('.admin-language-options [data-lang]').forEach(button=>button.addEventListener('click',()=>{const next=button.dataset.lang;if(!['az','ru','en'].includes(next))return;window.MelatoniStorage?.set('melatoni-language',next);localizeAdmin();document.querySelector('.admin-language-picker')?.removeAttribute('open');loadAnalytics();loadSupportTickets();loadProductAlerts()}));
   localizeAdmin();
   document.addEventListener('melatoni:catalog-updated',event=>{if(!Array.isArray(event.detail))return;products=event.detail;loadProducts()});
