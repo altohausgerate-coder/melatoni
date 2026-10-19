@@ -26,3 +26,17 @@
 .mc-banner-actions .mc-choice:hover,.mc-modal-actions .mc-button:hover{background:#edf5fb;border-color:rgba(18,63,122,.4)}
 .mc-banner-actions .mc-choice:active,.mc-modal-actions .mc-button:active{transform:translateY(0)}
 @media(max-width:760px){.mc-consent{inset:auto 0 0;padding:0}.mc-banner{padding:21px 20px max(20px,env(safe-area-inset-bottom));border-radius:22px 22px 0 0}.mc-banner h2{font-size:17px}.mc-banner>p{font-size:12px}.mc-banner .mc-reassurance{font-size:11px}.mc-banner-actions{grid-template-columns:1fr;gap:7px;margin-top:14px}.mc-button{min-height:45px}}
+
+/* Compact first-layer consent so it leaves the catalogue usable on phones. */
+@media(max-width:760px){
+  .mc-consent{inset:auto 10px max(10px,env(safe-area-inset-bottom));}
+  .mc-banner{width:100%;max-height:min(38svh,300px);overflow:auto;padding:13px 14px 12px;border:1px solid rgba(18,63,122,.13);border-radius:18px;background:rgba(251,250,247,.98);box-shadow:0 8px 30px rgba(16,42,67,.19)}
+  .mc-banner-head{gap:9px;margin-bottom:6px}
+  .mc-moon{width:30px;height:30px;font-size:18px}
+  .mc-banner-kicker,.mc-banner .mc-reassurance{display:none}
+  .mc-banner h2{font-size:15px;line-height:1.25}
+  .mc-banner>p{font-size:11px;line-height:1.45}
+  .mc-banner-actions{grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+  .mc-banner-actions .mc-button{min-height:39px;padding:0 9px;border-radius:11px;font-size:11px}
+  .mc-banner-actions .mc-manage-choice{grid-column:1/-1;min-height:30px;border:0;background:transparent;text-decoration:underline;text-underline-offset:3px}
+}

@@ -9,7 +9,12 @@
       try { return storageFor(area)?.getItem(key) ?? fallback; } catch (_) { return fallback; }
     },
     set(key, value, area = 'local') {
-      try { storageFor(area)?.setItem(key, String(value)); return true; } catch (_) { return false; }
+      try {
+        const store = storageFor(area);
+        if (!store) return false;
+        store.setItem(key, String(value));
+        return true;
+      } catch (_) { return false; }
     },
     remove(key, area = 'local') {
       try { storageFor(area)?.removeItem(key); return true; } catch (_) { return false; }

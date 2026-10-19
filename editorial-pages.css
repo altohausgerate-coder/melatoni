@@ -1,0 +1,47 @@
+/* Shared storefront system for the brand and contact pages. */
+.about-body,.contact-body{background:#f7f7f3;color:#102a43;font-family:Manrope,system-ui,sans-serif}
+.site-header.about-header,.site-header.contact-header{position:sticky;top:0;z-index:110;min-height:76px;height:76px;grid-template-columns:minmax(130px,190px) minmax(0,1fr) auto;gap:clamp(18px,2.4vw,38px);padding:0 clamp(22px,4.5vw,86px);background:rgba(247,247,243,.96);border-bottom:1px solid rgba(49,75,93,.14);box-shadow:0 5px 20px rgba(46,62,70,.055);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.about-header .brand,.contact-header .brand{width:min(176px,100%);justify-self:start}
+.about-header .brand img,.contact-header .brand img{width:100%;height:50px;object-fit:contain}
+.about-header .main-nav,.contact-header .main-nav{position:static;display:flex;align-items:center;justify-content:center;gap:clamp(16px,2.2vw,32px);max-height:none;padding:0;background:transparent;box-shadow:none;overflow:visible}
+.about-header .main-nav a,.contact-header .main-nav a{padding:10px 0;color:#314b5d;font:600 12px/1.2 Manrope,system-ui,sans-serif;letter-spacing:.015em;text-decoration:none;border:0}
+.about-header .main-nav a:hover,.contact-header .main-nav a:hover{color:#14559b}
+.about-header .main-nav .active,.contact-header .main-nav .active{color:#123f7a;border-bottom:1px solid #75bce8}
+.about-header .header-actions,.contact-header .header-actions{display:flex;align-items:center;gap:14px;white-space:nowrap}
+.about-shop-link{display:inline-flex;align-items:center;gap:9px;min-height:42px;padding:0 16px;border:1px solid rgba(18,63,122,.2);border-radius:999px;color:#123f7a;background:transparent;font:600 11px Manrope,system-ui,sans-serif;text-decoration:none;transition:background .18s,border-color .18s}
+.about-shop-link:hover{background:#edf5fb;border-color:rgba(18,63,122,.42)}
+.about-header .account-login-icon,.contact-header .account-login-icon,.about-header .account-initials,.contact-header .account-initials{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;overflow:hidden;border-radius:50%;color:#123f7a;background:transparent}
+.about-header .account-entry-icon,.contact-header .account-entry-icon{display:block;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.about-header .account-initials,.contact-header .account-initials{background:#e8edf0;font-size:12px;font-weight:700}
+.about-header .account-entry-avatar,.contact-header .account-entry-avatar{width:100%;height:100%;object-fit:cover}
+.contact-header .lang-wrap select{min-height:38px;padding:0 10px;border:1px solid rgba(18,63,122,.16);border-radius:999px;background:#fff;color:#314b5d;font:600 11px Manrope,system-ui,sans-serif}
+.about-hero{background:#f7f7f3}
+.about-section,.about-store{background:#fbfaf7}
+.about-rhythm{background:#eaf2f8}
+.about-beliefs{background:#f1eee7}
+.contact-page{max-width:1240px}
+.contact-form-card{padding:clamp(24px,4vw,42px);border:1px solid rgba(18,63,122,.1);border-radius:20px;background:#fbfaf7;box-shadow:0 12px 36px rgba(16,42,67,.055)}
+.contact-field input,.contact-field textarea{border:1px solid rgba(49,75,93,.18);border-radius:10px;background:#fff;padding:13px 14px;color:#102a43}
+.contact-field input:focus,.contact-field textarea:focus{border-color:#14559b;box-shadow:0 0 0 3px rgba(20,85,155,.1)}
+.contact-submit{border-radius:999px;background:#123f7a;color:#fff;font:700 12px Manrope,system-ui,sans-serif;letter-spacing:.04em;transition:background .18s,transform .18s}
+.contact-submit:hover{background:#14559b;transform:translateY(-1px)}
+.contact-footer,.about-footer{background:#f7f7f3;border-color:rgba(49,75,93,.14);color:#657986}
+@media(max-width:900px) and (min-width:761px){.site-header.about-header,.site-header.contact-header{grid-template-columns:150px minmax(0,1fr) auto;gap:14px;padding-inline:20px}.about-header .main-nav,.contact-header .main-nav{gap:13px}.about-header .main-nav a,.contact-header .main-nav a{font-size:11px}.about-shop-link{padding-inline:11px;font-size:10px}}
+@media(max-width:760px){
+ .site-header.about-header,.site-header.about-header.scrolled,.site-header.contact-header,.site-header.contact-header.scrolled{position:sticky;top:0;height:66px;min-height:66px;grid-template-columns:38px minmax(0,1fr) auto;gap:8px;padding:0 16px}
+ .about-header .menu-toggle,.contact-header .menu-toggle{width:40px;min-width:40px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;margin:0}
+ .about-header .menu-toggle span,.contact-header .menu-toggle span{display:block;width:19px;height:1.5px;background:#314b5d}
+ .about-header .brand,.contact-header .brand{width:min(138px,36vw);justify-self:start}
+ .about-header .brand img,.contact-header .brand img{height:40px}
+ .about-header .header-actions,.contact-header .header-actions{gap:5px}
+ .about-shop-link{display:none}
+ .about-header .account-login-icon,.contact-header .account-login-icon,.about-header .account-initials,.contact-header .account-initials{width:38px;height:38px;flex-basis:38px}
+ .about-header .main-nav,.contact-header .main-nav{position:absolute;left:0;right:0;top:100%;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;max-height:0;overflow:hidden;padding:0 6%;background:rgba(247,247,243,.98);box-shadow:0 14px 24px rgba(46,62,70,.08);transition:max-height .25s,padding .25s}
+ .about-header .main-nav.open,.contact-header .main-nav.open{max-height:340px;padding:8px 6% 15px}
+ .about-header .main-nav a,.contact-header .main-nav a{min-height:48px;padding:14px 0;border-bottom:1px solid rgba(49,75,93,.14);font-size:14px}
+ .contact-header .lang-wrap select{min-height:34px;padding-inline:8px;font-size:10px}
+ .about-hero{background:#f7f7f3}
+ .contact-page{padding-top:40px}
+ .contact-form-card{padding:22px 18px;border-radius:16px}
+}
+@media(prefers-reduced-motion:reduce){.about-header .main-nav,.contact-header .main-nav,.about-shop-link,.contact-submit{transition:none}}

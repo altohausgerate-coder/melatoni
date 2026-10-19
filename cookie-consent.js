@@ -6,14 +6,20 @@
   const callbacks = { functional: new Set(), analytics: new Set(), marketing: new Set() };
   const cleanup = { functional: new Set(), analytics: new Set(), marketing: new Set() };
   const copy = {
-    az:{kicker:'MELATONI · RAHAT ALIŞ-VERİŞ',title:'Rahat alış-veriş üçün seçim sizindir',intro:'Səbət və dil seçiminizin işləməsi üçün zəruri çərəzlərdən istifadə edirik. İstəyə bağlı çərəzlər saytı yaxşılaşdırmağa və uyğun təklifləri göstərməyə kömək edir. Hansılarına icazə verəcəyiniz sizə bağlıdır.',reassurance:'Seçiminizi istənilən vaxt dəyişə bilərsiniz.',cookies:'Çərəz siyasəti',privacy:'Məxfilik',manage:'Seçimləri fərdiləşdir',necessaryOnly:'Yalnız zəruri',accept:'Hamısını qəbul et',dialogTitle:'Çərəz seçimləriniz',close:'Bağla',dialogIntro:'Sayt təcrübənizi idarə etmək üçün çərəz kateqoriyalarını seçin. Zəruri çərəzlər həmişə aktiv qalır.',necessary:'Zəruri çərəzlər',required:'Həmişə aktiv',necessaryDesc:'Saytın təhlükəsiz işləməsi, səbətin, dil seçiminin və əsas funksiyaların qorunması üçün tələb olunur.',functional:'Funksional çərəzlər',functionalDesc:'Dil, region, baxılan məhsullar və digər şəxsi seçimlərinizin yadda saxlanılmasına kömək edir.',analytics:'Analitik çərəzlər',analyticsDesc:'Sayt istifadəsini və axtarış nəticələrinin məhsul kateqoriyalarını ölçməyə kömək edir. Yazdığınız axtarış sözləri saxlanılmır.',marketing:'Marketinq çərəzləri',marketingDesc:'Maraqlarınıza uyğun reklam və kampaniyaların göstərilməsi üçün istifadə olunur.',reject:'Hamısını rədd et',save:'Seçimləri yadda saxla',preferences:'Çərəz seçimləri'},
-    ru:{kicker:'MELATONI · ПРИЯТНЫЕ ПОКУПКИ',title:'Вы выбираете, как использовать cookie',intro:'Необходимые cookie помогают работать корзине и сохранять язык. Необязательные помогают улучшать сайт и показывать подходящие предложения. Вы решаете, какие из них разрешить.',reassurance:'Настройки можно изменить в любое время.',cookies:'Политика cookie',privacy:'Конфиденциальность',manage:'Настроить выбор',necessaryOnly:'Только необходимые',accept:'Принять все',dialogTitle:'Ваши настройки cookie',close:'Закрыть',dialogIntro:'Выберите категории cookie. Необходимые файлы всегда активны.',necessary:'Необходимые cookie',required:'Всегда активны',necessaryDesc:'Нужны для безопасной работы сайта, корзины, выбора языка и основных функций.',functional:'Функциональные cookie',functionalDesc:'Помогают сохранять язык, регион, просмотренные товары и другие настройки.',analytics:'Аналитические cookie',analyticsDesc:'Помогают измерять использование сайта и категории товаров в результатах поиска. Текст поисковых запросов не сохраняется.',marketing:'Маркетинговые cookie',marketingDesc:'Используются для показа рекламы и предложений с учётом интересов.',reject:'Отклонить все',save:'Сохранить настройки',preferences:'Настройки cookie'},
-    en:{kicker:'MELATONI · A COMFORTABLE WAY TO SHOP',title:'You choose how cookies are used',intro:'Necessary cookies keep your bag and language settings working. Optional cookies help improve the site and show relevant offers. You decide which ones to allow.',reassurance:'You can change your choice at any time.',cookies:'Cookie policy',privacy:'Privacy',manage:'Customize choices',necessaryOnly:'Necessary only',accept:'Accept all',dialogTitle:'Your cookie preferences',close:'Close',dialogIntro:'Choose cookie categories. Necessary cookies are always on.',necessary:'Necessary cookies',required:'Always active',necessaryDesc:'Required for site security, your bag, language choice, and core features.',functional:'Functional cookies',functionalDesc:'Help remember your language, region, viewed products, and other preferences.',analytics:'Analytics cookies',analyticsDesc:'Help measure site use and product categories in search results. Search phrases are not saved.',marketing:'Marketing cookies',marketingDesc:'Used to show relevant advertising and offers.',reject:'Reject all',save:'Save choices',preferences:'Cookie preferences'}
+    az:{kicker:'MELATONI · RAHAT ALIŞ-VERİŞ',title:'Çərəz seçiminiz',intro:'Zəruri çərəzlər saytın və səbətin işləməsi üçün istifadə olunur. İstəyə bağlı çərəzlər yalnız icazənizlə aktivləşir.',reassurance:'Seçiminizi istənilən vaxt dəyişə bilərsiniz.',cookies:'Çərəz siyasəti',privacy:'Məxfilik',manage:'Seçimləri fərdiləşdir',necessaryOnly:'Yalnız zəruri',accept:'Hamısını qəbul et',dialogTitle:'Çərəz seçimləriniz',close:'Bağla',dialogIntro:'Sayt təcrübənizi idarə etmək üçün çərəz kateqoriyalarını seçin. Zəruri çərəzlər həmişə aktiv qalır.',necessary:'Zəruri çərəzlər',required:'Həmişə aktiv',necessaryDesc:'Saytın təhlükəsiz işləməsi, səbətin, dil seçiminin və əsas funksiyaların qorunması üçün tələb olunur.',functional:'Funksional çərəzlər',functionalDesc:'Dil, region, baxılan məhsullar və digər şəxsi seçimlərinizin yadda saxlanılmasına kömək edir.',analytics:'Analitik çərəzlər',analyticsDesc:'Sayt istifadəsini və axtarış nəticələrinin məhsul kateqoriyalarını ölçməyə kömək edir. Yazdığınız axtarış sözləri saxlanılmır.',marketing:'Marketinq çərəzləri',marketingDesc:'Maraqlarınıza uyğun reklam və kampaniyaların göstərilməsi üçün istifadə olunur.',reject:'Hamısını rədd et',save:'Seçimləri yadda saxla',preferences:'Çərəz seçimləri'},
+    ru:{kicker:'MELATONI · ПРИЯТНЫЕ ПОКУПКИ',title:'Ваш выбор cookie',intro:'Необходимые cookie нужны для работы сайта и корзины. Необязательные cookie включаются только с вашего разрешения.',reassurance:'Настройки можно изменить в любое время.',cookies:'Политика cookie',privacy:'Конфиденциальность',manage:'Настроить выбор',necessaryOnly:'Только необходимые',accept:'Принять все',dialogTitle:'Ваши настройки cookie',close:'Закрыть',dialogIntro:'Выберите категории cookie. Необходимые файлы всегда активны.',necessary:'Необходимые cookie',required:'Всегда активны',necessaryDesc:'Нужны для безопасной работы сайта, корзины, выбора языка и основных функций.',functional:'Функциональные cookie',functionalDesc:'Помогают сохранять язык, регион, просмотренные товары и другие настройки.',analytics:'Аналитические cookie',analyticsDesc:'Помогают измерять использование сайта и категории товаров в результатах поиска. Текст поисковых запросов не сохраняется.',marketing:'Маркетинговые cookie',marketingDesc:'Используются для показа рекламы и предложений с учётом интересов.',reject:'Отклонить все',save:'Сохранить настройки',preferences:'Настройки cookie'},
+    en:{kicker:'MELATONI · A COMFORTABLE WAY TO SHOP',title:'Your cookie choice',intro:'Necessary cookies keep the site and bag working. Optional cookies turn on only with your permission.',reassurance:'You can change your choice at any time.',cookies:'Cookie policy',privacy:'Privacy',manage:'Customize choices',necessaryOnly:'Necessary only',accept:'Accept all',dialogTitle:'Your cookie preferences',close:'Close',dialogIntro:'Choose cookie categories. Necessary cookies are always on.',necessary:'Necessary cookies',required:'Always active',necessaryDesc:'Required for site security, your bag, language choice, and core features.',functional:'Functional cookies',functionalDesc:'Help remember your language, region, viewed products, and other preferences.',analytics:'Analytics cookies',analyticsDesc:'Help measure site use and product categories in search results. Search phrases are not saved.',marketing:'Marketing cookies',marketingDesc:'Used to show relevant advertising and offers.',reject:'Reject all',save:'Save choices',preferences:'Cookie preferences'}
   };
   const readConsent = () => {
     try {
-      const value = JSON.parse(window.MelatoniStorage?.get(STORAGE_KEY) || 'null');
-      return value && value.version === VERSION && value.categories ? value : null;
+      const cookieValue = document.cookie.split('; ').find(item => item.startsWith(`${STORAGE_KEY}=`))?.slice(STORAGE_KEY.length + 1);
+      const storedValue = window.MelatoniStorage?.get(STORAGE_KEY);
+      for (const candidate of [storedValue, cookieValue ? decodeURIComponent(cookieValue) : null]) {
+        if (!candidate) continue;
+        const value = JSON.parse(candidate);
+        if (value && value.version === VERSION && value.categories) return value;
+      }
+      return null;
     } catch (_) { return null; }
   };
   let consent = readConsent();
@@ -27,7 +33,17 @@
   const save = categories => {
     const previous = consent && consent.categories;
     consent = { version: VERSION, categories: { ...defaults, ...categories, necessary: true }, updatedAt: new Date().toISOString() };
-    try { window.MelatoniStorage?.set(STORAGE_KEY, JSON.stringify(consent)); } catch (error) { console.warn('Razılıq yadda saxlanmadı:', error); }
+    const serialized = JSON.stringify(consent);
+    let persisted = false;
+    try { persisted = Boolean(window.MelatoniStorage?.set(STORAGE_KEY, serialized)); } catch (_) {}
+    try {
+      const host = location.hostname;
+      const domain = host === 'melatoni.com' || host.endsWith('.melatoni.com') ? '; Domain=.melatoni.com' : '';
+      const secure = location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie = `${STORAGE_KEY}=${encodeURIComponent(serialized)}; Path=/; Max-Age=15552000; SameSite=Lax${secure}${domain}`;
+      persisted = persisted || document.cookie.includes(`${STORAGE_KEY}=`);
+    } catch (_) {}
+    if (!persisted) console.warn('Çərəz seçimi bu brauzerdə yadda saxlanmadı.');
     Object.keys(cleanup).forEach(category => {
       if (previous && previous[category] && !consent.categories[category]) cleanup[category].forEach(fn => { try { fn(); } catch (error) { console.error('Melatoni consent cleanup:', error); } });
     });
@@ -42,7 +58,7 @@
       <div class="mc-banner-head"><span class="mc-moon" aria-hidden="true">☾</span><div><p class="mc-banner-kicker" data-consent-copy="kicker"></p><h2 id="mc-banner-title" data-consent-copy="title"></h2></div></div>
       <p><span data-consent-copy="intro"></span> <a href="about.html" data-policy="cookies" data-consent-copy="cookies"></a> · <a href="about.html" data-policy="privacy" data-consent-copy="privacy"></a></p>
       <p class="mc-reassurance" data-consent-copy="reassurance"></p>
-      <div class="mc-banner-actions"><button class="mc-button mc-choice" type="button" data-action="manage" data-consent-copy="manage"></button><button class="mc-button mc-choice" type="button" data-action="reject" data-consent-copy="necessaryOnly"></button><button class="mc-button mc-choice" type="button" data-action="accept" data-consent-copy="accept"></button></div>
+      <div class="mc-banner-actions"><button class="mc-button mc-choice" type="button" data-action="reject" data-consent-copy="necessaryOnly"></button><button class="mc-button mc-choice" type="button" data-action="accept" data-consent-copy="accept"></button><button class="mc-button mc-choice mc-manage-choice" type="button" data-action="manage" data-consent-copy="manage"></button></div>
     </section>`;
   const layer = document.createElement('div');
   layer.className = 'mc-modal-layer';
@@ -91,6 +107,12 @@
   addFooterLink();
   if (!consent) banner.hidden = false;
   else notify();
+  window.addEventListener('storage', event => {
+    if (event.key !== STORAGE_KEY) return;
+    consent = readConsent();
+    banner.hidden = Boolean(consent);
+    if (consent) notify();
+  });
   document.addEventListener('click', event => {
     const policy = event.target.closest('[data-policy]');
     if (policy) { event.preventDefault(); openPolicy(policy.dataset.policy, policy); return; }
