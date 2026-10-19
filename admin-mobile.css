@@ -22,6 +22,16 @@
 .admin-product-row strong,
 .admin-product-row small,
 .admin-support-card small { overflow-wrap: anywhere; }
+.admin-order-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.admin-order-heading time { color: #71808d; font-size: 13px; }
+.admin-order-heading b { margin-left: auto; }
+.admin-order-customer { display: grid; gap: 4px; margin: 12px 0; }
+.admin-order-customer a { width: fit-content; color: #1b4e7d; text-decoration: underline; text-underline-offset: 3px; }
+.admin-order-customer span { color: #71808d; font-size: 13px; }
+.admin-order-items { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.admin-order-items li { display: grid; gap: 3px; }
+.admin-order-items small { color: #71808d; }
+.admin-section-actions button:disabled { opacity: .72; }
 
 @media (max-width: 700px) {
   .admin-header {
@@ -100,6 +110,8 @@
   .admin-form-actions { flex-wrap: wrap; }
   .admin-form-actions .button { flex: 1 1 130px; min-height: 46px; }
   .admin-order { grid-template-columns: minmax(0,1fr); gap: 10px; padding: 14px; border-radius: 12px; }
+  .admin-order-heading b { margin-left: 0; }
+  .admin-order-customer { padding: 10px 12px; border-radius: 10px; background: #f7f5f0; }
   .admin-order-controls { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; }
   .admin-order-controls select { width: 100%; }
   .admin-order-controls button { min-height: 44px; padding: 8px 12px; }

@@ -12,6 +12,7 @@
   const alertList = document.querySelector('#adminAlertsList');
   const orderPushButton = document.querySelector('#enableOrderPush');
   const orderPushStatus = document.querySelector('#orderPushStatus');
+  const orderRefreshButton = document.querySelector('#refreshOrders');
   let orderPushUserId = null;
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[char]);
   const say = (message, error = false) => { if (!status) return; status.textContent = message; status.classList.toggle('is-error', error); };
@@ -35,7 +36,11 @@
     document.querySelectorAll('[data-admin-copy]').forEach(node=>{node.textContent=at(node.dataset.adminCopy)});
     const summary=document.querySelector('#adminLanguageSummary');if(summary)summary.textContent=adminLang().toUpperCase();
   }
-  const orderItems = items => Array.isArray(items) ? items.map(item => `${escape(item.name || item.id || 'Məhsul')} × ${Math.max(1,Number(item.qty)||1)}${item.size ? ` · ${escape(item.size)}` : ''}`).join(' · ') : '';
+  const orderItems = items => Array.isArray(items) ? items.map(item => {
+    const name=languageValue(item.name,adminLang())||item.name||item.id||'Məhsul';
+    const options=[item.color?`Rəng: ${item.color}`:'',item.size?`Ölçü: ${item.size}`:'',item.unit_price!=null?money(item.unit_price):''].filter(Boolean);
+    return `<li><span>${escape(name)} × ${Math.max(1,Number(item.qty)||1)}</span>${options.length?`<small>${options.map(escape).join(' · ')}</small>`:''}</li>`;
+  }).join('') : '';
   let products = [];
   let newOrders = 0;
   let channel = null;
@@ -48,13 +53,22 @@
   }
   async function refreshOrderPushState() {
     if (!orderPushButton || !orderPushStatus) return;
+    const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isInstalled = navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    if (isIos && !isInstalled) {
+      orderPushButton.disabled = true;
+      orderPushButton.textContent = 'Ana ekrana əlavə edin';
+      orderPushStatus.textContent = 'iPhone-da sifariş bildirişləri üçün Safari-də Paylaş düyməsinə basın, “Ana ekrana əlavə et” seçin və admin panelini həmin ikonadan açın.';
+      return;
+    }
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
       orderPushButton.disabled = true;
-      orderPushStatus.textContent = 'Bu brauzer push bildirişlərini dəstəkləmir.';
+      orderPushButton.textContent = 'Bildiriş dəstəklənmir';
+      orderPushStatus.textContent = 'Bu brauzer push bildirişlərini dəstəkləmir. Saytı dəstəklənən brauzerdə açın.';
       return;
     }
     try {
-      const registration = await navigator.serviceWorker.getRegistration('./');
+      const registration = await navigator.serviceWorker.getRegistration(new URL('./', location.href).href);
       const subscription = await registration?.pushManager.getSubscription();
       orderPushButton.disabled = Boolean(subscription);
       orderPushButton.textContent = subscription ? 'Bu cihaz aktivdir' : 'Bu cihazda bildirişləri aktiv et';
@@ -62,7 +76,9 @@
         ? 'Bu cihaz yeni sifarişlər üçün bildiriş alacaq.'
         : 'Yeni sifariş bildirişlərini almaq üçün bu cihazda icazə verin.';
     } catch {
-      orderPushStatus.textContent = 'Bildiriş statusunu yoxlamaq mümkün olmadı.';
+      orderPushButton.disabled = false;
+      orderPushButton.textContent = 'Bildirişləri yenidən yoxla';
+      orderPushStatus.textContent = 'Bildiriş statusu yoxlanmadı. Səhifəni yeniləyib bir daha yoxlayın.';
     }
   }
   function activateAdminTab(name) {
@@ -95,7 +111,13 @@
           ? 'Bildiriş icazəsi bloklanıb. Brauzer ayarlarından Melatoni bildirişlərini aktiv edin.'
           : error?.message === 'unsupported'
             ? 'Bu brauzer push bildirişlərini dəstəkləmir.'
-            : 'Bildiriş aktiv olmadı. Yenidən cəhd edin.';
+            : error?.message === 'permission'
+              ? 'Bildiriş icazəsi verilmədi. Brauzer ayarlarından Melatoni bildirişlərini aktiv edin.'
+              : error?.message === 'unavailable'
+                ? 'Bildiriş xidməti hazır deyil. Saytı yeniləyin və bir daha cəhd edin.'
+                : error?.message === 'save'
+                  ? 'Bildiriş icazəsi verildi, amma cihaz qeydə alınmadı. İnterneti yoxlayıb yenidən cəhd edin.'
+                  : 'Bildiriş aktiv olmadı. İnterneti yoxlayıb yenidən cəhd edin.';
       if (orderPushStatus) orderPushStatus.textContent = message;
       orderPushButton.disabled = false;
       say(message, true);
@@ -195,12 +217,35 @@
     finally { button.disabled = false; }
   }
   async function loadOrders() {
-    const { data, error } = await client.from('orders').select('id,user_id,items,total,language,status,created_at').order('created_at',{ascending:false}).limit(100);
-    if (error) { orderList.innerHTML = '<p class="admin-empty">Sifarişlər yüklənmədi. Admin icazəsini yoxlayın.</p>'; return; }
-    const rows = data || [];
-    document.querySelector('#metricOrders').textContent = rows.length;
-    orderList.innerHTML = rows.length ? rows.map(order => `<article class="admin-order"><div><strong>${new Date(order.created_at).toLocaleString('az-AZ')} · ${money(order.total)}</strong><p>${orderItems(order.items)}</p><small>${escape(order.user_id)}</small></div><div class="admin-order-controls"><select aria-label="Sifariş statusu" data-order-status="${order.id}">${orderStatuses.map(value => `<option value="${value}" ${value===order.status?'selected':''}>${orderStatus[value]}</option>`).join('')}</select><button class="admin-order-action" data-save-order="${order.id}" type="button">Yadda saxla</button></div></article>`).join('') : '<p class="admin-empty">Hələ sifariş yoxdur.</p>';
-    newOrders = 0; const badge = document.querySelector('#newOrderCount'); badge.hidden = true; badge.textContent = '';
+    if (!client || !orderList) return false;
+    orderList.innerHTML = '<p class="admin-empty">Sifarişlər yüklənir…</p>';
+    try {
+      const { data, error } = await client.from('orders').select('id,user_id,items,total,language,status,created_at').order('created_at',{ascending:false}).limit(100);
+      if (error) throw error;
+      const rows = data || [];
+      const userIds=[...new Set(rows.map(order=>order.user_id).filter(Boolean))];
+      let customers=new Map();
+      let profileError=false;
+      if(userIds.length){
+        const profileResult=await client.from('profiles').select('id,full_name,phone').in('id',userIds);
+        if(!profileResult.error)customers=new Map((profileResult.data||[]).map(profile=>[profile.id,profile]));
+        else profileError=true;
+      }
+      document.querySelector('#metricOrders').textContent = rows.length;
+      orderList.innerHTML = rows.length ? rows.map(order => {
+        const customer=customers.get(order.user_id)||{};
+        const phone=String(customer.phone||'').trim();
+        const phoneLink=phone.replace(/[^\d+]/g,'');
+        const orderNumber=`ML-${String(order.id).replace(/-/g,'').slice(0,8).toUpperCase()}`;
+        const items=orderItems(order.items);
+        return `<article class="admin-order"><div class="admin-order-info"><header class="admin-order-heading"><strong>${orderNumber}</strong><time datetime="${escape(order.created_at)}">${escape(new Date(order.created_at).toLocaleString('az-AZ'))}</time><b>${money(order.total)}</b></header><div class="admin-order-customer"><strong>${escape(customer.full_name||'Ad qeyd edilməyib')}</strong>${phoneLink?`<a href="tel:${escape(phoneLink)}">${escape(phone)}</a>`:`<span>${profileError?'Müştəri məlumatı yüklənmədi':'Telefon nömrəsi profildə yoxdur'}</span>`}</div><ul class="admin-order-items">${items||'<li>Məhsul məlumatı yoxdur</li>'}</ul></div><div class="admin-order-controls"><select aria-label="${orderNumber} sifarişinin statusu" data-order-status="${escape(order.id)}">${orderStatuses.map(value => `<option value="${value}" ${value===order.status?'selected':''}>${orderStatus[value]}</option>`).join('')}</select><button class="admin-order-action" data-save-order="${escape(order.id)}" type="button">Yadda saxla</button></div></article>`;
+      }).join('') : '<p class="admin-empty">Hələ sifariş yoxdur.</p>';
+      newOrders = 0; const badge = document.querySelector('#newOrderCount'); badge.hidden = true; badge.textContent = '';
+      return true;
+    } catch {
+      orderList.innerHTML = '<p class="admin-empty is-error">Sifarişlər yüklənmədi. İnterneti və admin icazəsini yoxlayın.</p>';
+      return false;
+    }
   }
   async function loadAnalytics() {
     const since = new Date(Date.now()-30*24*60*60*1000).toISOString();
@@ -267,7 +312,7 @@
   document.querySelector('#cancelProductEdit')?.addEventListener('click',()=>fillProduct(null));
   list?.addEventListener('click',event=>{const button=event.target.closest('[data-edit-product]');if(button)fillProduct(products.find(product=>product.id===button.dataset.editProduct));});
   orderList?.addEventListener('click',async event=>{const button=event.target.closest('[data-save-order]');if(!button)return;const select=orderList.querySelector(`[data-order-status="${CSS.escape(button.dataset.saveOrder)}"]`);button.disabled=true;try{const {error}=await client.from('orders').update({status:select.value}).eq('id',button.dataset.saveOrder);say(error?'Sifariş statusu dəyişmədi.':'Sifariş statusu yadda saxlandı.',!!error);if(!error)await loadOrders()}catch{say('Sifariş statusu dəyişmədi.',true)}finally{button.disabled=false}});
-  document.querySelector('#refreshOrders')?.addEventListener('click',loadOrders);
+  orderRefreshButton?.addEventListener('click',async()=>{if(orderRefreshButton.disabled)return;const label=orderRefreshButton.textContent;orderRefreshButton.disabled=true;orderRefreshButton.textContent='Yenilənir…';const loaded=await loadOrders();orderRefreshButton.disabled=false;orderRefreshButton.textContent=label;say(loaded?'Sifarişlər yeniləndi.':'Sifarişlər yenilənmədi.',!loaded)});
   document.querySelector('#refreshAnalytics')?.addEventListener('click',loadAnalytics);
   document.querySelector('#refreshSupport')?.addEventListener('click',loadSupportTickets);
   document.querySelector('#refreshAlerts')?.addEventListener('click',loadProductAlerts);
