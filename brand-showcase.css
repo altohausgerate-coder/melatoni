@@ -2,7 +2,7 @@
 .brand-showcase-inner{max-width:1640px;margin:0 auto}
 .brand-showcase-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:36px;margin-bottom:18px}
 .brand-showcase-eyebrow{margin:0 0 19px;color:#6c8295;font-size:10px;font-weight:700;letter-spacing:.17em}
-.brand-showcase-heading h2{margin:0;font:400 clamp(42px,5vw,68px)/1.02 var(--serif);letter-spacing:-.045em}
+.brand-showcase-heading h2{margin:0;font:500 clamp(42px,5vw,68px)/1.08 var(--sans);letter-spacing:-.055em}
 .brand-showcase-heading h2 em{font-style:normal;color:#245f96}
 .brand-showcase-actions{display:flex;align-items:center;gap:28px;padding-bottom:5px}
 .brand-all-link{display:inline-flex;align-items:center;gap:12px;padding:12px 16px;border-radius:999px;background:#edf1f3;color:#183751;font-size:12px;white-space:nowrap;transition:background .2s,transform .2s}
