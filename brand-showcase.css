@@ -16,8 +16,8 @@
 .brand-track{display:flex;align-items:stretch;gap:10px;height:clamp(390px,42vw,550px);overflow:hidden}
 .brand-panel{position:relative;isolation:isolate;display:block;flex:1 1 0;min-width:0;height:100%;overflow:hidden;background:#d7d3cc;color:#fff;scroll-snap-align:center;transition:flex-grow 850ms cubic-bezier(.2,.78,.2,1),filter 650ms ease}
 .brand-panel:first-child{border-radius:2px 0 0 2px}.brand-panel:last-child{border-radius:0 2px 2px 0}
-.brand-panel.is-active{flex-grow:4.2}
-.brand-panel:hover{flex-grow:4.2}
+.brand-panel.is-active{flex-grow:1.08}
+.brand-panel:hover{flex-grow:1.08}
 .brand-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;filter:grayscale(1) brightness(.84);transform:scale(1.03);transition:filter 800ms ease,transform 1400ms cubic-bezier(.2,.65,.25,1)}
 .brand-panel.is-active img{filter:grayscale(0) brightness(1);transform:scale(1.005)}
 .brand-panel:hover img{transform:scale(1.045)}

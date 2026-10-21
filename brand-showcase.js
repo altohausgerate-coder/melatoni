@@ -12,36 +12,30 @@
   const translations = {
     az: {
       eyebrow: 'SEÇİLMİŞ MARKALAR',
-      title: 'Rahatlığa fərqli<br/><em>yanaşmalar.</em>',
-      all: 'Bütün markalar',
-      lead: 'Yuxu, ev və gündəlik rahatlıq üçün dörd fərqli marka dünyasını kəşf edin.',
-      urban: 'Ev geyimində rahatlıq və yumşaq toxumalar',
-      enza: 'Evin hər otağı üçün müasir dizayn',
-      dormy: 'Yataq otağına rəng qatan tekstil seçimləri',
-      mini: 'Körpələr və uşaqlar üçün yuxu rahatlığı',
-      region: 'Yataş markaları', previous: 'Əvvəlki marka', next: 'Növbəti marka', choose: 'Markanı seçin'
+      title: 'Yuxu üçün<br/><em>iki seçilmiş marka.</em>',
+      all: 'Bütün məhsullara bax',
+      lead: 'L’M MESER və MARK CROSS məhsullarını Melatoni mağazasında seçin.',
+      lmMeser: 'Yorğan, yastıq və yataq tekstili seçimləri',
+      markCross: 'Zərif yataq dəstləri və tekstil',
+      region: 'Seçilmiş yataq tekstili markaları', previous: 'Əvvəlki marka', next: 'Növbəti marka', choose: 'Markanı seçin'
     },
     en: {
       eyebrow: 'SELECTED BRANDS',
-      title: 'Different ways<br/><em>to feel at home.</em>',
-      all: 'All brands',
-      lead: 'Explore four distinct brand worlds for sleep, home and everyday comfort.',
-      urban: 'Soft textures and comfort for lounging',
-      enza: 'Contemporary design for every room',
-      dormy: 'Textiles that bring colour to the bedroom',
-      mini: 'Comfort for little ones and their sleep',
-      region: 'Yataş brands', previous: 'Previous brand', next: 'Next brand', choose: 'Choose a brand'
+      title: 'Two selected<br/><em>bedding brands.</em>',
+      all: 'Browse all products',
+      lead: 'Explore L’M MESER and MARK CROSS products in the Melatoni shop.',
+      lmMeser: 'Duvets, pillows and bedding',
+      markCross: 'Refined bedding sets and textiles',
+      region: 'Selected bedding brands', previous: 'Previous brand', next: 'Next brand', choose: 'Choose a brand'
     },
     ru: {
       eyebrow: 'ИЗБРАННЫЕ БРЕНДЫ',
-      title: 'Разные взгляды<br/><em>на домашний уют.</em>',
-      all: 'Все бренды',
-      lead: 'Откройте четыре мира брендов для сна, дома и повседневного комфорта.',
-      urban: 'Мягкие ткани и комфорт для отдыха дома',
-      enza: 'Современный дизайн для каждой комнаты',
-      dormy: 'Текстиль, который добавит спальне цвета',
-      mini: 'Комфортный сон для малышей и детей',
-      region: 'Бренды Yataş', previous: 'Предыдущий бренд', next: 'Следующий бренд', choose: 'Выбрать бренд'
+      title: 'Две избранные<br/><em>марки текстиля.</em>',
+      all: 'Все товары',
+      lead: 'Выберите товары L’M MESER и MARK CROSS в магазине Melatoni.',
+      lmMeser: 'Одеяла, подушки и постельное бельё',
+      markCross: 'Элегантные комплекты и текстиль',
+      region: 'Избранные марки постельного текстиля', previous: 'Предыдущая марка', next: 'Следующая марка', choose: 'Выбрать марку'
     }
   };
 
