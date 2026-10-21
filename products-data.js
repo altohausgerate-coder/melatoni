@@ -412,9 +412,9 @@ window.MELATONI_PRODUCTS=[
   "price": 289, "image": "assets/products/linen-satin.jpg"
  },
  {
-  "id": "linen-kids-dream", "localOnly": true, "category": "linen",
+  "id": "linen-kids-dream", "localOnly": true, "category": "linen", "brand": "Melatoni Mini",
   "name": {"az":"Little Dream Uşaq Yataq Dəsti","ru":"Детский комплект Little Dream","en":"Little Dream Kids Bedding Set"},
   "desc": {"az":"Uşaq yatağı üçün yumşaq, sakit rəngli yataq dəsti. Dəqiq ölçü, naxış və parça tərkibi sifariş zamanı dəqiqləşdirilir.","ru":"Комплект спокойных оттенков для детской кровати. Размер, рисунок и состав ткани уточняются при заказе.","en":"A calm-toned bedding choice for a child's bed. Exact size, print, and fabric content are confirmed when ordering."},
-  "price": 159, "image": "assets/products/linen-calm.jpg"
+  "price": 159, "image": "assets/products/melatoni-mini/mini-star-bedding.webp"
  }
 ];

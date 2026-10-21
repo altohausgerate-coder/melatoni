@@ -132,6 +132,18 @@ window.MELATONI_PRODUCT_COLOR_KEYS={
     "white",
     "blue"
   ],
+  "mini-star-pillow": [
+    "ivory",
+    "blue"
+  ],
+  "mini-moon-bedding": [
+    "sage",
+    "ivory"
+  ],
+  "mini-moon-pajamas": [
+    "sage",
+    "ivory"
+  ],
   "gift-rest": [
     "ivory",
     "sage"

@@ -11,31 +11,34 @@
   const mobileLayout = window.matchMedia('(max-width: 650px)');
   const translations = {
     az: {
-      eyebrow: 'SEÇİLMİŞ MARKALAR',
-      title: 'Yuxu üçün<br/><em>iki seçilmiş marka.</em>',
+      eyebrow: 'HƏR YAŞ ÜÇÜN RAHATLIQ',
+      title: 'Hər yaş üçün<br/><em>rahat gecələr.</em>',
       all: 'Bütün məhsullara bax',
-      lead: 'L’M MESER və MARK CROSS məhsullarını Melatoni mağazasında seçin.',
+      lead: 'Bütün ailə üçün yataq tekstili və yuxu rahatlığı — özünüzə uyğun seçimləri kəşf edin.',
       lmMeser: 'Yorğan, yastıq və yataq tekstili seçimləri',
       markCross: 'Zərif yataq dəstləri və tekstil',
-      region: 'Seçilmiş yataq tekstili markaları', previous: 'Əvvəlki marka', next: 'Növbəti marka', choose: 'Markanı seçin'
+      mini: 'Balacalar üçün yumşaq yataq tekstili və rahatlıq',
+      region: 'Melatoni kolleksiyaları', previous: 'Əvvəlki kolleksiya', next: 'Növbəti kolleksiya', choose: 'Kolleksiyanı seçin'
     },
     en: {
-      eyebrow: 'SELECTED BRANDS',
-      title: 'Two selected<br/><em>bedding brands.</em>',
+      eyebrow: 'COMFORT FOR EVERY AGE',
+      title: 'Comfort for<br/><em>every age.</em>',
       all: 'Browse all products',
-      lead: 'Explore L’M MESER and MARK CROSS products in the Melatoni shop.',
+      lead: 'Bedding and restful essentials for the whole family. Find the collection that feels right for you.',
       lmMeser: 'Duvets, pillows and bedding',
       markCross: 'Refined bedding sets and textiles',
-      region: 'Selected bedding brands', previous: 'Previous brand', next: 'Next brand', choose: 'Choose a brand'
+      mini: 'Soft bedding and little comforts for children',
+      region: 'Melatoni collections', previous: 'Previous collection', next: 'Next collection', choose: 'Choose a collection'
     },
     ru: {
-      eyebrow: 'ИЗБРАННЫЕ БРЕНДЫ',
-      title: 'Две избранные<br/><em>марки текстиля.</em>',
+      eyebrow: 'КОМФОРТ ДЛЯ ЛЮБОГО ВОЗРАСТА',
+      title: 'Комфорт для<br/><em>любого возраста.</em>',
       all: 'Все товары',
-      lead: 'Выберите товары L’M MESER и MARK CROSS в магазине Melatoni.',
+      lead: 'Текстиль и уют для сна всей семьи. Найдите коллекцию, которая подходит именно вам.',
       lmMeser: 'Одеяла, подушки и постельное бельё',
       markCross: 'Элегантные комплекты и текстиль',
-      region: 'Избранные марки постельного текстиля', previous: 'Предыдущая марка', next: 'Следующая марка', choose: 'Выбрать марку'
+      mini: 'Мягкий текстиль и уют для самых маленьких',
+      region: 'Коллекции Melatoni', previous: 'Предыдущая коллекция', next: 'Следующая коллекция', choose: 'Выбрать коллекцию'
     }
   };
 
