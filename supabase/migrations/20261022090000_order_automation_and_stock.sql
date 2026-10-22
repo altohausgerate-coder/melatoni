@@ -300,7 +300,8 @@ end;
 $$;
 revoke all on function public.create_store_order(jsonb,text) from public, anon;
 grant execute on function public.create_store_order(jsonb,text) to authenticated;
-revoke insert on public.orders from authenticated;
+-- Keep the current direct-insert checkout working during deployment. A follow-up
+-- migration revokes this permission after the new storefront is live.
 
 create or replace function public.handle_order_status_stock_and_notifications()
 returns trigger language plpgsql security definer set search_path = public, auth
