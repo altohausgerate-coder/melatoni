@@ -19,7 +19,7 @@
   const value = (name, item) => { const input = form.elements.namedItem(name); if (input) input.value = item || ''; };
   const languageValue = (item, lang) => typeof item === 'object' && item ? item[lang] || '' : '';
   const money = amount => `${new Intl.NumberFormat('az-AZ',{maximumFractionDigits:2}).format(Number(amount)||0)} AZN`;
-  const orderStatus = { pending:'Gözləyir', confirmed:'Təsdiqlənib', shipping:'Çatdırılır', delivered:'Çatdırılıb', cancelled:'Ləğv edilib' };
+  const orderStatus = { pending:'Yeni', confirmed:'Təsdiqləndi', preparing:'Hazırlanır', shipping:'Kuryerə verildi', delivered:'Çatdırıldı', cancelled:'Ləğv edildi' };
   const orderStatuses = Object.keys(orderStatus);
   const adminLang = () => window.MelatoniStorage?.get('melatoni-language') || 'az';
   const adminCopy = {
@@ -38,7 +38,7 @@
   }
   const orderItems = items => Array.isArray(items) ? items.map(item => {
     const name=languageValue(item.name,adminLang())||item.name||item.id||'Məhsul';
-    const options=[item.color?`Rəng: ${item.color}`:'',item.size?`Ölçü: ${item.size}`:'',item.unit_price!=null?money(item.unit_price):''].filter(Boolean);
+    const options=[item.color?`Rəng: ${item.color}`:'',item.size?`Ölçü: ${item.size}`:'',item.quote_only?'Qiyməti dəqiqləşdirin':item.unit_price!=null?money(item.unit_price):''].filter(Boolean);
     return `<li><span>${escape(name)} × ${Math.max(1,Number(item.qty)||1)}</span>${options.length?`<small>${options.map(escape).join(' · ')}</small>`:''}</li>`;
   }).join('') : '';
   let products = [];
@@ -220,7 +220,8 @@
     if (!client || !orderList) return false;
     orderList.innerHTML = '<p class="admin-empty">Sifarişlər yüklənir…</p>';
     try {
-      const { data, error } = await client.from('orders').select('id,user_id,items,total,language,status,created_at').order('created_at',{ascending:false}).limit(100);
+      let { data, error } = await client.from('orders').select('id,order_number,user_id,items,total,language,status,customer_name,customer_phone,customer_email,shipping_address,payment_method,payment_status,created_at').order('created_at',{ascending:false}).limit(100);
+      if (error) ({ data, error } = await client.from('orders').select('id,user_id,items,total,language,status,created_at').order('created_at',{ascending:false}).limit(100));
       if (error) throw error;
       const rows = data || [];
       const userIds=[...new Set(rows.map(order=>order.user_id).filter(Boolean))];
@@ -234,11 +235,14 @@
       document.querySelector('#metricOrders').textContent = rows.length;
       orderList.innerHTML = rows.length ? rows.map(order => {
         const customer=customers.get(order.user_id)||{};
-        const phone=String(customer.phone||'').trim();
+        const phone=String(order.customer_phone||customer.phone||'').trim();
         const phoneLink=phone.replace(/[^\d+]/g,'');
-        const orderNumber=`ML-${String(order.id).replace(/-/g,'').slice(0,8).toUpperCase()}`;
+        const orderNumber=order.order_number||`ML-${String(order.id).replace(/-/g,'').slice(0,8).toUpperCase()}`;
         const items=orderItems(order.items);
-        return `<article class="admin-order"><div class="admin-order-info"><header class="admin-order-heading"><strong>${orderNumber}</strong><time datetime="${escape(order.created_at)}">${escape(new Date(order.created_at).toLocaleString('az-AZ'))}</time><b>${money(order.total)}</b></header><div class="admin-order-customer"><strong>${escape(customer.full_name||'Ad qeyd edilməyib')}</strong>${phoneLink?`<a href="tel:${escape(phoneLink)}">${escape(phone)}</a>`:`<span>${profileError?'Müştəri məlumatı yüklənmədi':'Telefon nömrəsi profildə yoxdur'}</span>`}</div><ul class="admin-order-items">${items||'<li>Məhsul məlumatı yoxdur</li>'}</ul></div><div class="admin-order-controls"><select aria-label="${orderNumber} sifarişinin statusu" data-order-status="${escape(order.id)}">${orderStatuses.map(value => `<option value="${value}" ${value===order.status?'selected':''}>${orderStatus[value]}</option>`).join('')}</select><button class="admin-order-action" data-save-order="${escape(order.id)}" type="button">Yadda saxla</button></div></article>`;
+        const customerName=order.customer_name||customer.full_name||'Ad qeyd edilməyib';
+        const address=order.shipping_address&&typeof order.shipping_address==='object'?Object.values(order.shipping_address).filter(Boolean).join(', '):'';
+        const payment=order.payment_method==='to_be_confirmed'?'Ödəniş mağaza ilə razılaşdırılacaq':order.payment_method||'';
+        return `<article class="admin-order"><div class="admin-order-info"><header class="admin-order-heading"><strong>${escape(orderNumber)}</strong><time datetime="${escape(order.created_at)}">${escape(new Date(order.created_at).toLocaleString('az-AZ'))}</time><b>${Array.isArray(order.items)&&order.items.some(item=>item.quote_only)?'Qiyməti dəqiqləşdiriləcək':money(order.total)}</b></header><div class="admin-order-customer"><strong>${escape(customerName)}</strong>${phoneLink?`<a href="tel:${escape(phoneLink)}">${escape(phone)}</a>`:`<span>${profileError?'Müştəri məlumatı yüklənmədi':'Telefon nömrəsi profildə yoxdur'}</span>`}${order.customer_email?`<a href="mailto:${escape(order.customer_email)}">${escape(order.customer_email)}</a>`:''}</div>${address?`<p class="admin-muted">Çatdırılma: ${escape(address)}</p>`:''}${payment?`<p class="admin-muted">${escape(payment)} · ${escape(order.payment_status||'ödəniş məlumatı yoxdur')}</p>`:''}<ul class="admin-order-items">${items||'<li>Məhsul məlumatı yoxdur</li>'}</ul></div><div class="admin-order-controls"><select aria-label="${escape(orderNumber)} sifarişinin statusu" data-order-status="${escape(order.id)}">${orderStatuses.map(value => `<option value="${value}" ${value===order.status?'selected':''}>${orderStatus[value]}</option>`).join('')}</select><button class="admin-order-action" data-save-order="${escape(order.id)}" type="button">Yadda saxla</button></div></article>`;
       }).join('') : '<p class="admin-empty">Hələ sifariş yoxdur.</p>';
       newOrders = 0; const badge = document.querySelector('#newOrderCount'); badge.hidden = true; badge.textContent = '';
       return true;
@@ -249,10 +253,13 @@
   }
   async function loadAnalytics() {
     const since = new Date(Date.now()-30*24*60*60*1000).toISOString();
-    const [eventResult,orderResult,interactionResult] = await Promise.all([
+    const [eventResult,orderResult,interactionResult,cartResult,auditResult,escalationResult] = await Promise.all([
       client.from('storefront_events').select('event_name,product_id,session_id,created_at').gte('created_at',since).order('created_at',{ascending:false}).limit(10000),
-      client.from('orders').select('items,total,status,created_at').gte('created_at',since).order('created_at',{ascending:false}).limit(5000),
-      client.from('customer_interactions').select('product_id,event_name').gte('created_at',since).limit(10000)
+      client.from('orders').select('items,total,status,created_at,user_id').gte('created_at',since).order('created_at',{ascending:false}).limit(5000),
+      client.from('customer_interactions').select('product_id,event_name').gte('created_at',since).limit(10000),
+      client.from('abandoned_carts').select('user_id,total,updated_at').gte('updated_at',new Date(Date.now()-30*24*60*60*1000).toISOString()).limit(5000),
+      client.from('stock_audit_log').select('product_id,old_quantity,new_quantity,reason,created_at').order('created_at',{ascending:false}).limit(10),
+      client.from('support_escalations').select('id,status,created_at').eq('status','open').limit(200)
     ]);
     if (eventResult.error || orderResult.error) { analytics.innerHTML = `<p class="admin-empty">${escape(adminLang()==='ru'?'Не удалось загрузить аналитику. Проверьте миграцию.':adminLang()==='en'?'Could not load analytics. Check the migration.':'Analitika yüklənmədi. Miqrasiyanın tətbiq olunduğunu yoxlayın.')}</p>`; return; }
     const rows=eventResult.data||[], orderRows=orderResult.data||[], interactionRows=interactionResult.error?[]:(interactionResult.data||[]);
@@ -262,7 +269,7 @@
     let revenue=0,confirmedOrders=0,units=0;
     orderRows.forEach(order=>{
       const date=new Date(order.created_at).toLocaleDateString('az-AZ',{day:'2-digit',month:'2-digit'});
-      if(['confirmed','shipping','delivered'].includes(order.status)){revenue+=Number(order.total)||0;confirmedOrders+=1;revenueByDay.set(date,(revenueByDay.get(date)||0)+(Number(order.total)||0));(Array.isArray(order.items)?order.items:[]).forEach(item=>{const qty=Math.max(0,Number(item.qty)||0);if(!item.id)return;sold.set(item.id,(sold.get(item.id)||0)+qty);units+=qty})}
+      if(['confirmed','preparing','shipping','delivered'].includes(order.status)){revenue+=Number(order.total)||0;confirmedOrders+=1;revenueByDay.set(date,(revenueByDay.get(date)||0)+(Number(order.total)||0));(Array.isArray(order.items)?order.items:[]).forEach(item=>{const qty=Math.max(0,Number(item.qty)||0);if(!item.id)return;sold.set(item.id,(sold.get(item.id)||0)+qty);units+=qty})}
     });
     const topView=[...views.entries()].sort((a,b)=>b[1]-a[1])[0], topSold=[...sold.entries()].sort((a,b)=>b[1]-a[1])[0];
     const viewsTotal=(counts.get('page_view')||0)+(counts.get('product_view')||0);
@@ -274,7 +281,17 @@
     const chart=[...revenueByDay.entries()].reverse().slice(-7).map(([day,total])=>`<div class="admin-sales-day"><span>${escape(day)}</span><div class="admin-sales-bar"><i style="width:${Math.max(2,Math.round(total/maxRevenue*100))}%"></i></div><span>${money(total)}</span></div>`).join('')||`<p class="admin-empty">${at('noSales')}</p>`;
     const personalized=interactionRows.reduce((sum,row)=>sum+(row.event_name==='view'?1:0),0);
     const abandoned=[...addSessions].filter(session=>!orderSessions.has(session)).length;
-    analytics.innerHTML=Object.keys(labels).map(key=>`<article class="analytics-event"><strong>${counts.get(key)||0}</strong><span>${labels[key]}</span></article>`).join('')+
+    const paidOrAccepted=order=>['confirmed','preparing','shipping','delivered'].includes(order.status);
+    const periodStats=days=>{const start=Date.now()-days*86400000;const selected=orderRows.filter(row=>new Date(row.created_at).getTime()>=start);return{orders:selected.length,newOrders:selected.filter(row=>row.status==='pending').length,sales:selected.filter(paidOrAccepted).reduce((sum,row)=>sum+(Number(row.total)||0),0)}};
+    const dayStats=periodStats(1),weekStats=periodStats(7),monthStats=periodStats(30);
+    const statusCounts=orderRows.reduce((acc,row)=>(acc[row.status]=(acc[row.status]||0)+1,acc),{});
+    const lowStock=products.filter(item=>item.is_active&&item.stock_quantity!=null&&Number(item.stock_quantity)<5).sort((a,b)=>Number(a.stock_quantity)-Number(b.stock_quantity));
+    const cartRows=cartResult.error?[]:(cartResult.data||[]).filter(row=>new Date(row.updated_at).getTime()<Date.now()-3600000&&!orderRows.some(order=>order.user_id===row.user_id&&new Date(order.created_at).getTime()>=new Date(row.updated_at).getTime()));
+    const cartValue=cartRows.reduce((sum,row)=>sum+(Number(row.total)||0),0);
+    const statusLabels={pending:'Yeni',confirmed:'Təsdiqləndi',preparing:'Hazırlanır',shipping:'Kuryerə verildi',delivered:'Çatdırıldı',cancelled:'Ləğv edildi'};
+    const recentAudit=auditResult.error?[]:(auditResult.data||[]);
+    const auditHtml=recentAudit.length?recentAudit.map(row=>`<li>${escape(languageValue(productsById.get(row.product_id)?.name,'az')||row.product_id)} · ${row.old_quantity??'—'} → ${row.new_quantity??'—'} · ${escape(row.reason)} · ${escape(new Date(row.created_at).toLocaleString('az-AZ'))}</li>`).join(''):'<li>Stok dəyişiklikləri yoxdur.</li>';
+    analytics.innerHTML=`<h3>Satış göstəriciləri</h3><div class="admin-report-grid"><article><strong>${dayStats.orders} · ${money(dayStats.sales)}</strong><span>Bu gün · sifariş / satış</span></article><article><strong>${weekStats.orders} · ${money(weekStats.sales)}</strong><span>Bu həftə · sifariş / satış</span></article><article><strong>${monthStats.orders} · ${money(monthStats.sales)}</strong><span>Bu ay · sifariş / satış</span></article><article><strong>${dayStats.newOrders}</strong><span>Bu gün yeni sifariş</span></article><article><strong>${cartRows.length} · ${money(cartValue)}</strong><span>Tərk edilmiş səbət · təxmini</span></article><article><strong>${(escalationResult.data||[]).length}</strong><span>Açıq canlı dəstək sorğusu</span></article></div><div class="admin-report-columns"><section><h3>Sifariş statusları · 30 gün</h3><ol>${Object.entries(statusLabels).map(([key,label])=>`<li>${label} · ${statusCounts[key]||0}</li>`).join('')}</ol></section><section><h3>Stokda 5-dən az qalıb</h3><ol>${lowStock.map(item=>`<li>${escape(languageValue(item.name,'az')||item.id)} · ${item.stock_quantity} ədəd</li>`).join('')||'<li>Az qalan stok yoxdur.</li>'}</ol></section><section><h3>Son stok dəyişiklikləri</h3><ol>${auditHtml}</ol></section></div>`+Object.keys(labels).map(key=>`<article class="analytics-event"><strong>${counts.get(key)||0}</strong><span>${labels[key]}</span></article>`).join('')+
       `<div class="admin-report-grid"><article><strong>${orderRows.length}</strong><span>${at('orders30')}</span></article><article><strong>${confirmedOrders}</strong><span>${at('confirmed')}</span></article><article><strong>${money(revenue)}</strong><span>${at('revenue')}</span></article><article><strong>${units}</strong><span>${at('sold')}</span></article><article><strong>${counts.get('add_to_cart')||0}</strong><span>${at('cartAdds')}</span></article><article><strong>${counts.get('cart_removed')||0}</strong><span>${at('cartRemoves')}</span></article><article><strong>${abandoned}</strong><span>${at('abandoned')}</span></article><article><strong>${personalized}</strong><span>${at('recommendations')}</span></article></div>`+
       `<div class="admin-report-columns"><section><h3>${at('topViewed')}</h3><ol>${topList([...views.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section><section><h3>${at('topSold')}</h3><ol>${topList([...sold.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section><section><h3>${at('salesDynamics')}</h3><div class="admin-sales-chart">${chart}</div></section><section><h3>${at('topAdded')}</h3><ol>${topList([...adds.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section><section><h3>${at('topRemoved')}</h3><ol>${topList([...removed.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section></div>`;
   }

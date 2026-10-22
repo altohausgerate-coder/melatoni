@@ -93,12 +93,15 @@ document.querySelector('#showMoreProducts')?.addEventListener('click',()=>{visib
  }
  if(label)label.textContent=t('orderSaving');
  try{
-  const total=validCart.reduce((sum,item)=>{const product=products.find(p=>p?.id===item.id),price=product?productPrice(product):null;return sum+(price===null?0:price*Number(item.qty||1))},0);
-  const {error}=await client.from('orders').insert({user_id:user.id,items:validCart.map(item=>{const product=products.find(p=>p?.id===item.id);return{id:item.id,name:localizedText(product?.name||''),qty:Number(item.qty)||1,color:item.color||null,size:item.size||null,unit_price:product?productPrice(product):null}}),total,language:lang,status:'pending'});
+  const {data:created,error}=await client.rpc('create_store_order',{p_items:validCart.map(item=>({id:item.id,qty:Number(item.qty)||1,color:item.color||null,size:item.size||null})),p_language:lang});
   if(error)throw error;
-  document.dispatchEvent(new CustomEvent('melatoni:order-created',{detail:{source:'account-checkout'}}));
+  const order=Array.isArray(created)?created[0]:created;
+  const pricedItems=validCart.filter(item=>{const product=products.find(p=>p?.id===item.id);return product&&!product.quoteOnly&&product.price!=null});
+  if(pricedItems.length)window.MelatoniAnalytics?.track('purchase',{transaction_id:order?.order_number||order?.order_id,value:Number(order?.total)||0,currency:'AZN',shipping:0,discount:0,items:pricedItems.map(item=>{const product=products.find(p=>p?.id===item.id);return{item_id:item.id,item_name:localizedText(product?.name||''),item_category:product?.category,price:product?productPrice(product):0,quantity:Number(item.qty)||1}})});
+  if(pricedItems.length<validCart.length)window.MelatoniAnalytics?.track('generate_lead',{method:'quote_request',item_count:validCart.length-pricedItems.length});
+  document.dispatchEvent(new CustomEvent('melatoni:order-created',{detail:{source:'account-checkout',order_number:order?.order_number||''}}));
   cart=[];persist();location.assign('account.html#orders');
- }catch(error){console.error('Could not save order',error);toast(t('orderError'));button.disabled=false;button.removeAttribute('aria-busy');if(label)label.textContent=t('cartOrder')}
+ }catch(error){console.error('Could not save order',error);const reason=String(error?.message||'');toast(reason.includes('customer_details_required')||reason.includes('delivery_address_required')?'Sifariş üçün əvvəlcə hesabınızda ad, telefon və çatdırılma ünvanını tamamlayın.':reason.includes('insufficient_stock')?'Seçilmiş məhsuldan kifayət qədər stok qalmayıb. Səbəti yeniləyin.':t('orderError'));button.disabled=false;button.removeAttribute('aria-busy');if(label)label.textContent=t('cartOrder')}
 });
 document.querySelector('#searchInput')?.addEventListener('input',e=>{query=e.target.value;visibleProductCount=24;filter='all';document.querySelectorAll('.category-filter').forEach(x=>x.classList.toggle('active',x.dataset.categoryFilter==='all'));renderProducts()});
 document.querySelector('.wishlist-toggle')?.addEventListener('click',()=>{window.location.href='account.html#wishlist'});
