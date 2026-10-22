@@ -26,7 +26,7 @@ No n8n workflow is included: this implementation uses Supabase Vault, pg_cron, p
 
 Set these in **Supabase → Project Settings → Edge Functions → Secrets** (or the equivalent Supabase secrets command). Values are intentionally absent from this repository.
 
-- `ADMIN_NOTIFICATION_EMAIL`: private inbox that should receive new order, order status, support, low stock, and weekly report notices.
+- `ADMIN_NOTIFICATION_EMAIL`: private inbox or comma-separated inboxes that should receive new order, order status, support, low stock, and weekly report notices.
 - `RESEND_API_KEY`: Resend API key. Verify the sending domain and use `EMAIL_FROM` on that verified domain. Admin notices are sent through Resend to the configured Gmail inbox; Gmail is the recipient, not the sending provider.
 - `EMAIL_FROM`: sender such as `Melatoni <orders@melatoni.com>` after domain verification.
 - `OPENAI_API_KEY`: OpenAI API key. `OPENAI_MODEL` is optional and defaults to `gpt-4o-mini`.
