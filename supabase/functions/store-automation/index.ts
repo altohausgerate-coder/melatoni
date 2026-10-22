@@ -17,11 +17,11 @@ const statusCopy: Record<string, Record<string, string>> = {
   en: { order: 'Your order has been received', status: 'Your order status was updated', body: 'Your order status', follow: 'You can follow your order in the “My orders” section.', quote: 'Melatoni will confirm the prices of quote-request items separately.' }
 };
 
-async function email(to: string, subject: string, html: string, key: string, from: string, idempotencyKey: string) {
+async function email(to: string | string[], subject: string, html: string, key: string, from: string, idempotencyKey: string) {
   const result = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
-    body: JSON.stringify({ from, to: [to], subject, html })
+    body: JSON.stringify({ from, to: Array.isArray(to) ? to : [to], subject, html })
   });
   if (!result.ok) throw new Error(`email_${result.status}`);
 }
@@ -71,8 +71,8 @@ Deno.serve(async request => {
   const url = Deno.env.get('SUPABASE_URL');
   const resendKey = Deno.env.get('RESEND_API_KEY');
   const emailFrom = Deno.env.get('EMAIL_FROM');
-  const adminEmail = Deno.env.get('ADMIN_NOTIFICATION_EMAIL');
-  if (!secret || !serviceKey || !url || !resendKey || !emailFrom || !adminEmail) {
+  const adminEmails = (Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || '').split(',').map(value => value.trim()).filter(Boolean);
+  if (!secret || !serviceKey || !url || !resendKey || !emailFrom || !adminEmails.length) {
     return response(503, 'automation_secrets_missing');
   }
   let input: { task?: unknown };
@@ -92,7 +92,7 @@ Deno.serve(async request => {
       `Tərk edilmiş səbətlər: ${data.abandoned_carts} · ${money(data.abandoned_value)}`
     ].join('\n');
     try {
-      await email(adminEmail, 'Melatoni · həftəlik hesabat', noticeEmail(message), resendKey, emailFrom, `melatoni-weekly-${new Date(data.period_end).toISOString().slice(0, 10)}`);
+      await email(adminEmails, 'Melatoni · həftəlik hesabat', noticeEmail(message), resendKey, emailFrom, `melatoni-weekly-${new Date(data.period_end).toISOString().slice(0, 10)}`);
       return response(200, undefined, { sent: true });
     } catch { return response(502, 'admin_email_delivery_failed'); }
   }
@@ -114,7 +114,7 @@ Deno.serve(async request => {
         `Vaxt: ${new Date(job.created_at).toLocaleString('az-AZ', { timeZone: 'Asia/Baku' })}`
       ].join('\n');
       try {
-        await email(adminEmail, 'Melatoni · canlı dəstək müraciəti', noticeEmail(message), resendKey, emailFrom, `melatoni-${id}-admin-email`);
+        await email(adminEmails, 'Melatoni · canlı dəstək müraciəti', noticeEmail(message), resendKey, emailFrom, `melatoni-${id}-admin-email`);
         await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'admin_email', p_success: true });
         processed += 1;
       } catch {
@@ -128,7 +128,7 @@ Deno.serve(async request => {
       const name = job.product_name?.az || job.product_name?.en || job.product_id;
       try {
         const message = `Melatoni · stok xəbərdarlığı\n${name}\nQalıq: ${job.stock_quantity} ədəd`;
-        await email(adminEmail, 'Melatoni · stok xəbərdarlığı', noticeEmail(message), resendKey, emailFrom, `melatoni-${id}-admin-email`);
+        await email(adminEmails, 'Melatoni · stok xəbərdarlığı', noticeEmail(message), resendKey, emailFrom, `melatoni-${id}-admin-email`);
         await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'admin_email', p_success: true });
         processed += 1;
       } catch {
@@ -140,7 +140,7 @@ Deno.serve(async request => {
 
     if (!job.admin_email_sent_at) {
       try {
-        await email(adminEmail, `${job.event_type === 'order_created' ? 'Yeni sifariş' : 'Sifariş statusu yeniləndi'} · ${job.order_number || id}`, noticeEmail(orderAdminMessage(job)), resendKey, emailFrom, `melatoni-${id}-admin-email`);
+        await email(adminEmails, `${job.event_type === 'order_created' ? 'Yeni sifariş' : 'Sifariş statusu yeniləndi'} · ${job.order_number || id}`, noticeEmail(orderAdminMessage(job)), resendKey, emailFrom, `melatoni-${id}-admin-email`);
         await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'admin_email', p_success: true });
         job.admin_email_sent_at = true;
       } catch {
