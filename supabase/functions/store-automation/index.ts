@@ -8,7 +8,7 @@ const escapeHtml = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, c
 }[character]!));
 const money = (value: unknown) => `${new Intl.NumberFormat('az-AZ', { maximumFractionDigits: 2 }).format(Number(value) || 0)} AZN`;
 const statusAz: Record<string, string> = {
-  pending: 'Yeni', confirmed: 'Təsdiqləndi', preparing: 'Hazırlanır',
+  pending: 'Yeni', confirmed: 'Təsdiqləndi', preparing: 'Hazırlanır', processing: 'Hazırlanır',
   shipping: 'Kuryerə verildi', delivered: 'Çatdırıldı', cancelled: 'Ləğv edildi'
 };
 const statusCopy: Record<string, Record<string, string>> = {
@@ -64,7 +64,8 @@ function customerOrderEmail(job: Record<string, any>) {
   const status = statusAz[job.status] || String(job.status || '');
   const quoteOnly = Array.isArray(job.items) && job.items.some((item: Record<string, unknown>) => item.quote_only);
   const amount = quoteOnly ? `<p>${escapeHtml(copy.quote)}${Number(job.total)>0?` ${escapeHtml(money(job.total))}`:''}</p>` : `<p><strong>${escapeHtml(money(job.total))}</strong></p>`;
-  return `<div style="max-width:600px;margin:0 auto;padding:32px 24px;background:#f7f7f3;color:#193247;font-family:Arial,sans-serif;line-height:1.6"><p style="letter-spacing:.15em;color:#708498;font-size:12px">MELATONI</p><h1 style="font-size:26px">${escapeHtml(title)}</h1><p>${escapeHtml(copy.body)}: <strong>${escapeHtml(status)}</strong></p><p><strong>${escapeHtml(job.order_number)}</strong></p><ul>${lines}</ul>${amount}<p>${escapeHtml(copy.follow)}</p><a href="https://melatoni.com/account.html#orders" style="display:inline-block;padding:14px 22px;border-radius:999px;background:#17457c;color:#fff;text-decoration:none">${language === 'en' ? 'View my orders' : language === 'ru' ? 'Мои заказы' : 'Sifarişlərim'}</a></div>`;
+  const orderNumber = job.order_number || String(job.order_id || '').slice(0, 8).toUpperCase();
+  return `<div style="max-width:600px;margin:0 auto;padding:32px 24px;background:#f7f7f3;color:#193247;font-family:Arial,sans-serif;line-height:1.6"><p style="letter-spacing:.15em;color:#708498;font-size:12px">MELATONI</p><h1 style="font-size:26px">${escapeHtml(title)}</h1><p>${escapeHtml(copy.body)}: <strong>${escapeHtml(status)}</strong></p><p><strong>${escapeHtml(orderNumber)}</strong></p><ul>${lines}</ul>${amount}<p>${escapeHtml(copy.follow)}</p><a href="https://melatoni.com/account.html#orders" style="display:inline-block;padding:14px 22px;border-radius:999px;background:#17457c;color:#fff;text-decoration:none">${language === 'en' ? 'View my orders' : language === 'ru' ? 'Мои заказы' : 'Sifarişlərim'}</a></div>`;
 }
 
 Deno.serve(async request => {

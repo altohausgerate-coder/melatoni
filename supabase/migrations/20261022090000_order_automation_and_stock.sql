@@ -8,26 +8,25 @@ create extension if not exists supabase_vault with schema vault;
 
 alter table public.orders
   add column if not exists order_number text,
-  add column if not exists customer_name text not null default '',
-  add column if not exists customer_phone text not null default '',
-  add column if not exists customer_email text not null default '',
-  add column if not exists shipping_address jsonb not null default '{}'::jsonb,
-  add column if not exists payment_method text not null default 'to_be_confirmed',
-  add column if not exists payment_status text not null default 'unpaid',
-  add column if not exists delivery_fee numeric(12,2) not null default 0 check (delivery_fee >= 0),
-  add column if not exists discount_amount numeric(12,2) not null default 0 check (discount_amount >= 0),
+  add column if not exists customer_name text,
+  add column if not exists customer_phone text,
+  add column if not exists customer_email text,
+  add column if not exists shipping_address jsonb,
+  add column if not exists payment_method text,
+  add column if not exists payment_status text,
+  add column if not exists delivery_fee numeric(12,2) check (delivery_fee is null or delivery_fee >= 0),
+  add column if not exists discount_amount numeric(12,2) check (discount_amount is null or discount_amount >= 0),
   add column if not exists coupon_code text;
 
-update public.orders
-set order_number = 'ML-' || upper(substr(replace(id::text, '-', ''), 1, 12))
-where order_number is null;
-create unique index if not exists orders_order_number_uidx on public.orders(order_number);
-alter table public.orders alter column order_number set not null;
+-- Preserve all existing orders unchanged. New checkout orders receive their
+-- order number in create_store_order; historical rows can keep a NULL number.
+create unique index if not exists orders_order_number_uidx on public.orders(order_number)
+  where order_number is not null;
 
 alter table public.orders drop constraint if exists orders_status_check;
-update public.orders set status = 'preparing' where status = 'processing';
+-- Retain the legacy value without rewriting historical status data.
 alter table public.orders add constraint orders_status_check
-  check (status in ('pending','confirmed','preparing','shipping','delivered','cancelled'));
+  check (status in ('pending','confirmed','preparing','processing','shipping','delivered','cancelled'));
 
 alter table public.customer_preferences
   add column if not exists cart_reminders_consent boolean not null default false,
@@ -289,12 +288,12 @@ begin
     )));
   end loop;
 
-  insert into public.orders(id,order_number,user_id,items,total,language,status,customer_name,customer_phone,customer_email,shipping_address,payment_method,payment_status)
+  insert into public.orders(id,order_number,user_id,items,total,language,status,customer_name,customer_phone,customer_email,shipping_address,payment_method,payment_status,delivery_fee,discount_amount)
   values (
     new_order_id,new_order_number,actor,normalized_items,order_total,language_value,'pending',
     trim(customer_record.full_name),trim(customer_record.phone),coalesce(customer_email_value,''),
     jsonb_strip_nulls(jsonb_build_object('label',address_record.label,'city',address_record.city,'district',address_record.district,'street',address_record.street,'note',address_record.note)),
-    'to_be_confirmed','unpaid'
+    'to_be_confirmed','unpaid',0,0
   );
   return query select new_order_id,new_order_number,order_total;
 end;
@@ -319,6 +318,7 @@ begin
       (old.status='pending' and new.status in ('confirmed','cancelled')) or
       (old.status='confirmed' and new.status in ('preparing','cancelled')) or
       (old.status='preparing' and new.status in ('shipping','cancelled')) or
+      (old.status='processing' and new.status in ('preparing','shipping','cancelled')) or
       (old.status='shipping' and new.status in ('delivered','cancelled'))
     ) then raise exception 'invalid_order_status_transition'; end if;
 
@@ -474,12 +474,12 @@ begin
   select jsonb_build_object(
     'period_start',now()-interval '7 days','period_end',now(),
     'order_count',count(*),
-    'sales',coalesce(sum(total) filter(where status in ('confirmed','preparing','shipping','delivered')),0),
+    'sales',coalesce(sum(total) filter(where status in ('confirmed','preparing','processing','shipping','delivered')),0),
     'new_orders',count(*) filter(where status='pending'),
     'top_products',coalesce((select jsonb_agg(t) from (
       select item->>'name' as name,sum(coalesce((item->>'qty')::integer,1)) as quantity
       from public.orders o cross join lateral jsonb_array_elements(o.items) item
-      where o.created_at>=now()-interval '7 days' and o.status in ('confirmed','preparing','shipping','delivered')
+      where o.created_at>=now()-interval '7 days' and o.status in ('confirmed','preparing','processing','shipping','delivered')
       group by item->>'name' order by quantity desc limit 5) t),'[]'::jsonb),
     'low_stock',coalesce((select jsonb_agg(jsonb_build_object('name',coalesce(name->>'az',id),'stock',stock_quantity)) from public.products where is_active and stock_quantity is not null and stock_quantity<5),'[]'::jsonb),
     'abandoned_carts', (select count(*) from public.abandoned_carts c where c.updated_at<now()-interval '1 hour' and c.updated_at>now()-interval '30 days' and jsonb_array_length(c.items)>0 and not exists(select 1 from public.orders o where o.user_id=c.user_id and o.created_at>=c.updated_at)),

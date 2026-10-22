@@ -17,7 +17,7 @@ No n8n workflow is included: this implementation uses Supabase Vault, pg_cron, p
 ## 1. Apply Supabase changes
 
 1. Back up the existing project and review `supabase/migrations/20261022090000_order_automation_and_stock.sql` against the live schema. The migration expects the existing `products`, `profiles`, `addresses`, `customer_preferences`, `abandoned_carts`, `push_subscriptions`, `orders` tables, `is_melatoni_admin()` helper and Supabase Vault/pg_cron/pg_net extensions.
-2. Apply the migration to the existing project from Supabase SQL Editor or the configured Supabase CLI workflow. It does not drop existing customer or order rows. It does revoke direct customer inserts into `orders`; checkout must use the new RPC after deployment.
+2. Apply the migration to the existing project from Supabase SQL Editor or the configured Supabase CLI workflow. It does not rewrite, delete, or backfill historical order values; new order snapshot columns stay `NULL` on old orders, and new checkout orders receive values. Legacy `processing` statuses remain unchanged and display as preparing. It does revoke direct customer inserts into `orders`; checkout must use the new RPC after deployment.
 3. Confirm the project API URL/key and `SUPABASE_SERVICE_ROLE_KEY` are injected by Supabase Edge Functions. Never place the service role key in frontend files.
 4. Deploy the two functions with `supabase functions deploy store-automation` and `supabase functions deploy customer-assistant`. The existing `send-cart-reminders` function must also be redeployed after this update.
 5. Confirm the migration schedules existing cron invocations in UTC: queue worker every minute, cart-reminder scan every 15 minutes, weekly report Monday 09:00 UTC (13:00 Baku during UTC+4).
