@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.send-order-push]
 verify_jwt = false
+
+[functions.store-automation]
+verify_jwt = false
+
+[functions.customer-assistant]
+verify_jwt = false

@@ -230,7 +230,7 @@
       if (password.length < 8) { if (status) status.textContent = text('passwordShort'); return; }
       const { data, error } = await client.auth.signUp({ email, password, options:{ data:{ full_name:String(form.get('name') || '').trim(), phone }, emailRedirectTo:new URL('index.html', location.href).toString() } });
       if (status) status.textContent = error ? text('genericError') : (data.session ? text('registerSignedIn') : text('registerOk'));
-      if (!error) { accountForm.reset(); setMode('login',false); }
+      if (!error) { window.MelatoniAnalytics?.track('sign_up',{method:'email'}); accountForm.reset(); setMode('login',false); }
     } else {
       const { error } = await client.auth.signInWithPassword({ email, password });
       const loginErrorKey = error?.code === 'email_not_confirmed'
@@ -240,7 +240,7 @@
           : 'genericError';
       if (status) status.textContent = error ? text(loginErrorKey) : text('loginOk');
       const pass = $('[name="password"]'); if (pass) pass.value = '';
-      if (!error) setTimeout(() => account?.close(), 650);
+      if (!error) { window.MelatoniAnalytics?.track('login',{method:'email'}); setTimeout(() => account?.close(), 650); }
     }
     } catch { if (status) status.textContent = text('genericError'); }
   });
