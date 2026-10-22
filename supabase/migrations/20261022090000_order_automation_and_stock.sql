@@ -61,8 +61,8 @@ create table if not exists public.store_automation_queue (
   created_at timestamptz not null default now(),
   next_attempt_at timestamptz not null default now(),
   locked_until timestamptz,
-  telegram_sent_at timestamptz,
-  email_sent_at timestamptz,
+  admin_email_sent_at timestamptz,
+  customer_email_sent_at timestamptz,
   sent_at timestamptz,
   last_error text,
   check ((event_type in ('order_created','order_status') and order_id is not null)
@@ -387,18 +387,18 @@ begin
         'items',order_row.items,'item_summary',item_text,'total',order_row.total,'language',order_row.language,
         'status',order_row.status,'payment_method',order_row.payment_method,'payment_status',order_row.payment_status,
         'shipping_address',order_row.shipping_address,'created_at',order_row.created_at,'payload',queue_row.payload,
-        'telegram_sent_at',queue_row.telegram_sent_at,'email_sent_at',queue_row.email_sent_at
+        'admin_email_sent_at',queue_row.admin_email_sent_at,'customer_email_sent_at',queue_row.customer_email_sent_at
       );
     elsif queue_row.support_escalation_id is not null then
       return next (select jsonb_build_object('job_id',queue_row.id,'event_type','support_escalation',
         'support_escalation_id',s.id,'contact_name',s.contact_name,'contact_email',s.contact_email,
         'contact_phone',s.contact_phone,'message',s.message,'created_at',s.created_at,
-        'telegram_sent_at',queue_row.telegram_sent_at) from public.support_escalations s where s.id=queue_row.support_escalation_id);
+        'admin_email_sent_at',queue_row.admin_email_sent_at) from public.support_escalations s where s.id=queue_row.support_escalation_id);
     else
       select * into product_row from public.products where id=queue_row.product_id;
       return next jsonb_build_object('job_id',queue_row.id,'event_type','low_stock','product_id',queue_row.product_id,
         'product_name',product_row.name,'stock_quantity',product_row.stock_quantity,'payload',queue_row.payload,
-        'telegram_sent_at',queue_row.telegram_sent_at);
+        'admin_email_sent_at',queue_row.admin_email_sent_at);
     end if;
   end loop;
 end;
@@ -411,15 +411,15 @@ returns boolean language plpgsql security definer set search_path = public, vaul
 as $$
 begin
   if not exists(select 1 from vault.decrypted_secrets where name='melatoni_store_automation_secret' and decrypted_secret=p_secret) then raise exception 'not_authorized'; end if;
-  if p_channel not in ('telegram','email') then raise exception 'invalid_channel'; end if;
+  if p_channel not in ('admin_email','customer_email') then raise exception 'invalid_channel'; end if;
   update public.store_automation_queue set
-    telegram_sent_at=case when p_success and p_channel='telegram' then now() else telegram_sent_at end,
-    email_sent_at=case when p_success and p_channel='email' then now() else email_sent_at end,
+    admin_email_sent_at=case when p_success and p_channel='admin_email' then now() else admin_email_sent_at end,
+    customer_email_sent_at=case when p_success and p_channel='customer_email' then now() else customer_email_sent_at end,
     sent_at=case when p_success and (
-      (event_type in ('low_stock','support_escalation') and (p_channel='telegram' or telegram_sent_at is not null)) or
+      (event_type in ('low_stock','support_escalation') and (p_channel='admin_email' or admin_email_sent_at is not null)) or
       (event_type in ('order_created','order_status') and
-        (p_channel='telegram' or telegram_sent_at is not null) and
-        (p_channel='email' or email_sent_at is not null or not exists(select 1 from public.orders o where o.id=public.store_automation_queue.order_id and nullif(o.customer_email,'') is not null))
+        (p_channel='admin_email' or admin_email_sent_at is not null) and
+        (p_channel='customer_email' or customer_email_sent_at is not null or not exists(select 1 from public.orders o where o.id=public.store_automation_queue.order_id and nullif(o.customer_email,'') is not null))
       )
     ) then now() else sent_at end,
     locked_until=null,

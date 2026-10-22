@@ -17,14 +17,6 @@ const statusCopy: Record<string, Record<string, string>> = {
   en: { order: 'Your order has been received', status: 'Your order status was updated', body: 'Your order status', follow: 'You can follow your order in the “My orders” section.', quote: 'Melatoni will confirm the prices of quote-request items separately.' }
 };
 
-async function telegram(text: string, token: string, chatId: string) {
-  const result = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true })
-  });
-  if (!result.ok) throw new Error(`telegram_${result.status}`);
-}
-
 async function email(to: string, subject: string, html: string, key: string, from: string, idempotencyKey: string) {
   const result = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -32,6 +24,10 @@ async function email(to: string, subject: string, html: string, key: string, fro
     body: JSON.stringify({ from, to: [to], subject, html })
   });
   if (!result.ok) throw new Error(`email_${result.status}`);
+}
+
+function noticeEmail(text: string) {
+  return `<div style="max-width:640px;margin:0 auto;padding:28px;background:#f7f7f3;color:#193247;font:15px/1.65 Arial,sans-serif"><p style="letter-spacing:.15em;color:#708498;font-size:12px">MELATONI · İDARƏETMƏ</p><pre style="white-space:pre-wrap;font:inherit">${escapeHtml(text)}</pre><p><a href="https://melatoni.com/admin#orders" style="color:#17457c">İdarəetmə panelini aç</a></p></div>`;
 }
 
 function orderAdminMessage(job: Record<string, any>) {
@@ -73,11 +69,10 @@ Deno.serve(async request => {
   const secret = request.headers.get('x-store-automation-secret');
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
   const url = Deno.env.get('SUPABASE_URL');
-  const botToken = Deno.env.get('TELEGRAM_BOT_TOKEN');
-  const chatId = Deno.env.get('TELEGRAM_CHAT_ID');
   const resendKey = Deno.env.get('RESEND_API_KEY');
   const emailFrom = Deno.env.get('EMAIL_FROM');
-  if (!secret || !serviceKey || !url || !botToken || !chatId || !resendKey || !emailFrom) {
+  const adminEmail = Deno.env.get('ADMIN_NOTIFICATION_EMAIL');
+  if (!secret || !serviceKey || !url || !resendKey || !emailFrom || !adminEmail) {
     return response(503, 'automation_secrets_missing');
   }
   let input: { task?: unknown };
@@ -96,8 +91,10 @@ Deno.serve(async request => {
       'Ən çox satılanlar:', top || '—', 'Azalan stok:', low || '—',
       `Tərk edilmiş səbətlər: ${data.abandoned_carts} · ${money(data.abandoned_value)}`
     ].join('\n');
-    try { await telegram(message, botToken, chatId); return response(200, undefined, { sent: true }); }
-    catch { return response(502, 'telegram_delivery_failed'); }
+    try {
+      await email(adminEmail, 'Melatoni · həftəlik hesabat', noticeEmail(message), resendKey, emailFrom, `melatoni-weekly-${new Date(data.period_end).toISOString().slice(0, 10)}`);
+      return response(200, undefined, { sent: true });
+    } catch { return response(502, 'admin_email_delivery_failed'); }
   }
   if (input.task !== 'queue') return response(400, 'unknown_task');
 
@@ -107,7 +104,7 @@ Deno.serve(async request => {
   for (const job of jobs || []) {
     const id = String(job.job_id);
     if (job.event_type === 'support_escalation') {
-      if (job.telegram_sent_at) continue;
+      if (job.admin_email_sent_at) continue;
       const message = [
         'Melatoni · canlı dəstək müraciəti',
         `Ad: ${job.contact_name}`,
@@ -117,52 +114,53 @@ Deno.serve(async request => {
         `Vaxt: ${new Date(job.created_at).toLocaleString('az-AZ', { timeZone: 'Asia/Baku' })}`
       ].join('\n');
       try {
-        await telegram(message, botToken, chatId);
-        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'telegram', p_success: true });
+        await email(adminEmail, 'Melatoni · canlı dəstək müraciəti', noticeEmail(message), resendKey, emailFrom, `melatoni-${id}-admin-email`);
+        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'admin_email', p_success: true });
         processed += 1;
       } catch {
-        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'telegram', p_success: false, p_error: 'telegram_delivery_failed' });
+        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'admin_email', p_success: false, p_error: 'admin_email_delivery_failed' });
         failed += 1;
       }
       continue;
     }
     if (job.event_type === 'low_stock') {
-      if (job.telegram_sent_at) continue;
+      if (job.admin_email_sent_at) continue;
       const name = job.product_name?.az || job.product_name?.en || job.product_id;
       try {
-        await telegram(`Melatoni · stok xəbərdarlığı\n${name}\nQalıq: ${job.stock_quantity} ədəd`, botToken, chatId);
-        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'telegram', p_success: true });
+        const message = `Melatoni · stok xəbərdarlığı\n${name}\nQalıq: ${job.stock_quantity} ədəd`;
+        await email(adminEmail, 'Melatoni · stok xəbərdarlığı', noticeEmail(message), resendKey, emailFrom, `melatoni-${id}-admin-email`);
+        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'admin_email', p_success: true });
         processed += 1;
       } catch {
-        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'telegram', p_success: false, p_error: 'telegram_delivery_failed' });
+        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'admin_email', p_success: false, p_error: 'admin_email_delivery_failed' });
         failed += 1;
       }
       continue;
     }
 
-    if (!job.telegram_sent_at) {
+    if (!job.admin_email_sent_at) {
       try {
-        await telegram(orderAdminMessage(job), botToken, chatId);
-        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'telegram', p_success: true });
-        job.telegram_sent_at = true;
+        await email(adminEmail, `${job.event_type === 'order_created' ? 'Yeni sifariş' : 'Sifariş statusu yeniləndi'} · ${job.order_number || id}`, noticeEmail(orderAdminMessage(job)), resendKey, emailFrom, `melatoni-${id}-admin-email`);
+        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'admin_email', p_success: true });
+        job.admin_email_sent_at = true;
       } catch {
-        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'telegram', p_success: false, p_error: 'telegram_delivery_failed' });
+        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'admin_email', p_success: false, p_error: 'admin_email_delivery_failed' });
         failed += 1;
       }
     }
-    if (job.customer_email && !job.email_sent_at) {
+    if (job.customer_email && !job.customer_email_sent_at) {
       try {
         const copy = statusCopy[job.language] || statusCopy.az;
         const subject = `${job.event_type === 'order_created' ? copy.order : copy.status} · ${job.order_number}`;
         await email(job.customer_email, subject, customerOrderEmail(job), resendKey, emailFrom, `melatoni-${id}-customer-email`);
-        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'email', p_success: true });
-        job.email_sent_at = true;
+        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'customer_email', p_success: true });
+        job.customer_email_sent_at = true;
       } catch {
-        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'email', p_success: false, p_error: 'customer_email_delivery_failed' });
+        await db.rpc('finish_store_automation', { p_secret: secret, p_job_id: id, p_channel: 'customer_email', p_success: false, p_error: 'customer_email_delivery_failed' });
         failed += 1;
       }
     }
-    if (job.telegram_sent_at || job.customer_email) processed += 1;
+    if (job.admin_email_sent_at || job.customer_email) processed += 1;
   }
   return response(200, undefined, { jobs: jobs?.length || 0, processed, failed });
 });
