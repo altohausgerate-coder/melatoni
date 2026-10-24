@@ -30,6 +30,7 @@
       sessionId = '';
       storage?.remove('melatoni-analytics-session');
     }
+    if (analyticsAllowed) window.requestAnimationFrame(() => scanVisibleProducts());
   });
   let recommendationUserId = null;
   let recommendationConsent = false;
@@ -100,7 +101,7 @@
     const link = event.target.closest('a[href*="product.html?id="]');
     if (link) {
       const productId = new URL(link.href).searchParams.get('id');
-      if (productId) log('product_click', productId);
+      if (productId) log('product_click', productId, { source: placementFor(link) });
     }
     const favorite = event.target.closest('[data-save], [data-favorite]');
     if (favorite) log('wishlist_add', favorite.dataset.save || favorite.dataset.favorite);
@@ -116,4 +117,54 @@
   });
   document.addEventListener('melatoni:order-created', event => log('order_created', null, { source: event.detail?.source || 'checkout' }));
   document.querySelector('#cartOrder')?.addEventListener('click', () => log('checkout_started', null, { source: 'cart' }));
+
+  const impressionSelector = '#productGrid .product-card, #popularGrid [data-popular-card], .collection-products .collection-product-card, .account-product-links a';
+  const observedCards = new WeakSet();
+  const seenImpressions = new Set();
+  function placementFor(node) {
+    if (node.closest('#popularGrid')) return 'popular_products';
+    if (node.closest('.collection-products')) return 'home_collection';
+    if (node.closest('.account-product-links')) return 'personal_recommendations';
+    if (node.closest('#productGrid')) return 'catalog';
+    return 'product_list';
+  }
+  function productIdFor(node) {
+    const link = node.matches?.('a[href*="product.html?id="]') ? node : node.querySelector?.('a[href*="product.html?id="]');
+    try { return link ? new URL(link.href, location.href).searchParams.get('id') : null; } catch { return null; }
+  }
+  function recordImpression(card) {
+    if (!analyticsAllowed) return;
+    const productId = productIdFor(card), source = placementFor(card);
+    if (!productId) return;
+    const key = `${source}:${productId}`;
+    if (seenImpressions.has(key)) return;
+    seenImpressions.add(key);
+    const product = (window.MELATONI_PRODUCTS || []).find(item => item.id === productId);
+    log('product_impression', productId, { source, category: product?.category || '' });
+    document.dispatchEvent(new CustomEvent('melatoni:product-impression', { detail: { productId, source } }));
+  }
+  const impressionObserver = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+    entries.forEach(entry => { if (entry.isIntersecting && entry.intersectionRatio >= .5) recordImpression(entry.target); });
+  }, { threshold: [.5] }) : null;
+  function observeProducts(root = document) {
+    root.querySelectorAll?.(impressionSelector).forEach(card => {
+      if (observedCards.has(card)) return;
+      observedCards.add(card);
+      if (impressionObserver) impressionObserver.observe(card); else recordImpression(card);
+    });
+  }
+  function scanVisibleProducts() {
+    observeProducts();
+    document.querySelectorAll(impressionSelector).forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const visibleHeight = Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0);
+      if (visibleHeight > 0 && visibleHeight >= Math.min(rect.height * .5, innerHeight * .5)) recordImpression(card);
+    });
+  }
+  observeProducts();
+  new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => {
+    if (node.nodeType !== 1) return;
+    if (node.matches?.(impressionSelector)) observeProducts(node.parentElement || document);
+    else observeProducts(node);
+  }))).observe(document.body, { childList: true, subtree: true });
 })();
