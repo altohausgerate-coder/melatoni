@@ -1,5 +1,5 @@
 (() => {
-  const allowedEvents = new Set(['page_view','view_item_list','view_item','add_to_cart','remove_from_cart','view_cart','begin_checkout','add_shipping_info','add_payment_info','purchase','search','sign_up','login','generate_lead','contact_form_submit','whatsapp_click','telegram_click','phone_click']);
+  const allowedEvents = new Set(['page_view','view_item_list','select_item','view_item','add_to_cart','remove_from_cart','view_cart','begin_checkout','add_shipping_info','add_payment_info','purchase','search','sign_up','login','generate_lead','contact_form_submit','whatsapp_click','telegram_click','phone_click']);
   window.dataLayer = window.dataLayer || [];
   window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
   const denied = { ad_storage:'denied', analytics_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', functionality_storage:'denied', personalization_storage:'denied', security_storage:'granted' };
@@ -55,18 +55,12 @@
     if (!allowedEvents.has(name) || !window.MelatoniConsent?.has('analytics')) return;
     const redact=value=>{if(Array.isArray(value))return value.map(redact);if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).filter(([key])=>!/^(email|phone|address|user_id|customer_name|customer_email|customer_phone|contact_name|message)$/i.test(key)).map(([key,item])=>[key,redact(item)]));return value};
     const safeParams=redact(params);
-    window.dataLayer.push({ecommerce:null});
-    const ecommerceEvent=['view_item_list','view_item','add_to_cart','remove_from_cart','view_cart','begin_checkout','add_shipping_info','add_payment_info','purchase'].includes(name);
-    window.dataLayer.push(ecommerceEvent?{event:name,ecommerce:safeParams}:{event:name,...safeParams});
+    window.gtag('event',name,safeParams);
   };
   const idFromPage=()=>new URL(location.href).searchParams.get('id');
   const cart=()=>{try{return JSON.parse(window.MelatoniStorage?.get('melatoni-cart')||'[]')}catch{return[]}};
   const cartItems=()=>cart().map(line=>itemData(line.id,Number(line.qty)||1)).filter(Boolean);
   const page=location.pathname.split('/').pop()||'index.html';
-  if(page==='products.html'){
-    const list=(window.MELATONI_PRODUCTS||[]).map(item=>itemData(item.id)).filter(Boolean).slice(0,100);
-    if(list.length)ecommerce('view_item_list',{item_list_id:'melatoni_catalog',item_list_name:'Məhsullar',items:list});
-  }
   if(page==='product.html'){
     const item=itemData(idFromPage()); if(item)ecommerce('view_item',{currency:'AZN',value:item.price,items:[item]});
   }
@@ -81,12 +75,18 @@
     }
     if(target.matches('#cartOrder')){
       const items=cartItems(); ecommerce('begin_checkout',{currency:'AZN',value:items.reduce((sum,item)=>sum+item.price*item.quantity,0),items});
-      if(items.length)ecommerce('add_shipping_info',{currency:'AZN',value:items.reduce((sum,item)=>sum+item.price*item.quantity,0),shipping_tier:'standard_delivery',items});
     }
     const add=target.closest('[data-add],[data-add-to-bag],#detailAdd');
     if(add){const id=add.dataset.add||add.dataset.addToBag||idFromPage();const item=itemData(id);if(item)ecommerce('add_to_cart',{currency:'AZN',value:item.price*item.quantity,items:[item]});}
     const remove=target.closest('[data-remove],[data-cart-remove]');
     if(remove){const itemId=remove.dataset.remove||remove.dataset.cartRemove||remove.dataset.id;const item=itemData(itemId);if(item)ecommerce('remove_from_cart',{currency:'AZN',value:item.price,items:[item]});}
+    const productLink=target.closest('a[href*="product.html?id="]');
+    if(productLink){const itemId=new URL(productLink.href,location.href).searchParams.get('id');const item=itemData(itemId);if(item){const source=productLink.closest('#popularGrid')?'popular_products':productLink.closest('.collection-products')?'home_collection':productLink.closest('#productGrid')?'catalog':'product_link';ecommerce('select_item',{item_list_id:source,item_list_name:source,items:[item]});}}
+  });
+  document.addEventListener('melatoni:product-impression',event=>{
+    const item=itemData(event.detail?.productId);if(!item)return;
+    const source=String(event.detail?.source||'product_list').slice(0,100);
+    ecommerce('view_item_list',{item_list_id:source,item_list_name:source,items:[item]});
   });
   let searchTimer;
   document.querySelectorAll('input[type="search"],#searchInput,[name="search"]').forEach(input=>input.addEventListener('input',()=>{

@@ -30,6 +30,14 @@ function noticeEmail(text: string) {
   return `<div style="max-width:640px;margin:0 auto;padding:28px;background:#f7f7f3;color:#193247;font:15px/1.65 Arial,sans-serif"><p style="letter-spacing:.15em;color:#708498;font-size:12px">MELATONI · İDARƏETMƏ</p><pre style="white-space:pre-wrap;font:inherit">${escapeHtml(text)}</pre><p><a href="https://melatoni.com/admin#orders" style="color:#17457c">İdarəetmə panelini aç</a></p></div>`;
 }
 
+const percent = (value: unknown) => value == null ? '—' : `${Number(value).toLocaleString('az-AZ', { maximumFractionDigits: 1 })}%`;
+const change = (current: unknown, previous: unknown) => {
+  const now = Number(current) || 0, before = Number(previous) || 0;
+  if (!before) return now ? 'yeni artım' : 'dəyişməyib';
+  const delta = ((now - before) / before) * 100;
+  return `${delta >= 0 ? '+' : ''}${delta.toLocaleString('az-AZ', { maximumFractionDigits: 1 })}%`;
+};
+
 function orderAdminMessage(job: Record<string, any>) {
   const address = job.shipping_address || {};
   const addressText = [address.city, address.district, address.street, address.note].filter(Boolean).join(', ') || 'Ünvan qeyd edilməyib';
@@ -82,13 +90,32 @@ Deno.serve(async request => {
   if (input.task === 'weekly-report') {
     const { data, error } = await db.rpc('store_weekly_report', { p_secret: secret });
     if (error || !data) return response(503, 'report_unavailable');
-    const top = Array.isArray(data.top_products) ? data.top_products.map((item: any) => `${item.name || 'Məhsul'} × ${item.quantity}`).join('\n') : '—';
+    const top = Array.isArray(data.top_products) ? data.top_products.map((item: any) =>
+      `• ${item.name || item.product_id}: ${item.impressions || 0} göstərim → ${item.clicks || 0} klik → ${item.cart_adds || 0} səbət → ${item.ordered_quantity || 0} satış`
+    ).join('\n') : '—';
+    const opportunities = Array.isArray(data.opportunities) ? data.opportunities.map((item: any) =>
+      `• ${item.name || item.product_id}: ${item.impressions || 0} göstərim, ${item.clicks || 0} klik — şəkil, qiymət və sıralamanı yoxlayın`
+    ).join('\n') : '—';
+    const recommendations = data.recommendation_performance || {};
+    const previous = data.previous_period || {};
     const low = Array.isArray(data.low_stock) ? data.low_stock.map((item: any) => `${item.name}: ${item.stock}`).join('\n') : '—';
     const message = [
       'Melatoni · həftəlik hesabat',
       `Dövr: ${new Date(data.period_start).toLocaleDateString('az-AZ')} – ${new Date(data.period_end).toLocaleDateString('az-AZ')}`,
-      `Sifarişlər: ${data.order_count}`, `Satış: ${money(data.sales)}`, `Yeni sifarişlər: ${data.new_orders}`,
-      'Ən çox satılanlar:', top || '—', 'Azalan stok:', low || '—',
+      '', 'MÜŞTƏRİLƏR NƏ EDİR?',
+      `Ziyarətçi sessiyaları: ${data.sessions} (${change(data.sessions, previous.sessions)} əvvəlki həftəyə görə)`,
+      `Səhifə baxışları: ${data.page_views}`,
+      `Məhsul göstərimləri: ${data.product_impressions} → kliklər: ${data.product_clicks} (${percent(data.impression_to_click_rate)})`,
+      `Məhsul detalları: ${data.product_views} → səbətə əlavələr: ${data.cart_adds} (${percent(data.click_to_cart_rate)} klikdən səbətə)`,
+      `Sifarişə başlayanlar: ${data.checkout_starts} → sifarişlər: ${data.order_count} (${percent(data.session_to_order_rate)} sessiyadan sifarişə)`,
+      '', 'SİFARİŞ VƏ SATIŞ',
+      `Sifarişlər: ${data.order_count} (${change(data.order_count, previous.order_count)}) · təsdiqlənən: ${data.confirmed_orders} · ləğv: ${data.cancelled_orders}`,
+      `Təsdiqlənmiş satış: ${money(data.sales)} (${change(data.sales, previous.sales)}) · gözləyən: ${data.new_orders}`,
+      '', 'MƏHSULU QARŞISINA ÇIXARIRIQMI?',
+      `Seçilmiş/populyar bölmələr: ${recommendations.impressions || 0} göstərim → ${recommendations.clicks || 0} klik (${percent(recommendations.click_rate)})`,
+      'Ən çox görünən məhsullar:', top || '—',
+      'Çox göstərilib maraq görməyənlər:', opportunities || 'Yoxdur — göstərilən məhsullar klik alır.',
+      '', 'ƏMƏLİYYAT', 'Azalan stok:', low || '—',
       `Tərk edilmiş səbətlər: ${data.abandoned_carts} · ${money(data.abandoned_value)}`
     ].join('\n');
     try {

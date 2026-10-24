@@ -9,7 +9,7 @@ This change extends the existing Cloudflare Pages and Supabase site. It does not
 - Inventory is decremented only when an order is confirmed, restored if an eligible confirmed order is cancelled, and every stock change is audited. Out-of-stock items cannot be added from the product detail page; server-side stock checks remain authoritative. Products whose stock is `NULL` remain untracked until the admin enters a real stock count; enter counts for every SKU before relying on full inventory enforcement.
 - Cart reminders are queued at one and 24 hours. Email requires the account holder’s explicit opt-in in **Hesabım → Sayt bildirişləri**. Browser push requires an active push subscription, which the visitor explicitly enabled. Both are rechecked immediately before delivery.
 - The account support widget answers from active Supabase product data, can check an order using its number and phone, and asks for explicit contact consent before creating a human support request. PII is scrubbed before chat text is sent to OpenAI.
-- Admin analytics include today/week/month sales, new orders, abandoned cart estimate, open support requests, order status counts, low stock and recent stock audit entries.
+- Admin analytics include today/week/month sales, new orders, abandoned cart estimate, open support requests, order status counts, low stock and recent stock audit entries. Every Monday at 13:00 Baku time, the configured admin inboxes receive a privacy-safe weekly journey report: sessions, product impressions, product clicks, cart additions, checkout starts, orders, confirmed sales, week-over-week change, recommendation placement performance and products that were shown often but received little interest.
 - GTM is loaded only after analytics or marketing consent; Consent Mode v2 defaults to denied. PII fields are filtered from website analytics events.
 
 No n8n workflow is included: this implementation uses Supabase Vault, pg_cron, pg_net, Edge Functions and a private database queue. That keeps the current stack and avoids adding an external automation host.
@@ -54,7 +54,7 @@ Do not send email, phone, address, customer name, account ID, free-text search o
 
 ## 4. Events implemented
 
-- Ecommerce: `view_item_list`, `view_item`, `add_to_cart`, `remove_from_cart`, `view_cart`, `begin_checkout`, `add_shipping_info`, `purchase`.
+- Ecommerce: `view_item_list` (only when a product card is actually visible), `select_item`, `view_item`, `add_to_cart`, `remove_from_cart`, `view_cart`, `begin_checkout`, `add_shipping_info`, `purchase`.
 - Engagement/conversions: `search`, `sign_up`, `login`, `generate_lead`, `contact_form_submit`, `whatsapp_click`, `telegram_click`, `phone_click`.
 - `add_payment_info` awaits an actual payment selection in checkout.
 
