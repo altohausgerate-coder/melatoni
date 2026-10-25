@@ -1,5 +1,5 @@
 (() => {
-  const allowedEvents = new Set(['page_view','view_item_list','select_item','view_item','add_to_cart','remove_from_cart','view_cart','begin_checkout','add_shipping_info','add_payment_info','purchase','search','sign_up','login','generate_lead','contact_form_submit','whatsapp_click','telegram_click','phone_click']);
+  const allowedEvents = new Set(['page_view','view_item_list','select_item','view_item','add_to_cart','add_to_wishlist','remove_from_cart','view_cart','begin_checkout','add_shipping_info','add_payment_info','purchase','view_promotion','select_promotion','search','sign_up','login','generate_lead','contact_form_submit','whatsapp_click','telegram_click','phone_click']);
   window.dataLayer = window.dataLayer || [];
   window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
   const denied = { ad_storage:'denied', analytics_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', functionality_storage:'denied', personalization_storage:'denied', security_storage:'granted' };
@@ -80,6 +80,10 @@
     if(add){const id=add.dataset.add||add.dataset.addToBag||idFromPage();const item=itemData(id);if(item)ecommerce('add_to_cart',{currency:'AZN',value:item.price*item.quantity,items:[item]});}
     const remove=target.closest('[data-remove],[data-cart-remove]');
     if(remove){const itemId=remove.dataset.remove||remove.dataset.cartRemove||remove.dataset.id;const item=itemData(itemId);if(item)ecommerce('remove_from_cart',{currency:'AZN',value:item.price,items:[item]});}
+    const favorite=target.closest('[data-save],[data-favorite]');
+    if(favorite&&favorite.getAttribute('aria-pressed')!=='true'&&!favorite.classList.contains('saved')){const itemId=favorite.dataset.save||favorite.dataset.favorite;const item=itemData(itemId);if(item)ecommerce('add_to_wishlist',{currency:'AZN',value:item.price,items:[item]});}
+    const promotion=target.closest('.campaign-cta');
+    if(promotion){const slide=promotion.closest('[data-campaign-slide]');const slides=[...document.querySelectorAll('[data-campaign-slide]')];const position=Math.max(0,slides.indexOf(slide));ecommerce('select_promotion',{promotion_id:`home_campaign_${position+1}`,promotion_name:slide?.querySelector('[data-campaign="title"]')?.textContent?.replace(/\s+/g,' ').trim()||`Home campaign ${position+1}`,creative_slot:`hero_${position+1}`});}
     const productLink=target.closest('a[href*="product.html?id="]');
     if(productLink){const itemId=new URL(productLink.href,location.href).searchParams.get('id');const item=itemData(itemId);if(item){const source=productLink.closest('#popularGrid')?'popular_products':productLink.closest('.collection-products')?'home_collection':productLink.closest('#productGrid')?'catalog':'product_link';ecommerce('select_item',{item_list_id:source,item_list_name:source,items:[item]});}}
   });
@@ -88,6 +92,13 @@
     const source=String(event.detail?.source||'product_list').slice(0,100);
     ecommerce('view_item_list',{item_list_id:source,item_list_name:source,items:[item]});
   });
+  const seenPromotions=new Set();
+  const recordActivePromotion=()=>{
+    const slide=document.querySelector('[data-campaign-slide].is-active,[data-campaign-slide][aria-hidden="false"]');if(!slide||!window.MelatoniConsent?.has('analytics'))return;
+    const slides=[...document.querySelectorAll('[data-campaign-slide]')],position=Math.max(0,slides.indexOf(slide)),id=`home_campaign_${position+1}`;if(seenPromotions.has(id))return;seenPromotions.add(id);
+    ecommerce('view_promotion',{promotion_id:id,promotion_name:slide.querySelector('[data-campaign="title"]')?.textContent?.replace(/\s+/g,' ').trim()||`Home campaign ${position+1}`,creative_slot:`hero_${position+1}`});
+  };
+  const campaignRoot=document.querySelector('.campaign-slides');if(campaignRoot){recordActivePromotion();new MutationObserver(recordActivePromotion).observe(campaignRoot,{subtree:true,attributes:true,attributeFilter:['class','aria-hidden']});window.addEventListener('melatoni:consent-change',recordActivePromotion);}
   let searchTimer;
   document.querySelectorAll('input[type="search"],#searchInput,[name="search"]').forEach(input=>input.addEventListener('input',()=>{
     clearTimeout(searchTimer); searchTimer=setTimeout(()=>ecommerce('search',{search_term:'site_search'}),900);
