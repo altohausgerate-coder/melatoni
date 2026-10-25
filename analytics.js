@@ -15,10 +15,18 @@
   function loadContainer() {
     if (loaded || !/^GTM-[A-Z0-9]+$/.test(window.MELATONI_GTM_ID || '')) return;
     loaded = true;
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(window.MELATONI_GTM_ID)}`;
-    document.head.append(script);
+    const managerScript = document.createElement('script');
+    managerScript.async = true;
+    managerScript.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(window.MELATONI_GTM_ID)}`;
+    document.head.appendChild(managerScript);
+    if (/^G-[A-Z0-9]+$/.test(window.MELATONI_GA4_ID || '')) {
+      const analyticsScript = document.createElement('script');
+      analyticsScript.async = true;
+      analyticsScript.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(window.MELATONI_GA4_ID)}`;
+      document.head.appendChild(analyticsScript);
+      window.gtag('js',new Date());
+      window.gtag('config',window.MELATONI_GA4_ID,{send_page_view:false});
+    }
   }
   const allowed = () => Boolean(window.MelatoniConsent?.has('analytics') || window.MelatoniConsent?.has('marketing'));
   function applyConsent() {
