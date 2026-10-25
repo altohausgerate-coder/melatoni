@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.customer-assistant]
 verify_jwt = false
+
+[functions.merchant-feed]
+verify_jwt = false
