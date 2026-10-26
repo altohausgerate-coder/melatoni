@@ -68,10 +68,16 @@
   const idFromPage=()=>new URL(location.href).searchParams.get('id');
   const cart=()=>{try{return JSON.parse(window.MelatoniStorage?.get('melatoni-cart')||'[]')}catch{return[]}};
   const cartItems=()=>cart().map(line=>itemData(line.id,Number(line.qty)||1)).filter(Boolean);
-  const page=location.pathname.split('/').pop()||'index.html';
-  if(page==='product.html'){
+  const page=location.pathname.split('/').filter(Boolean).pop()||'index.html';
+  if(/^product(?:\.html)?$/i.test(page)){
     const item=itemData(idFromPage()); if(item)ecommerce('view_item',{currency:'AZN',value:item.price,items:[item]});
   }
+  document.addEventListener('melatoni:authorized-cart-intent',event=>{
+    const intent=event.detail;
+    if(intent?.type!=='add')return;
+    const item=itemData(intent.id);
+    if(item)ecommerce('add_to_cart',{currency:'AZN',value:item.price*item.quantity,items:[item]});
+  });
   document.addEventListener('click',event=>{
     const target=event.target.closest('a,button'); if(!target)return;
     const href=target.getAttribute('href')||'';
