@@ -13,6 +13,55 @@
     }
     return sessionId;
   };
+  let visitorId = storage?.get('melatoni-visitor-id', '') || '';
+  if (!visitorId) {
+    try { visitorId = crypto.randomUUID(); } catch { visitorId = `visitor-${Date.now()}-${Math.random().toString(36).slice(2)}`; }
+    storage?.set('melatoni-visitor-id', visitorId);
+  }
+  let activeSeconds = Number(storage?.get('melatoni-active-seconds', '0', 'session')) || 0;
+  let presenceTimer = null;
+  const deviceType = () => {
+    const ua = navigator.userAgent || '';
+    if (/iPad|Tablet|Android(?!.*Mobile)/i.test(ua)) return 'tablet';
+    if (/iPhone|iPod|Android.*Mobile|Mobile/i.test(ua) || matchMedia('(max-width: 700px)').matches) return 'phone';
+    return 'desktop';
+  };
+  const currentProduct = () => {
+    const productId = new URLSearchParams(location.search).get('id');
+    const product = (window.MELATONI_PRODUCTS || []).find(item => item.id === productId);
+    const productName = typeof product?.name === 'object' ? product.name.az || product.name.en || product.name.ru : product?.name;
+    return { productId, productName: productName || '' };
+  };
+  const referrerHost = () => {
+    try { const url = new URL(document.referrer); return url.host === location.host ? 'melatoni.com' : url.host; }
+    catch { return ''; }
+  };
+  const updatePresence = () => {
+    if (!analyticsAllowed || document.visibilityState === 'hidden') return;
+    const { productId, productName } = currentProduct();
+    client.rpc('track_visitor_presence', {
+      p_session_id: String(getSessionId()).slice(0,100),
+      p_visitor_id: String(visitorId).slice(0,100),
+      p_current_page: `${location.pathname}${location.search}`.slice(0,500),
+      p_page_title: document.title.slice(0,180),
+      p_product_id: productId,
+      p_product_name: productName,
+      p_device_type: deviceType(),
+      p_referrer_host: referrerHost(),
+      p_active_seconds: Math.min(86400,Math.max(0,Math.round(activeSeconds)))
+    }).then(() => {}).catch(() => {});
+  };
+  const startPresence = () => {
+    if (!analyticsAllowed || presenceTimer) return;
+    updatePresence();
+    presenceTimer = setInterval(() => {
+      if (document.visibilityState !== 'hidden') {
+        activeSeconds += 15;
+        storage?.set('melatoni-active-seconds', String(activeSeconds), 'session');
+        updatePresence();
+      }
+    },15000);
+  };
   const log = (eventName, productId = null, metadata = {}) => {
     if (!analyticsAllowed) return;
     const clean = Object.fromEntries(Object.entries(metadata).filter(([key, value]) => /^(category|source)$/.test(key) && typeof value === 'string').map(([key, value]) => [key, value.slice(0, 120)]));
@@ -29,8 +78,10 @@
     if (!analyticsAllowed) {
       sessionId = '';
       storage?.remove('melatoni-analytics-session');
+      if (presenceTimer) clearInterval(presenceTimer);
+      presenceTimer = null;
     }
-    if (analyticsAllowed) window.requestAnimationFrame(() => scanVisibleProducts());
+    if (analyticsAllowed) window.requestAnimationFrame(() => { scanVisibleProducts(); startPresence(); });
   });
   let recommendationUserId = null;
   let recommendationConsent = false;
@@ -52,6 +103,9 @@
     else pendingInteractions.length = 0;
   }).catch(() => { recommendationUserId = ''; pendingInteractions.length = 0; });
   log('page_view');
+  startPresence();
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { updatePresence(); startPresence(); } });
+  window.addEventListener('pagehide', updatePresence);
   const id = new URLSearchParams(location.search).get('id');
   if (id) { log('product_view', id); if (!seenViews.has(id)) { seenViews.add(id); trackCustomerInteraction(id,'view'); } }
   const categoriesForSearch = query => {

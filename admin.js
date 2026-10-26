@@ -13,6 +13,11 @@
   const orderPushButton = document.querySelector('#enableOrderPush');
   const orderPushStatus = document.querySelector('#orderPushStatus');
   const orderRefreshButton = document.querySelector('#refreshOrders');
+  const visitorList = document.querySelector('#adminVisitorList');
+  const visitorRefreshButton = document.querySelector('#refreshVisitors');
+  let visitorRows = [];
+  let visitorFilter = 'active';
+  let visitorRefreshTimer = null;
   let orderPushUserId = null;
   const escape = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[char]);
   const say = (message, error = false) => { if (!status) return; status.textContent = message; status.classList.toggle('is-error', error); };
@@ -92,6 +97,7 @@
     if (location.hash !== `#${name}`) history.replaceState(null, '', `#${name}`);
     button.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     if (name === 'orders') { loadOrders(); refreshOrderPushState(); }
+    if (name === 'visitors') loadVisitors();
     if (name === 'analytics') loadAnalytics();
     if (name === 'support') loadSupportTickets();
     if (name === 'alerts') loadProductAlerts();
@@ -135,7 +141,11 @@
       logout.hidden = false;
       say('Admin panelinə xoş gəlmisiniz.');
       await loadProducts();
-      await Promise.all([loadOrders(), loadAnalytics(), loadSupportTickets(), loadProductAlerts()]);
+      await Promise.all([loadOrders(), loadAnalytics(), loadSupportTickets(), loadProductAlerts(), loadVisitors()]);
+      if (visitorRefreshTimer) clearInterval(visitorRefreshTimer);
+      visitorRefreshTimer = setInterval(() => {
+        if (!document.querySelector('[data-admin-panel="visitors"]')?.hidden && document.visibilityState === 'visible') loadVisitors(false);
+      },15000);
       subscribeOrders();
       const requestedTab = location.hash.slice(1);
       if (requestedTab && document.querySelector(`[data-admin-tab="${CSS.escape(requestedTab)}"]`)) activateAdminTab(requestedTab);
@@ -298,6 +308,53 @@
       `<div class="admin-report-columns"><section><h3>${at('topViewed')}</h3><ol>${topList([...views.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section><section><h3>${at('topSold')}</h3><ol>${topList([...sold.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section><section><h3>${at('salesDynamics')}</h3><div class="admin-sales-chart">${chart}</div></section><section><h3>${at('topAdded')}</h3><ol>${topList([...adds.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section><section><h3>${at('topRemoved')}</h3><ol>${topList([...removed.entries()].sort((a,b)=>b[1]-a[1]))}</ol></section></div>`;
   }
 
+  const formatDuration = seconds => {
+    const value=Math.max(0,Number(seconds)||0);
+    if(value<60)return `${Math.max(1,Math.round(value))} san`;
+    if(value<3600)return `${Math.round(value/60)} dəq`;
+    return `${Math.floor(value/3600)} saat ${Math.round((value%3600)/60)} dəq`;
+  };
+  const pageLabel = row => {
+    if(row.product_name)return row.product_name;
+    const product=products.find(item=>item.id===row.product_id);
+    const productName=languageValue(product?.name,adminLang())||languageValue(product?.name,'az');
+    if(productName)return productName;
+    const path=String(row.current_page||'/').split('?')[0].replace(/\.html$/,'');
+    const labels={'/':'Ana səhifə','/index':'Ana səhifə','/products':'Məhsullar','/product':'Məhsul detalı','/about':'Haqqımızda','/contact':'Əlaqə','/account':'Müştəri paneli','/reset-password':'Şifrə yeniləmə'};
+    return labels[path]||row.page_title||path||'Ana səhifə';
+  };
+  const sourceLabel = source => {
+    if(!source||source==='melatoni.com')return source==='melatoni.com'?'Sayt daxilindən':'Birbaşa giriş';
+    try{return new URL(source).hostname.replace(/^www\./,'')||source}catch{return String(source).replace(/^www\./,'').slice(0,80)}
+  };
+  const deviceLabel = type => ({phone:'Telefon',tablet:'Planşet',desktop:'Kompüter',unknown:'Məlum deyil'})[type]||'Məlum deyil';
+  const filteredVisitors = () => {
+    const now=Date.now(),today=new Date();today.setHours(0,0,0,0);
+    return visitorRows.filter(row=>{const last=new Date(row.last_seen_at).getTime();if(visitorFilter==='active')return last>=now-120000;if(visitorFilter==='30m')return last>=now-1800000;if(visitorFilter==='today')return last>=today.getTime();return true});
+  };
+  function renderVisitors(){
+    if(!visitorList)return;
+    const now=Date.now(),rows=filteredVisitors();
+    visitorList.innerHTML=rows.length?rows.map(row=>{
+      const last=new Date(row.last_seen_at),live=last.getTime()>=now-120000;
+      const shortId=String(row.visitor_id||row.session_id||'').replace(/-/g,'').slice(-6).toUpperCase();
+      const page=pageLabel(row),path=String(row.current_page||'/');
+      return `<article class="admin-visitor-row ${live?'is-live':''}"><div class="visitor-identity"><span class="visitor-status"><i></i><strong>${live?'Saytdadır':'Ziyarətçi'}</strong></span><small>#${escape(shortId||'—')} ${row.user_id?'· hesabla daxil olub':''}</small></div><div class="visitor-location"><strong>${escape(page)}</strong><small title="${escape(path)}">${escape(path)}</small></div><div class="visitor-detail"><b>${escape(deviceLabel(row.device_type))}</b><small>${escape(sourceLabel(row.referrer_host))}</small></div><div class="visitor-detail"><b>${escape(formatDuration(row.active_seconds))}</b><small>${live?'indi aktiv':escape(last.toLocaleString('az-AZ'))}</small></div></article>`;
+    }).join(''):'<p class="admin-empty">Bu vaxt aralığında qeydə alınmış ziyarətçi yoxdur.</p>';
+  }
+  async function loadVisitors(showLoading=true){
+    if(!visitorList||!client)return;
+    if(showLoading&&!visitorRows.length)visitorList.innerHTML='<p class="admin-empty">Ziyarətçilər yüklənir…</p>';
+    const {data,error}=await client.rpc('get_visitor_dashboard');
+    if(error){visitorList.innerHTML='<p class="admin-empty is-error">Ziyarətçi paneli yüklənmədi. Yeni baza yenilənməsini yoxlayın.</p>';return false}
+    visitorRows=Array.isArray(data?.sessions)?data.sessions:[];
+    const values={visitorActiveNow:data?.active_now||0,visitorLast30:data?.last_30_minutes||0,visitorToday:data?.today||0,visitorAllTime:data?.all_time||0};
+    Object.entries(values).forEach(([id,count])=>{const node=document.querySelector(`#${id}`);if(node)node.textContent=new Intl.NumberFormat('az-AZ').format(Number(count)||0)});
+    const badge=document.querySelector('#liveVisitorCount');if(badge){badge.textContent=String(data?.active_now||0);badge.hidden=!(Number(data?.active_now)>0)}
+    const updated=document.querySelector('#visitorUpdatedAt');if(updated)updated.textContent=`Son yenilənmə: ${new Date().toLocaleTimeString('az-AZ',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+    renderVisitors();return true;
+  }
+
   async function loadSupportTickets() {
     if (!supportList) return;
     const {data,error}=await client.from('support_tickets').select('id,user_id,order_id,subject,message,status,admin_reply,created_at').order('created_at',{ascending:false}).limit(200);
@@ -333,6 +390,8 @@
   orderList?.addEventListener('click',async event=>{const button=event.target.closest('[data-save-order]');if(!button)return;const select=orderList.querySelector(`[data-order-status="${CSS.escape(button.dataset.saveOrder)}"]`);button.disabled=true;try{const {error}=await client.from('orders').update({status:select.value}).eq('id',button.dataset.saveOrder);say(error?'Sifariş statusu dəyişmədi.':'Sifariş statusu yadda saxlandı.',!!error);if(!error)await loadOrders()}catch{say('Sifariş statusu dəyişmədi.',true)}finally{button.disabled=false}});
   orderRefreshButton?.addEventListener('click',async()=>{if(orderRefreshButton.disabled)return;const label=orderRefreshButton.textContent;orderRefreshButton.disabled=true;orderRefreshButton.textContent='Yenilənir…';const loaded=await loadOrders();orderRefreshButton.disabled=false;orderRefreshButton.textContent=label;say(loaded?'Sifarişlər yeniləndi.':'Sifarişlər yenilənmədi.',!loaded)});
   document.querySelector('#refreshAnalytics')?.addEventListener('click',loadAnalytics);
+  visitorRefreshButton?.addEventListener('click',async()=>{visitorRefreshButton.disabled=true;await loadVisitors(false);visitorRefreshButton.disabled=false});
+  document.querySelector('.visitor-segments')?.addEventListener('click',event=>{const button=event.target.closest('[data-visitor-filter]');if(!button)return;visitorFilter=button.dataset.visitorFilter;document.querySelectorAll('[data-visitor-filter]').forEach(item=>item.classList.toggle('is-active',item===button));renderVisitors()});
   document.querySelector('#refreshSupport')?.addEventListener('click',loadSupportTickets);
   document.querySelector('#refreshAlerts')?.addEventListener('click',loadProductAlerts);
   document.querySelector('#campaignPushForm')?.addEventListener('submit',async event=>{event.preventDefault();const button=event.currentTarget.querySelector('button[type="submit"]');button.disabled=true;try{const data=new FormData(event.currentTarget);const result=await client.functions.invoke('send-campaign-push',{body:{title:String(data.get('title')||'').trim(),body:String(data.get('body')||'').trim(),url:String(data.get('url')||'products.html').trim()}});if(result.error||result.data?.error)say(at('campaignFailed'),true);else say(`${at('campaignSent')} (${result.data?.sent||0})`)}catch{say(at('campaignFailed'),true)}finally{button.disabled=false}});
